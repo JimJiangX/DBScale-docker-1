@@ -1,0 +1,17 @@
+{
+  "protocol": 3,
+  "bootstrap_expect": 3,
+  "server": true,
+  "datacenter": "{{getv "/consul/datacenter"}}",
+  "ui_dir": "/CONSUL/ui",
+  "data_dir": "/CONSUL/data",
+  "node_name": "{{getv "/consul/name"}}",
+  "disable_update_check": true,
+  "log_level": "INFO",
+  "addresses": {
+    "http": "{{getv "/consul/serverlocal"}}"
+  },
+  "start_join": [
+    "{{getv "/consul/server1"}}", "{{getv "/consul/server2"}}", "{{getv "/consul/server3"}}"
+ ]
+}

@@ -1,0 +1,13 @@
+[template]
+src = "consul.toml"
+dest = "/CONSUL/conf/consul.json"
+owner = "root"
+mode = "0644"
+keys = [
+   "/consul/datacenter",
+   "/consul/serverlocal",
+   "/consul/server1",
+   "/consul/server2",
+   "/consul/server3",
+   "/consul/name",
+]

@@ -1,0 +1,14 @@
+{
+  "server": false,
+  "datacenter": "{{getv "/consul/datacenter"}}",
+  "data_dir": "/CONSUL-AGENT/data",
+  "node_name": "{{getv "/consul/name"}}",
+  "disable_update_check": true,
+  "log_level": "INFO",
+  "addresses": {
+    "http": "{{getv "/consul/serverlocal"}}"
+  },
+  "start_join": [
+    "{{getv "/consul/server1"}}", "{{getv "/consul/server2"}}", "{{getv "/consul/server3"}}"
+ ]
+}
