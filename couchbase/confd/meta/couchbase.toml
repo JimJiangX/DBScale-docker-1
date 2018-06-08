@@ -1,0 +1,11 @@
+[metaObject]
+tmpl = "exmple.tmpl"
+dest = ""
+keys = [
+       "CB_USER"
+       "CB_PASSWORD"
+       "CB_RAM_PER_NODE"
+       "CB_SERVER1"
+       "CB_SERVER2"
+       "CB_SERVER3"
+]

@@ -1,0 +1,6 @@
+Store = "file"
+ConnectAddr = "/confd/data/filestore.toml"
+ConfDir = "/confd"
+Interval = 600
+Debug = true
+

@@ -1,0 +1,7 @@
+version: 0.1
+loglevel: info
+storage: 
+    filesystem:
+        rootdirectory: {{getv "/data/dir"}}
+http:
+    addr: {{getv "/ip/addr"}}:{{getv "/port"}}
