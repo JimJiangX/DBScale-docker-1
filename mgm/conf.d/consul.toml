@@ -1,0 +1,20 @@
+[template]
+src = "consul.toml"
+dest = "/MGM/script/insert.sql"
+owner = "root"
+mode = "0644"
+keys = [
+   "/mgm/db/name",
+   "/consul/server1",
+   "/consul/server2",
+   "/consul/server3",
+   "/consul/port",
+   "/consul/datacenter",
+   "/docker/reg/domain",
+   "/docker/reg/ip",
+   "/reg/port",
+   "/reg/ssh/port",
+   "/docker/reg/user",
+   "/docker/reg/password",
+   "/ca/crt",
+]
