@@ -1,0 +1,166 @@
+<section id="widget-grid" class="">
+			<div class="row">
+		    	<div id="list-alert">
+		        </div>
+	    	</div>
+			<div class="modal fade" id="sEventModal" tabindex="-1"
+				role="dialog" aria-labelledby="sEventModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<a href="javascript:void(0);" class="btn btn-info"
+				onclick="eventClick('update')" id="eventUpdate">编辑</a>
+			<a href="javascript:void(0);" class="btn btn-success"
+				onclick="eventClick('start')" id="eventEnable">启用</a>
+			<a href="javascript:void(0);" class="btn btn-danger"
+				onclick="eventClick('stop')" id="eventDisable">停用</a>
+			<a href="javascript:void(0);" class="btn btn-success"
+				onclick="eventClick('alarmStart')" id="eventAlarmEnable">告警启用</a>
+			<a href="javascript:void(0);" class="btn btn-danger"
+				onclick="eventClick('alarmStop')" id="eventAlarmDisable">告警停用</a>
+			<a href="javascript:void(0);" class="btn btn btn-primary" style="float: right;"
+				onclick="backClick()" id="eventBack">返回</a>
+			<p style="height: 0px;">&nbsp;</p>
+			<table id="jqgridEvent"></table>
+			<div id="pjqgridEvent"></div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    	    	sendGet("/" + getProjectName() + "/v1.0/monitor/hosts/config/"+getSession("eventHostId")+"/event-infos",eventInfosGrid,ListAlert,null);
+    		});
+    	});
+    });
+    
+    function backClick(){
+    	window.location.href = "index.html#views/monitor/host/resource.html";
+    }
+    
+    function eventClick(type){
+    	ListAlertClear();
+    	var s = $("#jqgridEvent").jqGrid('getGridParam', 'selarrrow');
+    	var metric = $("#jqgridEvent").jqGrid('getRowData',s).metric;
+    	var level = $("#jqgridEvent").jqGrid('getRowData',s).event_level;
+    	var jsonData = {};
+    	if(s.length == 1){
+    		switch(type){
+   		 	case "update":
+   		 		var id = $("#eventUpdate");
+	   		 	id.attr("data-toggle","modal");
+	            id.attr("data-target","#sEventModal");
+	            id.attr("href","views/monitor/host/eventUpdate.html");
+   		 		break;
+   		 	case "alarmStart":
+   		 		jsonData = {
+   		 		    metric:metric,
+   		 			hosts:[getSession("eventHostId")],
+   		 	    	level:level
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/alarm/enable",showReturn,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+   		 		break;
+   		 	case "alarmStop":
+   		 		jsonData = {
+   		 		    metric:metric,
+   		 			hosts:[getSession("eventHostId")],
+   		 	    	level:level
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/alarm/disable",showReturn,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+   		 		break;
+   		 	case "start":
+   		 		jsonData = {
+   		 		    metric:metric,
+   		 			hosts:[getSession("eventHostId")],
+   		 	    	level:level
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/event/level/enable",showReturn,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+		 		break;
+   		 	case "stop":
+   		 		jsonData = {
+   		 		    metric:metric,
+   		 			hosts:[getSession("eventHostId")],
+   		 	    	level:level
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/event/level/disable",showReturn,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+	 			break;
+   		 	default:
+    		}
+    	}else{
+	   		 ListAlert("请勾选一行数据");
+	 	}
+    }
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/hosts/config/"+getSession("eventHostId")+"/event-infos",reloadGrid,ListAlert,null);
+	}
+    
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];  	
+    	$("#jqgridEvent").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

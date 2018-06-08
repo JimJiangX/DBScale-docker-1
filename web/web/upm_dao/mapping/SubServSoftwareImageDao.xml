@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.SubServSoftwareImageDao">
+	<resultMap id="subServSoftwareImageResultMap"
+		type="com.bsg.upm.entity.SubServSoftwareImageEntity">
+		<id property="id" column="subserv_software_image_id" />
+		<result property="patchVersion" column="subserv_software_image_patch_version" />
+		<result property="buildVersion" column="subserv_software_image_build_version" />
+		<result property="enabled" column="subserv_software_image_enabled" />
+		<result property="relateId" column="subserv_software_image_relate_id" />
+		<result property="createDateTime" column="subserv_software_image_create_datetime" />
+		<result property="createUserLoginName" column="subserv_software_image_create_user_login_name" />
+		<association property="definitionSubServSoftware"
+			resultMap="com.bsg.upm.dao.DefinitionSubServSoftwareDao.dfSubServSoftwareResultMap" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+		<collection property="tasks"
+            resultMap="com.bsg.upm.dao.TaskDao.taskResultMap" columnPrefix="task_">
+        </collection>
+	</resultMap>
+
+	<select id="list" parameterType="java.util.Map" resultMap="subServSoftwareImageResultMap" flushCache="true">
+		SELECT sssi.id AS subserv_software_image_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.enabled AS subserv_software_image_enabled, 
+			sssi.create_datetime AS subserv_software_image_create_datetime, 
+			sssi.create_user_login_name AS subserv_software_image_create_user_login_name, 
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version,
+			site.id AS site_id,
+			site.name AS site_name,
+			task.id AS task_id, 
+            task.obj_type AS task_obj_type, 
+            task.obj_id AS task_obj_id, 
+            task.obj_name AS task_obj_name, 
+            task.action_type AS task_action_type, 
+            task.start_datetime AS task_start_datetime, 
+            task.end_datetime AS task_end_datetime, 
+            task.status AS task_status, 
+            task.msg AS task_msg, 
+            task.owner AS task_owner, 
+            task.create_user_login_name AS task_create_user_login_name
+		FROM tbl_subserv_software_image sssi LEFT JOIN tbl_task task ON task.obj_id = sssi.id, 
+			 tbl_definition_subserv_software dfsss,
+			 tbl_site site
+		WHERE sssi.definition_subserv_software_id = dfsss.id
+			AND sssi.site_id = site.id
+		<if test="siteId!=null">
+		 	AND sssi.site_id = #{siteId}
+		</if>
+		ORDER BY dfsss.definition_subserv_name, 
+			dfsss.major_version DESC, 
+			dfsss.minor_version DESC, 
+			sssi.patch_version DESC,
+			sssi.build_version DESC,
+			task.start_datetime DESC
+	</select>
+	
+	<select id="listSubServSoftwareImageVersion" parameterType="java.util.Map" resultMap="subServSoftwareImageResultMap" flushCache="true">
+		SELECT image.id AS subserv_software_image_id, 
+			image.patch_version AS subserv_software_image_patch_version,
+			image.build_version AS subserv_software_image_build_version,
+			image.enabled AS subserv_software_image_enabled,
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version
+		FROM tbl_subserv_software_image image, 
+			tbl_definition_subserv_software dfsss
+		WHERE image.definition_subserv_software_id = dfsss.id 
+			AND image.site_id = #{siteId} 
+			AND dfsss.definition_subserv_name = #{definitionSubServName}
+		<if test="enabled!=null">
+		 	AND image.enabled = #{enabled}
+		</if>
+		ORDER BY dfsss.major_version DESC, 
+			dfsss.minor_version DESC, 
+			image.patch_version DESC,
+			image.build_version DESC
+	</select>
+	
+	<select id="get" resultMap="subServSoftwareImageResultMap" flushCache="true">
+		SELECT sssi.id AS subserv_software_image_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.enabled AS subserv_software_image_enabled, 
+			sssi.create_datetime AS subserv_software_image_create_datetime, 
+			sssi.create_user_login_name AS subserv_software_image_create_user_login_name, 
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version,
+			site.id AS site_id,
+			site.name AS site_name,
+			task.id AS task_id, 
+            task.obj_type AS task_obj_type, 
+            task.obj_id AS task_obj_id, 
+            task.obj_name AS task_obj_name, 
+            task.action_type AS task_action_type, 
+            task.start_datetime AS task_start_datetime, 
+            task.end_datetime AS task_end_datetime, 
+            task.status AS task_status, 
+            task.msg AS task_msg, 
+            task.owner AS task_owner, 
+            task.create_user_login_name AS task_create_user_login_name
+		FROM tbl_subserv_software_image sssi LEFT JOIN tbl_task task ON task.obj_id = sssi.id,  
+			 tbl_definition_subserv_software dfsss,
+			 tbl_site site
+		WHERE sssi.definition_subserv_software_id = dfsss.id
+			AND sssi.site_id = site.id
+		  	AND sssi.id = #{id}
+	  	ORDER BY task.start_datetime DESC
+	</select>
+	
+	<select id="getByRelateId" resultMap="subServSoftwareImageResultMap" flushCache="true">
+		SELECT sssi.id AS subserv_software_image_id, 
+            sssi.patch_version AS subserv_software_image_patch_version, 
+            sssi.build_version AS subserv_software_image_build_version, 
+            sssi.relate_id AS subserv_software_image_relate_id, 
+            sssi.enabled AS subserv_software_image_enabled, 
+            sssi.create_datetime AS subserv_software_image_create_datetime, 
+            sssi.create_user_login_name AS subserv_software_image_create_user_login_name, 
+            dfsss.id AS df_subserv_software_id, 
+            dfsss.definition_subserv_name,
+            dfsss.major_version AS df_subserv_software_major_version, 
+            dfsss.minor_version AS df_subserv_software_minor_version,
+            site.id AS site_id,
+            site.name AS site_name
+        FROM tbl_subserv_software_image sssi, 
+             tbl_definition_subserv_software dfsss,
+             tbl_site site
+        WHERE sssi.definition_subserv_software_id = dfsss.id
+            AND sssi.site_id = site.id
+            AND sssi.relate_id = #{relateId}
+	</select>
+	
+	<select id="countImage" resultType="int" flushCache="true">
+		SELECT COUNT(id)
+		FROM tbl_subserv_software_image
+		WHERE site_id = #{siteId} 
+			AND definition_subserv_software_id = #{definitionSubServSoftwareId}
+			AND patch_version = #{patchVersion} 
+			AND build_version = #{buildVersion}
+	</select>
+
+	<insert id="save" parameterType="com.bsg.upm.entity.SubServSoftwareImageEntity">
+		INSERT INTO tbl_subserv_software_image 
+		(
+			id,
+			definition_subserv_software_id, 
+			patch_version,
+			build_version, 
+			site_id,
+			relate_id,
+			enabled,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUES 
+		(
+			#{id},
+			#{definitionSubServSoftware.id},
+			#{patchVersion},
+			#{buildVersion},
+			#{site.id},
+			#{relateId},
+			#{enabled},
+			#{createDateTime},
+			#{createUserLoginName}
+		)							
+	</insert>
+	
+	<update id="updateRelateId" parameterType="com.bsg.upm.entity.SubServSoftwareImageEntity">
+		UPDATE tbl_subserv_software_image
+		<set>
+			relate_id = #{relateId}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateEnabled" parameterType="com.bsg.upm.entity.SubServSoftwareImageEntity">
+		UPDATE tbl_subserv_software_image
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_subserv_software_image
+		WHERE id = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,391 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					主机详情
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>主机ID</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="id" name="id"
+							disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>主机名称</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="name" name="name" disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>IP地址</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="sshIp"
+							name="sshIp" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>所在站点</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="siteName" name="siteName" disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>所属区域</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="areaName"
+							name="areaName" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>所属集群</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="clusterName" name="clusterName"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>库房</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="room"
+							name="room" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>机架</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="name02" name="name02" disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>运行状态</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="statusText"
+							name="statusText" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>所连存储</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text"
+							id="sanName" name="sanName" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>入库时间</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text"
+							id="createDateTime" name="createDateTime" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<!-- <div class="row">
+					<label class="label col col-2"><label style="color: red"></label>实例上限</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="maxContainer" name="maxContainer"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>实例已分配</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="usedContainer"
+							name="usedContainer" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>CPU总数</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="cpuCnt"
+							name="cpuCnt" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>CPU已分配</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="usedCpuCnt" name="usedCpuCnt"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>内存容量</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="memCnt"
+							name="memCnt" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>内存已分配</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="usedMemCnt" name="usedMemCnt"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>HDD总量</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="hddCnt"
+							name="hddCnt" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>HDD已分配</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="usedHddCnt" name="usedHddCnt"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>SSD总量</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="ssdCnt"
+							name="ssdCnt" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>SSD已分配</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="usedSsdCnt" name="usedSsdCnt"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>带宽总量</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="bandwidth"
+							name="bandwidth" disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red"></label>带宽已分配</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="usedBandwidth" name="usedBandwidth"
+								disabled="disabled">
+						</label>
+						</label>
+					</section>
+				</div> -->
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>备注</label>
+					<section class="col col-10">
+						<label class="input"> <input type="text" id="description"
+							name="description" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				
+							<div class="row show-stats" style="padding: 0 5%;">
+								<div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+									<div style="height: 20px;">
+										<span class="text"><span id="container" class="pull-left"></span><span id="containerText" class="pull-right"></span>
+										</span>
+									</div>
+									<div class="progress">
+										<div id="containerBar" class="progress-bar bg-color-greenLight"></div>
+									</div>
+								</div>
+								<div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+									<div style="height: 20px;">
+										<span class="text"><span id="cpu" class="pull-left"></span><span id="cpuText" class="pull-right"></span>
+										</span>
+									</div>
+									<div class="progress">
+										<div id="cpuBar" class="progress-bar bg-color-yellow"></div>
+									</div>
+								</div>
+								<div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+									<div style="height: 20px;">
+										<span class="text"><span id="mem" class="pull-left"></span> <span id="memText" class="pull-right"></span>
+										</span>
+									</div>
+									<div class="progress">
+										<div id="memBar" class="progress-bar bg-color-red"></div>
+									</div>
+								</div>
+								<div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+									<div style="height: 20px;">
+										<span class="text"><span id="hdd" class="pull-left"></span><span id="hddText" class="pull-right"></span>
+										</span>
+									</div>
+									<div class="progress">
+										<div id="hddBar" class="progress-bar bg-color-greyLight"></div>
+									</div>
+								</div>
+								<div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+									<div style="height: 20px;">
+										<span class="text"><span id="ssd" class="pull-left"></span><span id="ssdText" class="pull-right"></span>
+										</span>
+									</div>
+									<div class="progress">
+										<div id="ssdBar" class="progress-bar bg-color-greyLight"></div>
+									</div>
+								</div>
+								<div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+									<div style="height: 20px;">
+										<span class="text"><span id="bandwidth" class="pull-left"></span> <span id="bandwidthText" class="pull-right"></span>
+										</span>
+									</div>
+									<div class="progress">
+										<div id="bandwidthBar" class="progress-bar bg-color-greyLight"></div>
+									</div>
+								</div>
+							</div>
+						
+			</fieldset>
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">关闭</button>
+
+</div>
+<script>
+    pageSetUp();
+    var pagefunction = function() {
+    	$('#site').val(getSession("siteId"));
+        var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var hostid = $("#jqgrid").jqGrid('getRowData',s).id;
+        sendGet("/" + getProjectName() + "/v1.0/hosts/"+hostid,fillForm,DialogAlert,null); 
+    };
+    
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function fillForm(data){
+    	var hostsdata=data['data'];
+        $('#id').val(hostsdata.id);
+        $('#name').val(hostsdata.name);
+        $('#sshIp').val(hostsdata.sshIp);
+        $('#siteName').val(hostsdata.siteName);
+        $('#areaName').val(hostsdata.areaName);
+        var sanNameValue = hostsdata.sanName;
+        if(hostsdata.sanName == null || hostsdata.sanName == ""){
+        	sanNameValue = "无";
+        }
+        $('#sanName').val(sanNameValue);
+        $('#clusterName').val(hostsdata.clusterName);
+        $('#room').val(hostsdata.room);
+        $('#name02').val(hostsdata.name);
+        $('#statusText').val(hostsdata.statusText);
+        $('#createDateTime').val(hostsdata.createDateTime);
+        $('#description').val(hostsdata.description);
+        
+        /* $('#maxContainer').val(hostsdata.maxContainer);
+        $('#usedContainer').val(hostsdata.units.length); */
+        /* var cpuCntValue = hostsdata.cpuCnt;
+        if(hostsdata.cpuCnt == null || hostsdata.cpuCnt == ""){
+        	cpuCntValue = 0;
+        }
+        $('#cpuCnt').val(cpuCntValue);
+        var usedCpuCntValue = hostsdata.usedCpuCnt;
+        if(hostsdata.usedCpuCnt == null || hostsdata.usedCpuCnt == ""){
+        	usedCpuCntValue = 0;
+        } */
+        /* $('#usedCpuCnt').val(usedCpuCntValue);
+        $('#memCnt').val(((hostsdata.memCnt)/1024/1024/1024).toFixed(0)+"G");
+        $('#usedMemCnt').val(((hostsdata.usedMemCnt)/1024/1024/1024).toFixed(0)+"G");
+        $('#hddCnt').val(((hostsdata.hddCnt)/1024/1024/1024).toFixed(0)+"G");
+        $('#usedHddCnt').val(((hostsdata.usedHddCnt)/1024/1024/1024).toFixed(0)+"G");
+        $('#ssdCnt').val(((hostsdata.ssdCnt)/1024/1024/1024).toFixed(0)+"G");
+        $('#usedSsdCnt').val(((hostsdata.usedSsdCnt)/1024/1024/1024).toFixed(0)+"G");
+        
+        $('#bandwidth').val((hostsdata.bandwidth).toFixed(0)+"M");
+        $('#usedBandwidth').val((hostsdata.usedBandwidth).toFixed(0)+"M"); */
+        
+        
+        if(hostsdata.maxContainer == null || hostsdata.maxContainer == ""){
+			hostsdata.maxContainer = 0;
+        }
+        $("#container").text("实例 ("+hostsdata.units.length + '/' + hostsdata.maxContainer+")");
+        $("#containerText").text(Percent(hostsdata.units.length, hostsdata.maxContainer));
+		$("#containerBar").width(Percent(hostsdata.units.length, hostsdata.maxContainer));
+		
+		if(hostsdata.usedCpuCnt == null || hostsdata.usedCpuCnt == ""){
+			hostsdata.usedCpuCnt = 0;
+        }
+		if(hostsdata.cpuCnt == null || hostsdata.cpuCnt == ""){
+			hostsdata.cpuCnt = 0;
+        }
+		$("#cpu").text("CPU ("+hostsdata.usedCpuCnt + '/' + hostsdata.cpuCnt+")");
+		$("#cpuText").text(Percent(hostsdata.usedCpuCnt, hostsdata.cpuCnt));
+		$("#cpuBar").width(Percent(hostsdata.usedCpuCnt, hostsdata.cpuCnt));
+		
+		if(hostsdata.usedMemCnt == null || hostsdata.usedMemCnt == ""){
+			hostsdata.usedMemCnt = 0;
+        }
+		if(hostsdata.memCnt == null || hostsdata.memCnt == ""){
+			hostsdata.memCnt = 0;
+        }
+		$("#mem").text("内存 ("+((hostsdata.usedMemCnt)/1024/1024/1024).toFixed(0)+ '/' + ((hostsdata.memCnt)/1024/1024/1024).toFixed(0)+"G)");
+		$("#memText").text(Percent(hostsdata.usedMemCnt, hostsdata.memCnt));
+		$("#memBar").width(Percent(hostsdata.usedMemCnt, hostsdata.memCnt));
+		
+		if(hostsdata.usedHddCnt == null || hostsdata.usedHddCnt == ""){
+			hostsdata.usedHddCnt = 0;
+        }
+		if(hostsdata.hddCnt == null || hostsdata.hddCnt == ""){
+			hostsdata.hddCnt = 0;
+        }
+		$("#hdd").text("HDD ("+((hostsdata.usedHddCnt)/1024/1024/1024).toFixed(0) + '/' + ((hostsdata.hddCnt)/1024/1024/1024).toFixed(0)+"G)");
+		$("#hddText").text(Percent(hostsdata.usedHddCnt, hostsdata.hddCnt));
+		$("#hddBar").width(Percent(hostsdata.usedHddCnt, hostsdata.hddCnt));
+		
+		if(hostsdata.usedSsdCnt == null || hostsdata.usedSsdCnt == ""){
+			hostsdata.usedSsdCnt = 0;
+        }
+		if(hostsdata.ssdCnt == null || hostsdata.ssdCnt == ""){
+			hostsdata.ssdCnt = 0;
+        }
+		$("#ssd").text("SSD ("+((hostsdata.usedSsdCnt)/1024/1024/1024).toFixed(0) + '/' + ((hostsdata.ssdCnt)/1024/1024/1024).toFixed(0)+"G)");
+		$("#ssdText").text(Percent(hostsdata.usedSsdCnt, hostsdata.ssdCnt));
+		$("#ssdBar").width(Percent(hostsdata.usedSsdCnt, hostsdata.ssdCnt));
+		
+		if(hostsdata.usedBandwidth == null || hostsdata.usedBandwidth == ""){
+			hostsdata.usedBandwidth = 0;
+        }
+		if(hostsdata.bandwidth == null || hostsdata.bandwidth == ""){
+			hostsdata.bandwidth = 0;
+        }
+		$("#bandwidth").text("带宽 ("+(hostsdata.usedBandwidth).toFixed(0)+ '/' + (hostsdata.bandwidth).toFixed(0)+"M)");
+		$("#bandwidthText").text(Percent(hostsdata.usedBandwidth, hostsdata.bandwidth));
+		$("#bandwidthBar").width(Percent(hostsdata.usedBandwidth, hostsdata.bandwidth));
+    }
+    
+    function Percent(base, total){
+    	if(total == 0){
+    		return "0%";
+    	}
+		return Math.round(base / total * 100) + "%";
+	}
+</script>

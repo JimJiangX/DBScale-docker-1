@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.AreaDao">
+	<resultMap id="areaResultMap" type="com.bsg.upm.entity.AreaEntity">
+		<id property="id" column="area_id" />
+		<result property="name" column="area_name" />
+		<result property="description" column="area_description" />
+		<result property="enabled" column="area_enabled" />
+		<result property="createDateTime" column="area_create_datetime" />
+		<result property="createUserLoginName" column="area_create_user_login_name" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+	</resultMap>
+	
+	<resultMap id="areaDetailResultMap" extends="areaResultMap"
+		type="com.bsg.upm.entity.AreaEntity">
+		<association property="backupStorage"
+			resultMap="com.bsg.upm.dao.BackupStorageDao.backupStorageResultMap">
+		</association>
+	</resultMap>
+
+	<select id="list" parameterType="java.util.Map" resultMap="areaDetailResultMap" flushCache="true">
+		SELECT area.id AS area_id,
+			area.name AS area_name,
+			area.description AS area_description,
+			area.enabled AS area_enabled,
+			area.create_datetime AS area_create_datetime, 
+			area.create_user_login_name AS area_create_user_login_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			bs.id AS backup_storage_id,
+			bs.name AS backup_storage_name,
+			bs.ip AS backup_storage_ip,
+			bs.dir AS backup_storage_dir, 
+			bs.mount_dir AS backup_storage_mount_dir, 
+			bs.mount_opts AS backup_storage_mount_opts
+		FROM tbl_area area, tbl_site site, tbl_backup_storage bs 
+		WHERE area.site_id = site.id 
+			AND area.backup_storage_id = bs.id
+			AND area.site_id = #{siteId}
+		<if test="enabled!=null">
+			AND area.enabled = #{enabled}
+		</if>
+		ORDER BY site.create_datetime DESC, area.create_datetime DESC
+	</select>
+	
+	<select id="listName" resultMap="areaResultMap" flushCache="true">
+		SELECT area.id AS area_id,
+			area.name AS area_name
+		FROM tbl_area area 
+		WHERE area.site_id = #{siteId}
+		<if test="enabled!=null">
+			AND area.enabled = #{enabled}
+		</if>
+		ORDER BY area.name
+	</select>
+	
+	
+	<select id="listWithoutAssociation" resultMap="areaResultMap" flushCache="true">
+		SELECT area.id AS area_id,
+			area.name AS area_name
+		FROM tbl_area area 
+	</select>
+	
+	<select id="get" resultMap="areaDetailResultMap" flushCache="true">
+		SELECT area.id AS area_id,
+			area.name AS area_name,
+			area.description AS area_description,
+			area.enabled AS area_enabled,
+			area.create_datetime AS area_create_datetime, 
+			area.create_user_login_name AS area_create_user_login_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			bs.id AS backup_storage_id,
+			bs.name AS backup_storage_name,
+			bs.ip AS backup_storage_ip,
+			bs.dir AS backup_storage_dir, 
+			bs.mount_dir AS backup_storage_mount_dir, 
+			bs.mount_opts AS backup_storage_mount_opts
+		FROM tbl_area area, tbl_site site, tbl_backup_storage bs 
+		WHERE area.site_id = site.id 
+			AND area.backup_storage_id = bs.id
+			AND area.id = #{id}
+	</select>
+	
+	<select id="countByBackupStorageId" resultType="int" flushCache="true">
+		SELECT COUNT(area.id)
+		FROM tbl_area area
+		WHERE area.backup_storage_id = #{backupStorageId}
+	</select>
+	
+	<select id="countBySiteIdAndName" resultType="int" flushCache="true">
+		SELECT COUNT(area.id)
+		FROM tbl_area area
+		WHERE area.site_id = #{siteId}
+			AND area.name = #{name} 
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.AreaEntity">
+		INSERT INTO tbl_area
+		(
+			id,
+			site_id,
+			name,
+			description,
+			enabled,
+			backup_storage_id,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+		(
+			#{id},
+			#{site.id},
+			#{name},
+			#{description},
+			#{enabled},
+			#{backupStorage.id},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.AreaEntity">
+		UPDATE tbl_area
+		<set>
+			name = #{name},
+			description = #{description},
+			backup_storage_id = #{backupStorage.id}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateEnabled" parameterType="com.bsg.upm.entity.AreaEntity">
+		UPDATE tbl_area
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="remove">
+		DELETE FROM tbl_area
+		WHERE id = #{id}
+	</delete>
+
+</mapper>

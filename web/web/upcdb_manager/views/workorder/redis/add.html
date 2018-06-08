@@ -1,0 +1,1272 @@
+<style>
+html {
+	background: none
+}
+
+body {
+	background: white
+}
+
+.info {
+	width: 22px;
+	background: #dddddd;
+	font-weight: bolder
+}
+
+.data .btn {
+	background: #e8e8e8;
+	font-size: 12px;
+	width: 120px;
+	padding: 6px 0;
+	border: 0;
+	margin-right: 2px
+}
+
+.dropdown-menu .btn {
+	margin-right: 0;
+	margin-top: 2px;
+	color: black;
+}
+
+.data .btn-default.active {
+	background: #43bfe3;
+	color: white;
+}
+
+.data .btn-default.active.focus {
+	background: #43bfe3;
+	color: white;
+}
+
+.data .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary,
+	.bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary
+	{
+	background: #43bfe3;
+}
+
+.padding {
+	padding: 10px 0;
+}
+
+.irs-bar, .irs-line {
+	height: 28px;
+}
+
+.irs-bar {
+	background: #43bfe3;
+	margin-left: -6px;
+}
+
+.irs-slider {
+	height: 34px;
+	top: 20px;
+}
+
+.irs-line {
+	top: 22px;
+}
+
+.irs-max, .irs-min {
+	background: none;
+	top: 30px;
+	font-weight: bold
+}
+
+.irs-max {
+	right: 20px;
+}
+
+.irs-from, .irs-single, .irs-to {
+	background: none;
+	color: #43bfe3;
+	font-weight: bold
+}
+
+.ui-spinner {
+	width: 100px;
+	left: 400px;
+	top: -20px;
+}
+
+#sharding-count .ui-spinner{
+	width: 50px;
+	left: 123px;
+	top: -20px;
+}
+
+
+.jarviswidget {
+	margin: 0px;
+}
+
+.detail td {
+	padding: 3px 0;
+}
+
+.btn-primary.active, .btn-primary:active, .btn-primary:hover, .open>.dropdown-toggle.btn-primary
+	{
+	background: #e8e8e8;
+}
+
+.btn-primary.active, .btn-primary:active, .btn-primary:hover, .open>.dropdown-toggle.btn-primary
+	{
+	background: #e8e8e8;
+}
+
+.btn-primary.active.focus, .btn-primary.active:focus, .btn-primary.active:hover,
+	.btn-primary:active.focus, .btn-primary:active:focus, .btn-primary:active:hover,
+	.open>.dropdown-toggle.btn-primary.focus, .open>.dropdown-toggle.btn-primary:focus,
+	.open>.dropdown-toggle.btn-primary:hover {
+	background: #e8e8e8;
+}
+
+.dropdown-menu {
+	min-width: 0px;
+	border: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.dropdown-menu .btn.active, .dropdown-menu .btn:active {
+	-webkit-box-shadow: none;
+	background: #43bfe3;
+	color: white;
+}
+
+.jarviswidget>div {
+	padding: 5px 0 5px 13px;
+}
+
+.jarviswidget .widget-body {
+	padding-bottom: 0;
+}
+
+.btn:active {
+	top: 0px;
+	left: 0px;
+}
+
+.comboAreaShadow {
+	position: absolute;
+	z-index: 99;
+	background: white;
+	opacity: 0.1;
+	filter: alpha(opacity = 10);
+}
+.add-data-system{
+cursor: pointer; font-size:23px; color:#43bfe3;margin:4px 0 0 5px;
+}
+</style>
+
+<div>
+	<div id="list-alert"></div>
+	<!-- widget content -->
+	<div class="widget-body" style="font-size: 12px;">
+		<form id="checkout-form" class="smart-form">
+			<div style='margin-right: 340px'>
+				<div style='background: #fafafa'>
+					<table>
+						<tr>
+							<td class='info' align='center'><span>系统配置</span></td>
+							<td valign='top' style='padding-left: 30px'>
+								<table class='data'>
+									<tr>
+										<td width="100px">所属系统：</td>
+										<td class='padding'>
+											<div id='data_system' class="btn-group" data-toggle="buttons"></div>
+										</td>
+									</tr>
+									<tr>
+										<td>所属子系统：</td>
+										<td class='padding'>
+											<div id='data_subSystem' class="btn-group"
+												data-toggle="buttons"></div>
+										</td>
+									</tr>
+									<tr>
+										<td>服务名称：</td>
+										<td class='padding'><input type="text" name="servName"
+											id='servName' style='width: 116px; height: 26px;'
+											placeholder="服务名称">
+										<a class="btn btn-default" style="width: 50px; border:1px solid #adadad;" href="javascript:void(0);" role="button" id="randServName" name="randServName">随 机</a>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div style='margin-top: 8px; background: #fafafa'>
+					<table>
+						<tr>
+							<td class='info' align='center'><span>基本配置</span></td>
+							<td valign='top' style='padding-left: 30px'>
+								<table class='data'>
+									<tr>
+										<td width="100px">站点：</td>
+										<td class='padding'>
+											<div id='data_site' class="btn-group" data-toggle="buttons"></div>
+										</td>
+									</tr>
+									<tr>
+										<td>版本：</td>
+										<td class='padding'>
+											<div id='data_softwareImage' class="btn-group"
+												data-toggle="buttons"></div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div style='margin-top: 8px; background: #fafafa'>
+					<table id="sharding-count">
+						<tr>
+							<td class='info' align='center'><span>分片</span></td>
+							<td valign='top' style='padding-left: 30px'>
+								<table class='data'>
+								   <tr>
+										<td width="100px">分片数量：</td>
+										<td class='padding' style="width: 120px;">
+										<input id="dataDirSizeSliderSharding" type="text"> 
+										<input type="number" step="1" id="dataDirSizeSharding" name="dataDirSizeSharding">
+								   </tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div style='margin-top: 8px; background: #fafafa'>
+					<table>
+						<tr>
+							<td class='info' align='center'><span>套餐</span></td>
+							<td valign='top' style='padding-left: 30px'>
+								<table class='data'>
+									<tr>
+										<td width="100px">套餐：</td>
+										<td class='padding'>
+											<div id='data_combo' class="btn-group" data-toggle="buttons">
+												<label class="btn btn-default"> <input type="radio"
+													onchange='procComboChanged(this)' name="combo">自定义套餐
+												</label>
+												<div class="btn-group">
+													<button type="button" id="combo_standardBtn"
+														class="btn btn-primary dropdown-toggle"
+														data-toggle="dropdown" style='color: black'>
+														<span id='combo_standard'>标准套餐选择</span> <span
+															class="caret"></span>
+													</button>
+													<div class="dropdown-menu">
+														<div class="btn-group" data-toggle="buttons"
+															id="combo_standardArea"></div>
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class='comboArea'>
+					<div class='comboAreaShadow' style='display: none'></div>
+					<div style='margin-top: 8px; background: #fafafa'>
+						<table>
+							<tr>
+								<td class='info' align='center'><span>实例规格</span></td>
+								<td valign='top' style='padding-left: 30px'>
+									<table class='data'>
+										<tr>
+											<td width="100px">架构：</td>
+											<td class='padding'>
+												<div id='data_arch' class="btn-group" data-toggle="buttons">
+													<div class="btn-group">
+														<!-- <button type="button"
+															class="btn btn-primary dropdown-toggle"
+															data-toggle="dropdown" style='color: black' id='mssBtn'>
+															<span id="mss">主备多从</span> <span class="caret"></span>
+														</button> -->
+														<div class="dropdown-menu">
+															<div class="btn-group" data-toggle="buttons"
+																id='data_arch_mss'></div>
+														</div>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>规模：</td>
+											<td class='padding'><select id='data_scale' name='scale'
+												class="form-control" style='width: 200px;'
+												onchange="procScaleChanged(this)"></select></td>
+										</tr>
+										<tr style='display: none'>
+											<td>混合部署</td>
+											<td class='padding'><input type="checkbox" id='mixed' /></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					<div style='margin-top: 8px; background: #fafafa'>
+						<table>
+							<tr>
+								<td class='info' align='center'><span>网络</span></td>
+								<td valign='top' style='padding-left: 30px'>
+									<table class='data'>
+										<tr>
+											<td width="100px">接入点数量：</td>
+											<td class='padding'>
+												<select id='data_upproxy_arch' name='data_upproxy_arch' class="form-control" style='width: 200px;'>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td width="100px">网络带宽：</td>
+											<td class='padding'>
+												<div id='data_network' class="btn-group"
+													data-toggle="buttons"></div>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					<div style='margin-top: 8px; background: #fafafa'>
+						<table>
+							<tr>
+								<td class='info' align='center'><span>数据类型</span></td>
+								<td valign='top' style='padding-left: 30px'>
+									<table class='data'>
+										<tr>
+											<td width="100px">数据类型：</td>
+											<td class='padding'>
+												<div id='data_dataDirDeviceType' class="btn-group"
+													data-toggle="buttons"></div>
+											</td>
+										</tr>
+										<tr style="display:none;">
+											<td width="100px">表空间：</td>
+											<td class='padding'><input id="dataDirSizeSlider"
+												type="text"> <input type="number" step="10"
+												id="dataDirSize" name="dataDirSize">
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div style='position: fixed; right: 18px; top: 110px'>
+	<section id="widget-grid" class="" style=''>
+		<div class="row">
+			<article class="" style='width: 300px;'>
+				<div class="jarviswidget jarviswidget-color-darken" id="wid-id-2"
+					data-widget-editbutton="false" data-widget-colorbutton="false"
+					data-widget-deletebutton="false"
+					data-widget-fullscreenbutton="false" data-widget-sortable="false">
+					<header style='background: #dddddd; border: none; color: black'>
+						<span class="widget-icon"> <i class="fa fa-align-justify"></i>
+						</span>
+						<h2 class="font-sm">
+							<strong>基本配置</strong>
+						</h2>
+					</header>
+					<div style='border: none; background: #fafafa !important'>
+						<div class="widget-body">
+							<table class='detail'>
+								<tr>
+									<td style='width: 80px'>系统:</td>
+									<td><span id='systemText'></span></td>
+								</tr>
+								<tr>
+									<td>子系统:</td>
+									<td><span id='subSystemText'></span></td>
+								</tr>
+								<tr>
+									<td>服务名称:</td>
+									<td><span id='servNameText'></span></td>
+								</tr>
+								<tr>
+									<td>地域:</td>
+									<td><span id='siteText'></span></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="jarviswidget jarviswidget-color-darken" id="wid-id-2"
+					data-widget-editbutton="false" data-widget-colorbutton="false"
+					data-widget-deletebutton="false"
+					data-widget-fullscreenbutton="false" data-widget-sortable="false">
+					<header style='background: #dddddd; border: none; color: black'>
+						<span class="widget-icon"> <i class="fa fa-align-justify"></i>
+						</span>
+						<h2 class="font-sm">
+							<strong>UPREDIS配置</strong>
+						</h2>
+					</header>
+					<div style='border: none; background: #fafafa !important'>
+						<div class="widget-body">
+							<table class='detail'>
+								<tr>
+									<td style='width: 80px'>版本:</td>
+									<td><span id='softwareTypeText'></span><span
+										id='softwareImageText'></span></td>
+								</tr>
+								<tr>
+									<td>架构:</td>
+									<td><span id='archText'></span><input type='hidden'
+										id='upredisUnitNum'></td>
+								</tr>
+								<tr>
+									<td>分片数量:</td>
+									<td><span id='shardingCount'></span></td>
+								</tr>
+								<tr>
+									<td>规模:</td>
+									<td><span id='scaleText'></span><input type='hidden'
+										id='upredisCpuNum'><input type='hidden'
+										id='upredisMemSize'></td>
+								</tr>
+								<tr>
+									<td>表空间:</td>
+									<td><span id='dataDirDeviceTypeText'></span><span>:</span><span
+										id='dataDirSizeText'></span><span>G</span></td>
+								</tr>
+								<tr>
+									<td>日志空间:</td>
+									<td><span id='logDirSizeText' name='logDirSizeText'></span><span>G</span></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="jarviswidget jarviswidget-color-darken" id="wid-id-2"
+					data-widget-editbutton="false" data-widget-colorbutton="false"
+					data-widget-deletebutton="false"
+					data-widget-fullscreenbutton="false" data-widget-sortable="false">
+					<header style='background: #dddddd; border: none; color: black'>
+						<span class="widget-icon"> <i class="fa fa-align-justify"></i>
+						</span>
+						<h2 class="font-sm">
+							<strong>URPROXY配置</strong>
+						</h2>
+					</header>
+					<div style='border: none; background: #fafafa !important'>
+						<div class="widget-body">
+							<table class='detail'>
+								<tr>
+									<td style='width: 80px'>规模:</td>
+									<td><span id='urproxy_scaleText'></span><input
+										type='hidden' id='urproxyCpuNum'><input type='hidden'
+										id='urproxyMemSize'></td>
+								</tr>
+								<tr>
+									<td>接入点数量:</td>
+									<td><span id='urproxy_archText'></span></td>
+								</tr>
+								<tr>
+									<td>网络带宽:</td>
+									<td><span id='networkBandwidthText'></span></td>
+								</tr>
+								<tr>
+									<td>日志空间:</td>
+									<td><span id='urproxy_logDirSizeText' name='urproxy_logDirSizeText' style="display:none;"></span>
+									<span id='urproxy_data_logDirSize' name='urproxy_data_logDirSize'></span>
+									<span>G</span>
+									<input type='hidden' id='urproxy_dataDirSizeText'>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="jarviswidget jarviswidget-color-darken" id="wid-id-2"
+					data-widget-editbutton="false" data-widget-colorbutton="false"
+					data-widget-deletebutton="false"
+					data-widget-fullscreenbutton="false" data-widget-sortable="false">
+					<header style='background: #dddddd; border: none; color: black'>
+						<span class="widget-icon"> <i class="fa fa-align-justify"></i>
+						</span>
+						<h2 class="font-sm">
+							<strong>统计</strong>
+						</h2>
+					</header>
+					<div
+						style='border: none; background: #ffe9da !important; font-weight: bolder;'>
+						<div class="widget-body">
+							<table class='detail'>
+								<tr>
+									<td style='width: 80px'>CPU:</td>
+									<td style='color: #ff6600; font-size: 16px'><span
+										id='cpuSumText'></span><span>核</span></td>
+								</tr>
+								<tr>
+									<td>内存:</td>
+									<td style='color: #ff6600; font-size: 16px'><span
+										id='memSumText'></span><span>G</span></td>
+								</tr>
+								<tr>
+									<td>磁盘:</td>
+									<td style='color: #ff6600; font-size: 16px'><span
+										id='diskSumText'></span><span>G</span></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<input type="hidden" name="sentinel_logsize" id="sentinel_logsize" value="">
+				<input type="hidden" name="upredis_mixed" id='upredis_mixed'
+					value="false"> <input type="hidden" name="urproxy_mixed"
+					id='urproxy_mixed' value="false"> <input type="hidden"
+					name="sentinel_mixed" id='sentinel_mixed' value="false"> <input
+					type="hidden" name="upredis_highAvailable"
+					id='upredis_highAvailable' value="false"> <input
+					type="hidden" name="urproxy_highAvailable"
+					id='urproxy_highAvailable' value="false"> <input
+					type="hidden" name="sentinel_highAvailable"
+					id='sentinel_highAvailable' value="false"> <input
+					type="hidden" name="shardingCnt_number" id='shardingCnt_number'
+					value="1">
+				<div style='width: 100%; text-align: center'>
+					<a class="btn btn-success btn-lg"
+						style='background: #ff6600; border: none; width: 180px; height: 60px; line-height: 60px; margin: 20px 0 0 0; padding: 0; font-size: 24px'
+						onclick="apply()" href="javascript:void(0);">立即申请</a>
+				</div>
+			</article>
+		</div>
+	</section>
+</div>
+<script>
+
+	var sentinel_datasize;
+	var urproxy_datasize;
+	
+	var shardingCnt = 1;
+	$("#shardingText").text("分片数量：" + shardingCnt);
+	$("#shardingBtn").css({
+        "background" : "#43bfe3",
+        "color" : "white"
+    });
+	$("#shardingCount").text(shardingCnt);
+	$("#dataDirSizeSharding").val(1);
+
+	if(typeof(flag) != "undefined"){
+	 	clearInterval(flag);
+ 	}
+
+	$("#randServName").click(function(){
+		var randWord = randomWord(false,5);
+		$("#servName").val(randWord);
+		$("#servNameText").text($("#servName").val());
+	});
+	
+	$("#dataDirSizeSlider").ionRangeSlider({
+	    min : 0,
+	    max : 1000,
+	    from : 0,
+	    to : 1000,
+	    type : 'single',
+	    step : 10,
+	    postfix : "GB",
+	    onChange : function(data) {
+	        $("#dataDirSize").val(data.from);
+	        $("#dataDirSizeText").text(data.from);
+	        sumChange();
+	    }
+	});
+
+	$("#dataDirSize").spinner({
+	    min : 0,
+	    max : 1000,
+	    step : 10,
+	    start : 0,
+	    numberFormat : "n",
+	    spin : function(event, data) {
+	        $("#dataDirSizeSlider").data("ionRangeSlider").update({
+	            from : data.value
+	        });
+	        $("#dataDirSizeText").text(data.value);
+	        sumChange();
+	    }
+	});
+
+
+    $("#mixed").bootstrapSwitch({
+        size : "small"
+    });
+    
+    $("#sharding").bootstrapSwitch({
+        size : "small",
+        state: true,
+        onSwitchChange:function(event,state){  
+            if(state){  
+                $("#shardingArea").show();
+                $("#shardingCntArea").find(".active").removeClass("active");
+                
+                $("#shardingBtn").css({
+                    "background" : "#e8e8e8",
+                    "color" : "black"
+                });
+                $("#shardingText").text("分片数量选择");
+            }else{  
+                $("#shardingArea").hide();
+                sumChange();
+            } 
+        }  
+    });
+    
+    // 分片数量变化时处理
+    $("input[name='shardingCnt']").change(function(){
+        $("#shardingText").text("分片数量：" + this.nextSibling.nodeValue);
+        $("#shardingCnt_number").val(this.nextSibling.nodeValue);
+        $("#shardingCount").text(this.nextSibling.nodeValue);
+        $("#shardingBtn").css({
+            "background" : "#43bfe3",
+            "color" : "white"
+        });
+        shardingCnt = this.nextSibling.nodeValue;
+        sumChange();
+    })
+    
+    $("#dataDirSizeSliderSharding").ionRangeSlider({
+	    min : 1,
+	    max : 256,
+	    from : 1,
+	    to : 256,
+	    type : 'single',
+	    step : 1,
+	    postfix : "个",
+	    onChange : function(data) {
+	        $("#dataDirSizeSharding").val(data.from);
+	        $("#shardingCnt_number").val(data.from);
+	        $("#shardingCount").text(data.from);
+	        shardingCnt = data.from;
+	        sumChange();
+	    }
+	});
+
+	$("#dataDirSizeSharding").spinner({
+	    min : 1,
+	    max : 256,
+	    step : 1,
+	    start : 1,
+	    numberFormat : "n",
+	    spin : function(event, data) {
+	        $("#dataDirSizeSliderSharding").data("ionRangeSlider").update({
+	            from : data.value
+	        });
+	        $("#shardingCnt_number").val(data.value);
+	        $("#shardingCount").text(data.value);
+	        shardingCnt = data.value;
+	        sumChange();
+	    }
+	});
+	
+	$("#dataDirSizeSharding").change(function() {
+		var value = parseInt($(this).val());
+		$(this).val(value);
+		$("#shardingCnt_number").val(value);
+        $("#shardingCount").text(value);
+        shardingCnt = value;
+		$("#dataDirSizeSliderSharding").data("ionRangeSlider").update({
+			from : value
+		});
+		sumChange();
+	});
+
+    var features = {async: false};
+    var standardComboData = {};
+    var scaleData = {};
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/combos?serv_type=upredis_urproxy_sentinel",function(data){
+    	standardComboData = data;
+    },ListAlert,features);
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/scales?serv_type=upredis_urproxy_sentinel",function(data){
+    	scaleData = data;
+    },ListAlert,features);
+
+    init();
+
+	function init() {
+		// 所属系统
+		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/business_systems",function(data){
+			setSystem(data);
+	    },ListAlert,null);
+		
+		// 服务名称
+		var randWord = randomWord(false,5);
+		$("#servName").val(randWord);
+		$("#servNameText").text($("#servName").val());
+		
+		// 地域
+		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/sites",function(data){
+			setSite(data);
+	    },ListAlert,null);
+		
+		// 数据库类型
+		$("#data_softwareType").find("label:eq(0)").click();
+		
+		$("#sharding").bootstrapSwitch({"state":false});
+		if ($("#sharding").bootstrapSwitch("state")) {
+			$("#shardingArea").show();
+		} else {
+			$("#shardingArea").hide(); 
+		}
+		
+		// 标准套餐
+        setCombo(standardComboData.data);
+	}
+
+	// 设置所属系统
+	function setSystem(data) {
+		$("#data_system").html("");
+		$.each(data, function(index, item){
+			$("#data_system").append("<label class='btn btn-default' style='margin:0 0 5px 0;'><input type='radio' name='system' onchange='procSystemChanged(this)' value='" + item.id + "'>" + item.text + "</label>");
+		});
+		$("#data_system").append("<label style='margin:0 0 5px 0;width:120px;'><i class='fa fa-plus-circle fa-2 add-data-system' onclick='toSys();' aria-hidden='true'></i></label>");
+		$("#data_system").find("label:eq(0)").click();
+	}
+	
+	// 设置所属子系统
+	function setSubSystem(data) {
+		$("#data_subSystem").html("");
+		$.each(data, function(index, item){
+            $("#data_subSystem").append("<label class='btn btn-default' style='margin:0 0 5px 0;'><input type='radio' name='subSystem' onchange='procSubSystemChanged(this)' value='" + item.id + "'>" + item.text + "</label>");
+        });
+		$("#data_subSystem").append("<label style='margin:0 0 5px 0;width:120px;'><i class='fa fa-plus-circle fa-2 add-data-system' onclick='toSubSys();' aria-hidden='true'></i></label>");
+		$("#data_subSystem").find("label:eq(0)").click();
+	}
+	
+	function toSys(){
+		window.location.href = "index.html#views/workorder/sys/list.html";
+	}
+	function toSubSys(){
+		window.location.href = "index.html#views/workorder/subsys/list.html";
+	}
+	
+	// 设置地域
+	function setSite(data) {
+		$("#data_site").html("");
+        $.each(data, function(index, item){
+            $("#data_site").append("<label class='btn btn-default'><input type='radio' name='site' onchange='procSiteChanged(this)' value='" + item.id + "'>" + item.text + "</label>");
+            if(getSession("siteId") == item.id){
+            	$("#data_site").find("label:eq("+index+")").click();
+            }
+        });
+	}
+	
+	// 设置版本
+	function setSoftwareImage(data) {
+		$("#data_softwareImage").html("");
+        $.each(data, function(index, item){
+            $("#data_softwareImage").append("<label class='btn btn-default'><input type='radio' name='softwareImage' onchange='procSoftwareImageChanged(this)' value='" + item.id + "'>" + item.text + "</label>");
+        });
+        $("#data_softwareImage").find("label:first").click();
+	}
+	
+	
+	var comboSyncCount = 5;
+	// 设置套餐
+	function setCombo(data) {
+		$("#combo_standardArea").html("");
+        $.each(data, function(index, item){
+            $("#combo_standardArea").append("<label class='btn btn-default'><input type='radio' name='combo' class='standard' onchange='procComboChanged(this)' value='" + item.id + "'>" + item.name + "</label>");
+        });
+        
+        // 架构
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/archs?serv_type=upredis_urproxy_sentinel&subserv_type=upredis&has_standby=0",function(data){
+        	setArch(data.data);
+        	comboSyncCount --;
+        	if(comboSyncCount == 0){
+        		// 默认选中标准套餐
+                $("#combo_standardArea").find("label:eq(0)").click();
+        	}
+	    },ListAlert,null);
+        
+        
+        // 规模
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/scales?serv_type=upredis_urproxy_sentinel&subserv_type=upredis",function(data){
+        	setScale(data.data);
+        	comboSyncCount --;
+        	if(comboSyncCount == 0){
+        		// 默认选中标准套餐
+                $("#combo_standardArea").find("label:eq(0)").click();
+        	}
+	    },ListAlert,null);
+        
+        // 接入点
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/aps?serv_type=upredis_urproxy_sentinel&subserv_type=urproxy",function(data){
+        	setUpproxyArch(data);
+        	comboSyncCount --;
+        	if(comboSyncCount == 0){
+        		// 默认选中标准套餐
+                $("#combo_standardArea").find("label:eq(0)").click();
+        	}
+	    },ListAlert,null);
+        
+        // 网络带宽
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/network_bandwidth",function(data){
+        	setNetworkBandwidth(data);
+        	comboSyncCount --;
+        	if(comboSyncCount == 0){
+        		// 默认选中标准套餐
+                $("#combo_standardArea").find("label:eq(0)").click();
+        	}
+	    },ListAlert,null);
+        
+        // 数据类型
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/data_dir_types",function(data){
+        	setDataDirDeviceType(data);
+        	comboSyncCount --;
+        	if(comboSyncCount == 0){
+        		// 默认选中标准套餐
+                $("#combo_standardArea").find("label:eq(0)").click();
+        	}
+	    },ListAlert,null);
+	}
+	
+	// 设置架构
+	function setArch(data) {
+		$("#data_arch").children("label").remove();
+		$("#data_arch_mss").html("");
+		var data_archStr = "";
+        $.each(data, function(index, item){
+        	if (!item.hasStandBy) {
+        		data_archStr += "<label class='btn btn-default'><input type='radio' name='arch' onchange='procArchChanged(this)' value='" + item.id + "' unitNum='" + item.unitNum + "'>" + item.name + "</label>";
+        	} else {
+        		$("#data_arch_mss").append("<label class='btn btn-default'><input type='radio' name='arch' onchange='procArchChanged(this)' class='mss' value='" + item.id + "' unitNum='" + item.unitNum + "'>" + item.name + "</label>");
+        	}
+        });
+        $("#data_arch").prepend(data_archStr);
+	}
+	
+	// 设置规模
+	function setScale(data) {
+		$("#data_scale").html("");
+		$.each(data, function(index, item){
+            $("#data_scale").append("<option value='" + item.id + "' cpuNum='" + item.cpuNum + "' memSize='"+ item.memSize +"'>" + item.name + "</option>");
+        });
+	}
+	
+	// 设置接入点数量
+	function setUpproxyArch(data) {
+		$("#data_upproxy_arch").html("");
+        $.each(data, function(index, item){
+        	$("#data_upproxy_arch").append("<option value='" + item.id + "'>" + item.text + "</option>");
+        });
+	}
+	
+	// 设置网络
+	function setNetworkBandwidth(data) {
+		$("#data_network").html("");
+        $.each(data, function(index, item){
+            $("#data_network").append("<label class='btn btn-default'><input type='radio' name='networkBandwidth' onchange='procNetworkBandwidthChanged(this)' value='" + item.id + "'>" + item.text + "</label>");
+        });
+	}
+	
+	// 设置数据类型
+	function setDataDirDeviceType(data) {
+		$("#data_dataDirDeviceType").html("");
+        $.each(data, function(index, item){
+        	if(item.id != 'local_ssd' && item.id != 'san'){
+	            $("#data_dataDirDeviceType").append("<label class='btn btn-default'><input type='radio' name='dataDirDeviceType' onchange='procDataDirDeviceTypeChanged(this)' value='" + item.id + "'>" + item.text + "</label>");
+        	}
+        });
+	}
+
+	// 系统变化时处理
+	function procSystemChanged(obj) {
+		$("#systemText").text(obj.nextSibling.nodeValue);
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/business_subsystems?business_system="+obj.value,function(data){
+        	setSubSystem(data);
+	    },ListAlert,null);
+	}
+
+	// 子系统变化时处理
+	function procSubSystemChanged(obj) {
+        $("#subSystemText").text(obj.nextSibling.nodeValue);
+    }
+
+	// 服务名称变化时处理
+	$("input[name='servName']").change(function() {
+		$('#servNameText').text(this.value);
+	});
+
+	// 地域变化时处理
+	function procSiteChanged(obj) {
+        $("#siteText").text(obj.nextSibling.nodeValue);
+        sendGetWithoutLayer("/" + getProjectName() + "/v1.0/selections/software/versions?site="+obj.value+"&software_type=upredis&enabled=1",function(data){
+        	setSoftwareImage(data);
+	    },ListAlert,null);
+    }
+	
+	// 版本变化时处理
+	function procSoftwareImageChanged(obj) {
+		 $("#softwareImageText").text(obj.nextSibling.nodeValue);
+	}
+
+    function procComboChanged(obj) {
+    	setComboStyle(obj);
+    	if ($(obj).hasClass("standard")) {
+    		$.each(standardComboData.data, function(index, item){
+                if (item.id == obj.value) {
+                    $.each(item.subCombos, function(index_subCombo, item_subCombo) {
+                        if (item_subCombo.subServType == "upredis") {
+                        	// 选择规模
+                            $("#data_scale").val(item_subCombo.scaleId);
+                            $("#scaleText").text($("#data_scale").find("option:selected").text());
+                            $("#upredisCpuNum").val($("#data_scale").find("option:selected").attr("cpuNum"));
+                            $("#upredisMemSize").val($("#data_scale").find("option:selected").attr("memSize"));
+                        	
+                            // 选择架构
+                            $("#data_arch").find("input[value='" + item_subCombo.archId + "']").parent("label").click();
+                            
+                            // 选择数据类型
+                            $("#data_dataDirDeviceType").find("input[value='" + item_subCombo.dataDirDeviceType + "']").parent("label").click();
+                            
+                            // 选择表空间
+                            var dataDirSize = parseInt(item_subCombo.dataDirSize / 1024 / 1024 / 1024);
+                            $("#dataDirSize").val(dataDirSize);
+                            $("#dataDirSizeSlider").data("ionRangeSlider").update({
+                                from : dataDirSize
+                            });
+                            $("#dataDirSizeText").text(dataDirSize);
+                            
+                            // 设置upredis日志空间
+                            var logDirSize = parseInt(item_subCombo.logDirSize / 1024 / 1024 / 1024);
+                            $("#logDirSizeText").text(logDirSize);
+                            
+                        	// 设置套餐mixed值和高可用值
+                         	$("#upredis_mixed").val(item_subCombo.mixed);
+                         	$("#upredis_highAvailable").val(item_subCombo.highAvailable);
+                            
+                        } else if (item_subCombo.subServType == "urproxy") {
+                        	urproxy_datasize = item_subCombo.dataDirSize;
+                            // 选择接入点数量
+                            $("#data_upproxy_arch").val(item_subCombo.archId);
+                            var arch_num = $("#data_upproxy_arch option:selected").text();
+                        	$('#urproxy_archText').text(arch_num);
+                            // 选择网络带宽
+                            $("#data_network").find("input[value='" + item_subCombo.networkBandwidth + "']").parent("label").click();
+                            
+                            // upproxy日志空间
+                            $("#urproxy_logDirSizeText").text(parseInt((item_subCombo.logDirSize) / 1024 / 1024 / 1024));
+                            $("#urproxy_dataDirSizeText").val(parseInt((item_subCombo.dataDirSize) / 1024 / 1024 / 1024));
+                            $("#urproxy_data_logDirSize").text(parseInt((item_subCombo.logDirSize + item_subCombo.dataDirSize) / 1024 / 1024 / 1024));
+                            $.each(scaleData.data, function(index_scale, item_scale) {
+                                if (item_scale.id == item_subCombo.scaleId) {
+                                    $("#urproxyCpuNum").val(item_scale.cpuNum);
+                                    $("#urproxyMemSize").val(item_scale.memSize);
+                                    $("#urproxy_scaleText").text(item_scale.cpuNum + "核" + (item_scale.memSize / 1024 / 1024 / 1024) + "G");
+                                    return;
+                                }
+                            });
+                         	// 设置套餐mixed值和高可用值
+                         	$("#urproxy_mixed").val(item_subCombo.mixed);
+                         	$("#urproxy_highAvailable").val(item_subCombo.highAvailable);
+                         	
+                        }else if (item_subCombo.subServType == "sentinel"){
+                        	// 设置套餐mixed值和高可用值
+                        	sentinel_datasize = item_subCombo.dataDirSize;
+                        	$("#sentinel_logsize").val(item_subCombo.logDirSize);
+                         	$("#sentinel_mixed").val(item_subCombo.mixed);
+                         	$("#sentinel_highAvailable").val(item_subCombo.highAvailable);
+                        }
+                    });
+                    return;
+                }
+            });
+    	} else {
+    		$("#data_arch").find("label:eq(0)").click();
+    		$("#data_scale").find("option").eq(0).attr("selected",true); 
+            $("#scaleText").text($("#data_scale").find("option:selected").text());
+            $("#upredisCpuNum").val($("#data_scale").find("option:selected").attr("cpuNum"));
+            $("#upredisMemSize").val($("#data_scale").find("option:selected").attr("memSize"));
+            $("#data_upproxy_arch").find("option").eq(0).attr("selected",true);
+            var arch_num = $("#data_upproxy_arch option:selected").text();
+        	$('#urproxy_archText').text(arch_num);
+            $("#data_network").find("label:eq(0)").click();
+            $("#dataDirSize").find("label:eq(0)").click();
+            $("#dataDirSize").val(Number($("#upredisMemSize").val()/1024/1024/1024)*3);
+            $("#dataDirSizeSlider").data("ionRangeSlider").update({
+                from : $("#dataDirSize").val()
+            });
+            $("#dataDirSizeText").text($("#dataDirSize").val());
+            $("#logDirSizeText").text(10);
+            
+            $("#urproxyCpuNum").val(1);
+            $("#urproxyMemSize").val(8 * 1024 * 1024 * 1024);
+            $("#urproxy_scaleText").text("1核8G");
+            $("#urproxy_logDirSizeText").text(9);
+    	}
+    	sumChange();
+    }
+    
+    // 架构变化时处理
+    function procArchChanged(obj) {
+        setArchStyle(obj);
+        $("#archText").text(obj.nextSibling.nodeValue);
+        $("#upredisUnitNum").val($(obj).attr("unitNum"));
+        sumChange();
+    }
+    
+    // 规模变化时处理
+    function procScaleChanged(obj) {
+        $("#scaleText").text($(obj).find("option:selected").text());
+        $("#upredisCpuNum").val($(obj).find("option:selected").attr("cpuNum"));
+        $("#upredisMemSize").val($(obj).find("option:selected").attr("memSize"));
+        $("#dataDirSizeText").text(Number($("#upredisMemSize").val()/1024/1024/1024)*3);
+        sumChange();
+    }
+    
+    // 接入点变化时处理
+    $("#data_upproxy_arch").change(function (){
+    	var arch_num = $("#data_upproxy_arch option:selected").text();
+    	$('#urproxy_archText').text(arch_num);
+        sumChange();
+    });
+    
+    // 网络带宽变化时处理
+    function procNetworkBandwidthChanged(obj) {
+    	$('#networkBandwidthText').text(obj.nextSibling.nodeValue);
+    }
+    
+    // 数据类型变化时处理
+    function procDataDirDeviceTypeChanged(obj) {
+    	$('#dataDirDeviceTypeText').text(obj.nextSibling.nodeValue);
+    }
+    
+	$(window).resize(function() {
+		$('.comboAreaShadow').width($(".comboArea").innerWidth());
+		$('.comboAreaShadow').height($(".comboArea").innerHeight());
+	});
+
+	function setComboStyle(obj) {
+		if ($(obj).hasClass("standard")) {
+			// 移除套餐选中的样式
+			$("#data_combo").find(".active").removeClass("active");
+			
+			// 模拟标准套餐选择按钮选中
+			$("#combo_standardBtn").css({
+                "background" : "#43bfe3",
+                "color" : "white"
+            });
+			
+			// 改变标准套餐选择按钮文字显示
+			$("#combo_standard").text(obj.nextSibling.nodeValue);
+			
+			// 将架构、规模、接入点数量、网络带宽、数据类型、表空间禁用掉(并未真正得禁用掉)
+			$(".comboArea .btn").attr("disabled", "disabled");
+			$(".comboArea input[type='radio']").attr("disabled", "disabled");
+			$("#data_scale").attr("disabled", "disabled");
+			$("#dataDirSizeSlider").data("ionRangeSlider").update({
+				disable : true
+			});
+			$("#dataDirSize").spinner({
+				disabled : true
+			});
+			
+			// 将架构、规模、接入点数量、网络带宽、数据类型、表空间遮住(模拟禁用)
+			$('.comboAreaShadow').show();
+            $('.comboAreaShadow').width($(".comboArea").innerWidth());
+            $('.comboAreaShadow').height($(".comboArea").innerHeight());
+
+		} else {
+			$("#data_combo").find(".dropdown-menu").find(".active").removeClass("active");
+            
+			$("#combo_standardBtn").css({
+				"background" : "#e8e8e8",
+				"color" : "black"
+			});
+			$("#combo_standard").text("标准套餐选择");
+			
+	         $(".comboArea .btn").removeAttr("disabled");
+	            $(".comboArea input[type='radio']").removeAttr("disabled");
+	            $("#data_scale").removeAttr("disabled");
+			$("#dataDirSizeSlider").data("ionRangeSlider").update({
+			    disable : false
+			});
+			$("#dataDirSize").spinner({
+				disabled : false
+			});
+			$('.comboAreaShadow').hide()
+		}
+	}
+	
+	function setArchStyle(obj) {
+		if ($(obj).hasClass("mss")) {
+			$("#mss").text(obj.nextSibling.nodeValue);
+			$("#mssBtn").css({
+				"background" : "#43bfe3",
+				"color" : "white"
+			});
+			$("#data_arch").find(".active").removeClass("active")
+		} else {
+			$("#mssBtn").css({
+				"background" : "#e8e8e8",
+				"color" : "black"
+			});
+			$("#data_arch").find(".dropdown-menu").find(".active").removeClass(
+					"active");
+			$("#mss").text("主备多从");
+		}
+	}
+
+	$("#dataDirSize").change(function() {
+		var value = parseInt($(this).val() / 10) * 10;
+		$(this).val(value);
+		$("#dataDirSizeText").text(value);
+		$("#dataDirSizeSlider").data("ionRangeSlider").update({
+			from : value
+		});
+		sumChange();
+	});
+
+	function sumChange() {
+		var upredisUnitNum = $("#upredisUnitNum").val();
+		if (upredisUnitNum == "") {
+			return;
+		}
+		upredisUnitNum = parseInt(upredisUnitNum);
+		
+		var upredisCpuNum = $("#upredisCpuNum").val();
+		if (upredisCpuNum == "") {
+			return;
+		}
+		upredisCpuNum = parseInt(upredisCpuNum);
+		
+		var upredisMemSize = $("#upredisMemSize").val();
+		if (upredisMemSize == "") {
+            return;
+        }
+		upredisMemSize = parseInt(upredisMemSize);
+		
+		var upproxyUnitNum = $("#urproxy_archText").text();
+        if (upproxyUnitNum == "") {
+            return;
+        }
+        upproxyUnitNum = parseInt(upproxyUnitNum);
+        
+        var urproxyCpuNum = $("#urproxyCpuNum").val();
+        if (urproxyCpuNum == "") {
+            return;
+        }
+        urproxyCpuNum = parseInt(urproxyCpuNum);
+        
+        var urproxyMemSize = $("#urproxyMemSize").val();
+        if (urproxyMemSize == "") {
+            return;
+        }
+        urproxyMemSize = parseInt(urproxyMemSize);
+        
+        
+        var cpuSum = upredisCpuNum * upredisUnitNum * shardingCnt + urproxyCpuNum * upproxyUnitNum;
+        var memSum = (upredisMemSize * upredisUnitNum * shardingCnt + urproxyMemSize * upproxyUnitNum) / 1024 / 1024 / 1024;
+        $("#cpuSumText").text(cpuSum);
+        $("#memSumText").text(memSum);
+        
+        var diskSum = (parseInt($("#dataDirSizeText").text()) + parseInt($("#logDirSizeText").text())) * upredisUnitNum * shardingCnt + (parseInt($("#urproxy_logDirSizeText").text())+parseInt($("#urproxy_dataDirSizeText").val())) * upproxyUnitNum;
+        $("#diskSumText").text(diskSum);
+	}
+	
+	function apply(){
+		var postBody;
+		var shardingCnt_number = $("#shardingCnt_number").val();
+			  postBody = {
+					definitionServ: "upredis_urproxy_sentinel",
+					site: $("[name='site']:checked").val(),
+					tag: $("[name='subSystem']:checked").val(),
+					servName: $("[name='servName']").val(),
+					sharding: true,
+					definitionSubServs: [
+						{
+							name: "upredis",
+							arch: $("[name='arch']:checked").val(),
+							scale: $("[name='scale']").val(),
+							softwareImage: $("[name='softwareImage']:checked").val(),
+							dataDirDeviceType: $("[name='dataDirDeviceType']:checked").val(),
+							dataDirSize: Number($("#upredisMemSize").val())*3,
+							logDirSize: Number($("[name='logDirSizeText']").text())*1024*1024*1024,
+							mixed: eval($("#upredis_mixed").val().toLowerCase()),
+							highAvailable:eval($("#upredis_highAvailable").val().toLowerCase())
+						},
+						{
+							name: "urproxy",
+							arch: $("#data_upproxy_arch").val(),
+							networkBandwidth: Number($("[name='networkBandwidth']:checked").val()),
+							dataDirSize:urproxy_datasize,
+							logDirSize: Number($("[name='urproxy_logDirSizeText']").text())*1024*1024*1024,
+							mixed: eval($("#urproxy_mixed").val().toLowerCase()),
+							highAvailable:eval($("#urproxy_highAvailable").val().toLowerCase())
+						},
+						{
+							name: "sentinel",
+							dataDirSize:sentinel_datasize,
+							logDirSize:Number($("#sentinel_logsize").val())*1,
+							mixed: eval($("#sentinel_mixed").val().toLowerCase()),
+							highAvailable:eval($("#sentinel_highAvailable").val().toLowerCase())
+						}
+					],
+    		};
+			if(shardingCnt_number > 1){
+					 for(var k=1;k<shardingCnt_number;k++){
+						 postBody['definitionSubServs'].push(postBody['definitionSubServs'][0]);
+					 }
+			}
+		
+			var textregexp = /^([a-z]{5})$/;
+			var servNameCheck = textregexp.test($("[name='servName']").val());
+			 
+			if(servNameCheck){
+				var subSystem = $("[name='subSystem']:checked").val();
+				if(subSystem!="" && subSystem!=null && typeof (subSystem) != "undefined"){
+					sendPost("/" + getProjectName() + "/v1.0/orders", function(data){
+						swal({ 
+							  title: "提交成功", 
+							  text: "请前往工单管理页面查看", 
+							  type: "success",
+							  showCancelButton: true, 
+							  confirmButtonColor: "#DD6B55",
+							  confirmButtonText: "前往", 
+							  cancelButtonText: "继续申请",
+							  closeOnConfirm: true,
+							  closeOnCancel	:true
+							}).then((result) => {
+								if (result.value) { 
+									window.location.href = "index.html#views/workorder/upsql/list.html";
+								} else { 
+									var randWord = randomWord(false,5);
+									$("#servName").val(randWord);
+									$("#servNameText").text($("#servName").val());
+								}
+						});
+					}, ListAlert,JSON.stringify(postBody), null);
+				}else{
+					 swal("","请选择业务子系统！","info");
+				}
+			 }else{
+				 swal("","用户名称必须由五位小写字母组成！","info");
+			 } 
+		
+	}
+</script>

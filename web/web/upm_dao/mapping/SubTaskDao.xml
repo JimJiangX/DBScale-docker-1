@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.SubTaskDao">
+	<resultMap id="subTaskResultMap" type="com.bsg.upm.entity.SubTaskEntity">
+		<id property="id" column="subtask_id" />
+		<result property="objType" column="subtask_obj_type" />
+		<result property="objId" column="subtask_obj_id" />
+		<result property="objName" column="subtask_obj_name" />
+		<result property="actionType" column="subtask_action_type" />
+		<result property="async" column="subtask_async" />
+		<result property="timeout" column="subtask_timeout" />
+		<result property="startDateTime" column="subtask_start_datetime" />
+		<result property="endDateTime" column="subtask_end_datetime" />
+		<result property="status" column="subtask_status" />
+		<result property="url" column="subtask_url" />
+		<result property="methodType" column="subtask_method_type" />
+		<result property="param" column="subtask_param" />
+		<result property="relateTaskId" column="subtask_relate_task_id" />
+		<result property="relateTaskStatus" column="subtask_relate_task_status" />
+		<result property="relateTaskMsg" column="subtask_relate_task_msg" />
+		<result property="priority" column="subtask_priority" />
+	</resultMap>
+
+	<resultMap id="subTaskDetialResultMap" type="com.bsg.upm.entity.SubTaskEntity"
+		extends="subTaskResultMap">
+		<association property="task"
+			resultMap="com.bsg.upm.dao.TaskDao.taskResultMap" columnPrefix="task_"/>
+	</resultMap>
+	
+	<select id="get" resultMap="subTaskResultMap" flushCache="true">
+		SELECT subtask.id AS subtask_id, 
+			subtask.obj_type AS subtask_obj_type, 
+			subtask.obj_id AS subtask_obj_id, 
+			subtask.obj_name AS subtask_obj_name, 
+			subtask.action_type AS subtask_action_type, 
+			subtask.async AS subtask_async, 
+			subtask.timeout AS subtask_timeout, 
+			subtask.start_datetime AS subtask_start_datetime, 
+			subtask.end_datetime AS subtask_end_datetime, 
+			subtask.status AS subtask_status, 
+			subtask.url AS subtask_url, 
+			subtask.method_type AS subtask_method_type, 
+			subtask.param AS subtask_param,
+			subtask.relate_task_id AS subtask_relate_task_id, 
+			subtask.relate_task_status AS subtask_relate_task_status, 
+			subtask.relate_task_msg AS subtask_relate_task_msg, 
+			subtask.priority AS subtask_priority
+		FROM tbl_subtask subtask
+		WHERE subtask.id = #{id}
+	</select>
+	
+	<select id="listRunning" resultMap="subTaskDetialResultMap" flushCache="true">
+		SELECT subtask.id AS subtask_id, 
+			subtask.obj_type AS subtask_obj_type, 
+			subtask.obj_id AS subtask_obj_id, 
+			subtask.obj_name AS subtask_obj_name, 
+			subtask.action_type AS subtask_action_type, 
+			subtask.async AS subtask_async, 
+			subtask.timeout AS subtask_timeout, 
+			subtask.start_datetime AS subtask_start_datetime, 
+			subtask.end_datetime AS subtask_end_datetime, 
+			subtask.status AS subtask_status, 
+			subtask.url AS subtask_url, 
+			subtask.method_type AS subtask_method_type, 
+			subtask.param AS subtask_param,
+			subtask.relate_task_id AS subtask_relate_task_id, 
+			subtask.relate_task_status AS subtask_relate_task_status, 
+			subtask.relate_task_msg AS subtask_relate_task_msg, 
+			subtask.priority AS subtask_priority,
+			task.id AS task_id
+		FROM tbl_subtask subtask, tbl_task task
+		WHERE subtask.task_id = task.id
+			AND subtask.status = 'running'
+		ORDER BY subtask.start_datetime DESC
+	</select>
+	
+	<update id="updateToStart" parameterType="com.bsg.upm.entity.SubTaskEntity">
+		UPDATE tbl_subtask 
+		<set>
+			start_datetime = #{startDateTime},
+			status = #{status}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateToEnd" parameterType="com.bsg.upm.entity.SubTaskEntity">
+		UPDATE tbl_subtask 
+		<set>
+			end_datetime = #{endDateTime},
+			status = #{status}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateRelateId" parameterType="com.bsg.upm.entity.SubTaskEntity">
+		UPDATE tbl_subtask 
+		<set>
+			relate_task_id = #{relateTaskId}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateRelateStatusAndMsg" parameterType="com.bsg.upm.entity.SubTaskEntity">
+		UPDATE tbl_subtask 
+		<set>
+			relate_task_status = #{relateTaskStatus},
+			relate_task_msg = #{relateTaskMsg}
+		</set>
+		WHERE id = #{id}
+	</update>
+</mapper>

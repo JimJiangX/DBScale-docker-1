@@ -1,0 +1,174 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					网段编辑
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>网段名称</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" name="name"
+							placeholder=" 输入网段名称" class="required " id="name">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>起始
+						IP </label>
+					<section class="col  col-8">
+						<label class="input state-disabled"> <input type="text"
+							name="startIp" class="required ip" id="startIp"
+							placeholder="输入起始 IP" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>结束
+						IP </label>
+					<section class="col  col-8">
+						<label class="input state-disabled"> <input type="text"
+							name="endIp" class="required ip" id="endIp" placeholder="输入结束 IP"
+							disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>网关
+					</label>
+					<section class="col  col-8">
+						<label class="input state-disabled"> <input type="text"
+							name="gateway" class="required ip" id="gateway"
+							placeholder="输入网关" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>掩码</label>
+					<section class="col col-8">
+						<label class="input state-disabled"> <input type="text"
+							name="prefix" placeholder=" 输入掩码" class="required digits "
+							id="prefix" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>VLAN
+						ID</label>
+					<section class="col col-8">
+						<label class="input state-disabled"> <input type="text"
+							name="vlanId" placeholder=" 输入VLAN ID" class="required digits "
+							id="vlanId" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div style="display: none;">
+					<input type="text" name="site" id="site" value="">
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="button" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+
+<script>
+    pageSetUp();
+    var networkingID;
+    var siteid=getSession("siteId");
+	$('#site').val(siteid);
+    var pagefunction = function() {
+    	 s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+         var networkingsid = $("#jqgrid").jqGrid('getRowData',s).id;
+         sendGet("/" + getProjectName() + "/v1.0/networkings/"+networkingsid,fillForm,DialogAlert,null);  
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option= {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{           
+            	   name:{
+                       required:"请输入网段名"
+                   },
+                   startIp:{
+                       required:"请输入IP地址",
+                       ip:"输入正确的IP"
+                   },
+                   endIp:{
+                       required:"请输入IP地址",
+                       ip:"输入正确的IP"
+                   },
+                   gateway:{
+                       required:"请输入网关",
+                       ip:"输入正确的IP"
+                   },
+                   vlanId:{
+                       required:"请输入vlan ID",
+                       digits:"输入正确的vlan ID"
+                   },
+                   prefix:{
+                       required:"请输入掩码",
+                       digits:"输入正确的掩码"
+                   }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",$(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToString(data);
+            	jsonData = JSON.parse(jsonData);
+            	jsonData.vlanId = parseInt(jsonData.vlanId);
+            	jsonData.prefix = parseInt(jsonData.prefix);
+            	//在这里调用ajax方法提交
+            	sendPut("/" + getProjectName() + "/v1.0/networkings/"+networkingID, postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/networkings?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    function fillForm(data){
+    	var networkingsdata=data['data'];
+    	networkingID=networkingsdata.id;
+        $('#name').val(networkingsdata.name);
+        $('#prefix').val(networkingsdata.prefix);
+        $('#vlanId').val(networkingsdata.vlanId);
+        $('#startIp').val(networkingsdata.startIp);
+        $('#endIp').val(networkingsdata.endIp);
+        $('#gateway').val(networkingsdata.gateway);
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

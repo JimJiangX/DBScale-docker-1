@@ -1,0 +1,35 @@
+<section id="widget-grid" class="">
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-24 col-sm-24 col-md-24 col-lg-12">
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+    </div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			sendGet("/" + getProjectName() + "/v1.0/servs?site="+getSession("siteId"),createGridInstance,ListAlert,null);
+    		});
+    	});
+    });
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/servs?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    
+    function reloadGrid(data){
+	   	ListAlertClear();
+	   	var jq_data=data['data'];  	
+	   	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

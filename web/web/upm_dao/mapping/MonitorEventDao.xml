@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.MonitorEventDao">
+	<resultMap id="monitorEventResultMap" type="com.bsg.upm.entity.MonitorEventEntity">
+		<id property="id" column="id" />
+
+		<result property="value" column="value" />
+		<result property="metric" column="metric" />
+		<result property="level" column="level" />
+
+		<result property="alarm" column="alarm" />
+		<result property="send" column="send" />
+
+		<result property="createTimestamp" column="create_timestamp" />
+		<result property="sendTimestap" column="send_timestap" />
+
+		<result property="hostRelateId" column="obj_host_relate_id" />
+		<result property="objType" column="obj_type" />
+		<result property="obj" column="obj" />
+		<result property="owner" column="obj_owner" />
+
+
+		<result property="servId" column="serv_id" />
+		<result property="systemId" column="business_system_id" />
+		<result property="subSystemId" column="business_subsystem_id" />
+		<result property="clusterId" column="cluster_id" />
+		<result property="siteId" column="site_id" />
+		<result property="areaId" column="area_id" />
+	</resultMap>
+
+	<select id="listAlarmWithNoSend" resultMap="monitorEventResultMap">
+		SELECT *
+		FROM
+		tbl_monitor_event e
+		WHERE e.send=0
+		AND e.alarm=1
+	</select>
+
+	<select id="list" resultMap="monitorEventResultMap">
+		SELECT *
+		FROM tbl_monitor_event e
+		order by e.create_timestamp DESC
+	</select>
+
+
+	<select id="countAlarm" resultType="int">
+		SELECT COUNT(e.id)
+		FROM
+		tbl_monitor_event e
+		WHERE e.alarm = 1
+		AND
+		e.send=${send}
+		<if test="siteId !=null and siteId !=''">
+			AND e.site_id = #{siteId}
+		</if>
+
+		<if test="owner !=null and owner !=''">
+			AND e.obj_owner = #{owner}
+		</if>
+
+		<if test="start !=null and start !=''">
+			AND e.create_timestamp >= #{start}
+		</if>
+
+		<if test="end !=null and end !=''">
+			AND #{end} >= e.create_timestamp
+		</if>
+
+	</select>
+
+
+	<select id="countEvent" resultType="int">
+		SELECT COUNT(e.id)
+		FROM
+		tbl_monitor_event e
+		<trim prefix="WHERE" prefixOverrides="AND |OR">
+			<if test="siteId !=null and siteId !=''">
+				AND e.site_id =
+				#{siteId}
+			</if>
+
+			<if test="owner !=null and owner !=''">
+				AND e.obj_owner = #{owner}
+			</if>
+
+			<if test="start !=null and start !=''">
+				AND e.create_timestamp >= #{start}
+			</if>
+
+			<if test="end !=null and end !=''">
+				AND #{end} >= e.create_timestamp
+			</if>
+		</trim>
+	</select>
+
+	<select id="listAlarm" parameterType="java.util.Map" resultMap="monitorEventResultMap">
+		SELECT *
+		FROM tbl_monitor_event e
+
+		WHERE e.alarm=1
+		
+		<if test="siteId !=null and siteId !=''">
+				AND e.site_id = #{siteId}
+		</if>
+
+		<if test="start !=null and start !=''">
+			AND e.create_timestamp >= #{start}
+		</if>
+
+
+		<if test="end !=null and end !=''">
+			AND #{end} >= e.create_timestamp
+		</if>
+
+
+		<if test="type !=null and type !=''">
+			AND e.obj_type = #{type}
+		</if>
+
+		<if test="hostId !=null and hostId !=''">
+			AND e.host_id = #{hostId}
+		</if>
+
+		<if test="owner !=null and owner !=''">
+			AND e.obj_owner = #{owner}
+		</if>
+        order by e.create_timestamp DESC
+	</select>
+
+	<select id="get" resultMap="monitorEventResultMap">
+		SELECT *
+		FROM tbl_monitor_event e
+		WHERE
+		e.id=#{id}
+	</select>
+
+	<select id="listEvent" parameterType="java.util.Map" resultMap="monitorEventResultMap">
+		SELECT *
+		FROM tbl_monitor_event e
+
+		WHERE e.site_id = #{siteId}
+
+		<if test="start !=null and start !=''">
+			AND e.create_timestamp >= #{start}
+		</if>
+
+
+		<if test="end !=null and end !=''">
+			AND #{end} >= e.create_timestamp
+		</if>
+
+
+		<if test="type !=null and type !=''">
+			AND e.obj_type = #{type}
+		</if>
+
+		<if test="hostId !=null and hostId !=''">
+			AND e.host_id = #{hostId}
+		</if>
+
+		<if test="owner !=null and owner !=''">
+			AND e.obj_owner = #{owner}
+		</if>
+       order by e.create_timestamp DESC
+	</select>
+
+
+	<update id="updateSend" parameterType="com.bsg.upm.entity.MonitorEventEntity">
+		UPDATE tbl_monitor_event
+		<set>
+			send = #{send},
+			send_timestap = #{sendTimestap},
+
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<insert id="save" parameterType="com.bsg.upm.entity.MonitorEventEntity">
+		INSERT INTO tbl_monitor_event
+		(
+		id,
+		serv_id,
+		business_system_id,
+		business_subsystem_id,
+		cluster_id,
+		alarm,
+		send,
+		obj_host_relate_id,
+		obj_type,
+		obj,
+		obj_owner,
+		value,
+		metric,
+		level,
+		create_timestamp,
+		send_timestap,
+		area_id,
+		site_id
+
+		)
+		VALUE
+		(
+		#{id},
+		#{servId},
+		#{systemId},
+		#{subSystemId},
+		#{clusterId},
+		#{alarm},
+		#{send},
+		#{hostRelateId},
+		#{objType},
+		#{obj},
+		#{owner},
+		#{value},
+		#{metric},
+		#{level},
+		#{createTimestamp},
+		#{sendTimestap},
+		#{areaId},
+		#{siteId}
+		)
+	</insert>
+</mapper>

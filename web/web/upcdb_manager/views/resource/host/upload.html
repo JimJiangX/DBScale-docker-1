@@ -1,0 +1,117 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					上传文件
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>选择文件</label>
+					<section class="col col-8">
+						<label class="input"> <input type="file" name="uploadfile"
+							id="uploadfile" placeholder="请选择Excel文件" class="required ">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+
+<script>
+	pageSetUp();
+	var pagefunction = function() {
+		//请求表单中的内容-如select并填充到页面
+		var siteid = getSession("siteId");
+		$('#site').val(siteid);
+
+		var errorClass = 'invalid';
+		var errorElement = 'em';
+		var option = {
+			errorClass : errorClass,
+			errorElement : errorElement,
+			highlight : function(element) {
+				$(element).parent().removeClass('state-success').addClass(
+						"state-error");
+				$(element).removeClass('valid');
+			},
+			unhighlight : function(element) {
+				$(element).parent().removeClass("state-error").addClass(
+						'state-success');
+				$(element).addClass('valid');
+
+			},
+			// Rules for form validation
+			// Messages for form validation
+			messages : {
+				uploadfile : {
+					required : '请选择Excel文件'
+				}
+			},
+			errorPlacement : function(error, element) {
+				if ($(element).next("div").hasClass("tooltip")) {
+					$(element).attr("data-original-title", $(error).text())
+							.tooltip("show");
+				} else {
+					$(element).attr("title", $(error).text()).tooltip("show");
+				}
+			},
+			submitHandler : function(form) {
+				var fd = new FormData();
+				fd.append("file", $("#uploadfile").get(0).files[0]);
+				//在这里调用ajax方法提交
+				$.ajax({
+							url : "/" + getProjectName() + "/v1.0/hosts/upload?site="
+									+ getSession("siteId"),
+							method : "post",
+							dataType : "json",
+							data : fd,
+							processData : false,
+							contentType : false,
+							beforeSend : function() {
+								loadIndex = layer.load();
+							},
+							success : function(data) {
+								layer.close(loadIndex);
+								postSuccess();
+							},
+							error : function(XMLHttpRequest, textStatus,
+									errorThrown) {
+								login_time_out(XMLHttpRequest);
+								layer.close(loadIndex);
+								DialogAlert(JSON.parse(XMLHttpRequest.responseText).msg);
+							}
+						});
+			}
+		};
+		$('#checkout-form').validate(option);
+	};
+	loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+	
+    function postSuccess(){
+    	swal("", "提交成功", "success");
+		$("#uploadModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/hosts?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+	
+	$('#submitbtn').click(function() {
+		DialogAlertClear();
+		$('#checkout-form').submit();
+	});
+</script>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DictDao">
+	<resultMap id="ResultMap" type="com.bsg.upm.entity.DictEntity">
+		<id property="code" column="code" />
+		<id property="dictTypeCode" column="dict_type_code" />
+		<result property="name" column="name" />
+		<result property="sequence" column="sequence" />
+	</resultMap>
+
+	<select id="getByDictTypeCodeAndDictCode" resultMap="ResultMap" parameterType="java.util.Map" flushCache="true">
+		SELECT d.dict_type_code, d.code, d.name, d.sequence
+		FROM tbl_dict d 
+		WHERE d.code = #{dictCode} 
+			AND d.dict_type_code = #{dictTypeCode}
+	</select>
+	
+	<select id="getByDictTypeCodeAndDictName" resultMap="ResultMap" parameterType="java.util.Map" flushCache="true">
+		SELECT d.dict_type_code, d.code, d.name, d.sequence
+		FROM tbl_dict d 
+		WHERE d.name = #{dictName} 
+			AND d.dict_type_code = #{dictTypeCode}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.DictEntity">
+		INSERT INTO tbl_dict
+		(
+			dict_type_code,
+			code,
+			name,
+			sequence
+		)
+		VALUE
+		(
+			#{dictTypeCode},
+			#{code},
+			#{name},
+			#{sequence}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.DictEntity">
+		UPDATE tbl_dict
+		<set>
+			name = #{name},
+			sequence = #{sequence}
+		</set>	
+		WHERE dict_type_code = #{dictTypeCode}
+			AND code = #{code}
+	</update>
+	
+	<delete id="removeDict">
+		DELETE FROM tbl_dict
+		WHERE dict_type_code = #{dictTypeCode}
+			AND code = #{code}
+	</delete>
+
+</mapper>

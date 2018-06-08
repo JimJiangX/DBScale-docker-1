@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.SubOrderDao">
+	<resultMap id="subOrderResultMap" type="com.bsg.upm.entity.SubOrderEntity">
+		<id property="id" column="suborder_id" />
+		<result property="networkBandwidth" column="suborder_network_bandwidth" />
+		<result property="dataDirSize" column="suborder_data_dir_size" />
+		<result property="dataDirDeviceType" column="suborder_data_dir_device_type" />
+		<result property="logDirSize" column="suborder_log_dir_size" />
+		<result property="logDirDeviceType" column="suborder_log_dir_device_type" />
+		<result property="mixed" column="suborder_mixed" />
+		<result property="highAvailable" column="suborder_high_available" />
+		<result property="associateSubOrderId" column="suorder_associate_suborder_id" />
+		<association property="definitionSubServ"
+			resultMap="com.bsg.upm.dao.DefinitionSubServDao.definitionSubServResultMap" />
+		<association property="subServSoftwareImage"
+			resultMap="com.bsg.upm.dao.SubServSoftwareImageDao.subServSoftwareImageResultMap" />
+		<association property="definitionSubServArch"
+			resultMap="com.bsg.upm.dao.DefinitionSubServArchDao.definitionSubServArchResultMap" />
+		<association property="definitionSubServUnitScale"
+			resultMap="com.bsg.upm.dao.DefinitionSubServUnitScaleDao.definitionSubServUnitScaleResultMap" />
+	</resultMap>
+	
+	<select id="countBySubServSoftwareImageId" resultType="int" flushCache="true">
+		SELECT COUNT(id)
+		FROM tbl_suborder
+		WHERE subserv_software_image_id = #{subServSoftwareImageId}
+	</select>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.SubOrderEntity">
+		UPDATE tbl_suborder
+		<set>
+			subserv_software_image_id = #{subServSoftwareImage.id},
+			definition_subserv_arch_id = #{definitionSubServArch.id},
+			definition_subserv_unit_scale_id = #{definitionSubServUnitScale.id},
+			network_bandwidth = #{networkBandwidth},
+			data_dir_size = #{dataDirSize},
+			data_dir_device_type = #{dataDirDeviceType},
+			log_dir_size = #{logDirSize},
+			log_dir_device_type = #{logDirDeviceType},
+			mixed = #{mixed},
+			high_available = #{highAvailable}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

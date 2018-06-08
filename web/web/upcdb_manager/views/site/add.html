@@ -1,0 +1,179 @@
+<div>
+    <!-- widget content -->
+    <div class="widget-body">
+        <form action="" method="post" id="checkout-form" class="smart-form">
+            <header>
+                <h2>
+                    站点新增
+                    <button class="close"  data-dismiss="modal">
+                        x
+                    </button>
+                </h2>
+            </header>
+			<fieldset>
+				<div id="dialog-alert">
+            	</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>站点名称</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" name="name" id="name" placeholder=" 输入站点名称" class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+				  <label class="label col col-3"><label style="color:red">*</label>所属地域</label>
+                    <section class="col col-8">
+                    	<label class="select">
+                            <select class=" required " id="regionCode" name="regionCode" >
+                                <option value="">请选择地域</option>
+                            </select>
+                        </label>
+                    </section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>consul地址</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" name="consulIps" id="consulIps" placeholder=" 请输入consul地址" class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>consul端口</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" name="consulPort" id="consulPort" placeholder=" 请输入consul端口" class="required">
+						</label>
+					</section>
+					<label class="label col col-2">consul令牌</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" name="consulToken" id="consulToken" placeholder=" 请输入consul令牌" class="">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">mgm 认证</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" name="mgmCa" id="mgmCa" placeholder=" 请输入mgm认证" class="">
+						</label>
+					</section>
+					<label class="label col col-2">horus 认证</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" name="horusServerCa" id="horusServerCa" placeholder=" 请输入horus认证" class="">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+    </div>
+    <!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+        取消
+    </button>
+    <button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+        保存
+    </button>
+</div>
+
+<script>
+    pageSetUp();
+    
+    var regionCode, $regionCode;
+    
+    var pagefunction = function() {
+    	
+    	$regionCode = $("#regionCode").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: []
+    	});
+    	regionCode = $regionCode[0].selectize;
+    	
+    	sendGet("/" + getProjectName() + "/v1.0/selections/regions",fill_regionCode,ListAlert,null);
+
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var options = {
+            errorClass		: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+                name: {
+                    required: '请输入站点名'
+                },
+                regionCode: {
+                    required: '请选择区域'
+                },
+                consulIps: {
+                    required: '请输入consul地址'
+                },
+                consulPort: {
+                    required: '请输入端口'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data = $('#checkout-form').serializeArray();
+            	var jsonData=arrayToString(data);
+            	jsonData = JSON.parse(jsonData);
+            	jsonData = {
+            			name: jsonData.name,
+            			regionCode: jsonData.regionCode,
+            			consulIps: jsonData.consulIps,
+            			consulPort: parseInt(jsonData.consulPort),
+            			consulToken: jsonData.consulToken,
+            			mgmCa: jsonData.mgmCa,
+            			horusServerCa: jsonData.horusServerCa,
+            			mgmPrefix: "MG",
+            			horusServerPrefix: "HS"
+            	}
+            	//在这里调用ajax方法提交
+            	sendPost("/" + getProjectName() + "/v1.0/sites", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+            }
+        };
+        $('#checkout-form').validate(options);
+    };
+    loadScript("../../js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function fill_regionCode(data){
+    	regionCode = $regionCode[0].selectize;
+    	regionCode.clearOptions();
+		$.each(data, function(k, v) {
+			regionCode.addOption(v);
+			regionCode.setValue(v.text);
+		});
+    }
+    
+	$('#submitbtn').click(function() {
+		DialogAlertClear();
+		$('#checkout-form').submit();
+	});
+	
+	function postSuccess(){
+		DialogAlertClear();
+		location.reload(true);
+	}
+</script>

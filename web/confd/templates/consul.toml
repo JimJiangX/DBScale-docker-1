@@ -1,0 +1,9 @@
+#mysql database setting
+jdbc.type=mysql
+jdbc.driver=com.mysql.jdbc.Driver
+
+
+jdbc.url=jdbc:mysql://{{getv "/mysql/ip"}}:{{getv "/port"}}/{{getv "/db/name"}}
+jdbc.username=root
+jdbc.password={{getv "/pass"}}
+

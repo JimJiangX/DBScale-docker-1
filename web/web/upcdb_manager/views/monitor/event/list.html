@@ -1,0 +1,54 @@
+  <!--区域-列表页面 -->
+<section id="widget-grid" class="">
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="widget-body">
+                <!-- Dynamic Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- content will be filled here -->
+                        </div>
+                    </div>
+                </div>
+              
+            </div>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <table id="jqgrid"></table>
+            <div id="pjqgrid">
+            </div>
+        </article>
+
+    </div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			sendGet("/" + getProjectName() + "/v1.0/monitor/event?site="+getSession("siteId"),createGrid_monitor_info,ListAlert,null);
+    		});
+    	});
+    });
+	
+    function showReturn(data){
+    	//启用、停用执行成功后的操作方法，刷新表格
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/event?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+		
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

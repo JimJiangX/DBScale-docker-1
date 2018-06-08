@@ -1,0 +1,172 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					软件新增
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>软件名称</label>
+					<section class="col col-8">
+						<label class="select"> <select class="required" id="definitionSubServSoftware" name="definitionSubServSoftware">
+								<option value="">请选择软件</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>主版本</label>
+					<section class="col col-8">
+						<label class="select"> <select class="required" id="majorVersion" name="majorVersion">
+								<option value="">请选择软件主版本</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>修订版本</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" id="patchVersion"
+							name="patchVersion" placeholder=" 请输入修订版本"
+							class="required digits">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>编译版本</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" id="buildVersion"
+							name="buildVersion" placeholder=" 请输入编译版本"
+							class="required digits">
+						</label>
+					</section>
+				</div>
+				<div style="display: none;">
+					<input type="text" name="site" id="site" value="">
+				</div>
+			</fieldset>
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+	var definitionSubServSoftware, $definitionSubServSoftware;
+	var majorVersion, $majorVersion;
+    pageSetUp();
+    
+    $majorVersion = $("#majorVersion").selectize({
+		valueField: 'id',
+		labelField: 'text',
+		searchField: 'text',
+		create: false,
+		sortField: {field: 'text'},
+		options: []
+	});
+    
+    var pagefunction = function() {
+    	var siteid=getSession("siteId");
+    	$('#site').val(siteid);
+    	
+		//请求表单中的内容-如select并填充到页面
+    	//这里具体请求的地址及页面上有哪些select还待讨论
+    	sendGet("/" + getProjectName() + "/v1.0/selections/softwares",fillSelect,DialogAlert,null);
+		
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var options ={
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+            	patchVersion : {
+                    required : '请输入修订版本',
+                    digits:'请输入正确的数字'
+                },
+                buildVersion : {
+                    required : '请输入编译版本',
+                    digits:'请输入正确的数字'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToString(data);
+            	jsonData = JSON.parse(jsonData);
+            	jsonData = {
+            		  "site":jsonData.site,
+            		  "definitionSubServSoftware":jsonData.majorVersion,
+            		  "patchVersion":parseInt(jsonData.patchVersion),
+            		  "buildVersion":parseInt(jsonData.buildVersion),
+            		  "description":""
+            	};
+            	//在这里调用ajax方法提交
+            	sendPost("/" + getProjectName() + "/v1.0/softwares/images",postSuccess,DialogAlert,JSON.stringify(jsonData),null);
+            }
+        };
+        $('#checkout-form').validate(options);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/softwares/images?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    function fillSelect(data){
+    	$definitionSubServSoftware = $("#definitionSubServSoftware").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: data
+    	});
+    	$("#definitionSubServSoftware").change(function(){
+    		sendGet("/" + getProjectName() + "/v1.0/selections/software/major_minor_versions?software_type="+$(this.selectedOptions).val(),fillSelect_version,DialogAlert,null);
+    	});
+    }
+    function fillSelect_version(data){
+    	majorVersion = $majorVersion[0].selectize;
+    	majorVersion.clearOptions();
+    	$.each(data, function(k, v){
+    		majorVersion.addOption(v);
+    	});
+    }
+    
+</script>

@@ -1,0 +1,238 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+		<form action="" method="post" id="dir-checkout-form" class="smart-form">
+			<header>
+				<h2>
+					增加用户
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<!-- <div class="row">
+            		<div style="color: red; padding: 0px 0 15px 20px;">(提示：为了数据安全，建议给用户分配仅够使用的最小权限,并且设置访问白名单。)</div>
+            	</div> -->
+				<div class="row">
+					<label class="label col col-3">用户名</label>
+					<section class="col col-6">
+						<label class="input"> <input type="text" id="username"
+							name="username" placeholder=" 请输入用户名" class="required">
+						</label>
+					</section>
+					<label>DBPM <input type="checkbox" id="authTypesCheck"
+							name="authTypesCheck" style="margin: 10px 0 0 5px;"></label>
+				</div>
+				<div class="row" id="password_tb">
+					<label class="label col col-3">密码</label>
+					<section class="col col-8">
+						<label class="input"> <input type="password" id="password"
+							name="password" placeholder=" 请输入密码" class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">白名单</label>
+					<section class="col col-8">
+						<label class="textarea"> <textarea rows="3" id="whiteIps"
+								name="whiteIps" class="custom-scroll"
+								placeholder="请填写以逗号相隔的IP地址" class="required"></textarea>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">数据库选择</label>
+					<section class="col col-8">
+						<label class="select"> <select class="required"
+							id="dbNameSel" name="dbNameSel">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">数据库权限</label>
+					<section class="col col-8" style="margin-bottom: 1px;">
+						<label class="select select-multiple"> <select
+							class="required" id="dbPrivilegesSel" name="dbPrivilegesSel"
+							multiple="multiple">
+						</select>
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+    pageSetUp();
+    
+    var dbPrivileges = {};
+    var dbPrivileges_number = 1;
+    var dbPrivileges_info = {};
+    var dbNameSel, $dbNameSel;
+    var dbPrivilegesSel, dbPrivilegesSel;
+    
+    $("#authTypesCheck").click(function(){
+    	var authTypesCheckValue = $('#authTypesCheck').is(':checked');
+    	if(authTypesCheckValue){
+    		$("#password_tb").hide();
+    	}else{
+    		$("#password_tb").show();
+    	}
+    });
+    
+    var pagefunction = function() {
+    	sendGet("/" + getProjectName() + "/v1.0/selections/privileges?enabled=1",get_dbPrivilegesSel_info,ListAlert,null);
+    	
+    	function get_dbPrivilegesSel_info(data){debugger;
+	    	$dbPrivilegesSel = $("#dbPrivilegesSel").selectize({
+	    		valueField: 'id',
+				labelField: 'text',
+				searchField: 'text',
+	    		create: false,
+	    		options: data
+	    	});
+	    	dbPrivilegesSel = $dbPrivilegesSel[0].selectize;
+    	}
+    	
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/databases",get_database_info,ListAlert,null);
+    	function get_database_info(data){
+        	$dbNameSel = $("#dbNameSel").selectize({
+        		valueField: 'name',
+    			labelField: 'name',
+    			searchField: 'name',
+        		create: false,
+        		sortField: {field: 'name'},
+        		options: data['data']
+        	});
+        	dbNameSel = $dbNameSel[0].selectize;
+        }
+    	
+    	//fillForm(data);
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option ={
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+                username : {
+                    required : '请输入用户名'
+                },
+                password : {
+                    required : '请输入密码'
+                },
+                whiteIps : {
+                	required : '请输入白名单'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                    $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var flg = false;
+            	var user_name_check = $('#username').val();
+            	var db_name1 = $('#dbNameSel').val();
+            	var ips = $('#whiteIps').val();
+            	
+            	if(typeof(db_name1) != "undefined" && db_name1 != null && db_name1 != ""){
+            		flg = true;
+            	}else{
+            		flg = false;
+            		DialogAlert("请分配数据库及其权限!");
+            	}
+            	
+            	if(user_name_check.indexOf("root")>=0 || user_name_check.indexOf("cup_dba")>=0 || user_name_check.indexOf("db_aas")>=0){
+            		flg = false;
+            		DialogAlert("用户名中包含root,cup_dba,db_aas的系统关键字,请更换名称!");
+            	}else{
+            		flg = true;
+            	}
+            	
+            	if(typeof(ips) != "undefined" && ips != null && ips != ""){
+            		flg = true;
+            	}else{
+            		flg = false;
+            		DialogAlert("请填写白名单!");
+            	}
+            	//在这里生成需要提交的json数据
+            	var jsonData = {
+            			username:$('#username').val(),
+            			password:$('#authTypesCheck').is(':checked') ?"":$('#password').val(),
+            			authType:$('#authTypesCheck').is(':checked') ? "DBPM":"password",
+            			databaseName:db_name1,
+            			ips:$('#whiteIps').val().split(","),
+            			privileges:dbPrivileges[db_name1]
+            	};
+            	if(flg){
+	            	//在这里调用ajax方法提交
+	            	sendPost("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/direct_users", postSuccess,DialogAlert,JSON.stringify(jsonData), null);debugger;
+            	}
+            }
+        };
+        $('#dir-checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function fillForm(data){
+    	var curDbName = '';
+    	var curDbPrivileges = '';
+    	$.each(data.data.dbPrivileges, function(k, v){
+    		if(curDbName == ''){
+    			curDbName = k;
+    			curDbPrivileges = v;
+    		}
+    		dbNameSel.addOption({
+    			id: k,
+    			text: k
+    		})
+    		dbPrivileges[k] = v;
+    	});
+    	dbNameSel.setValue([curDbName]); // toggle change
+    	dbPrivilegesSel.setValue([curDbPrivileges]);
+    }
+    
+    $("#dbNameSel").change(function(){
+    	dbPrivilegesSel.setValue(dbPrivileges[$("#dbNameSel").val()]);
+	});
+    
+	$("#dbPrivilegesSel").change(function(){
+		dbPrivileges[$("#dbNameSel").val()] = $("#dbPrivilegesSel").val();
+	});
+	
+	
+
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#dir-checkout-form').submit();
+    });
+    
+    function postSuccess(data){
+    	//提交成功的方法
+    	$("#myModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/direct_users',userDirectShowReturn,ListAlert,null);
+    }
+</script>

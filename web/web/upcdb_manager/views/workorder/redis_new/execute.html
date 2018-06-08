@@ -1,0 +1,477 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form id="checkout-form" class="smart-form">
+			<header style="padding: 10px 0;">
+				<h2>
+					工单执行
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">站点</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="siteName"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">区域</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="areaName" name="areaName">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">用户</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="owner"
+							disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">系统</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="businessSystemName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">子系统</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="businessSubSystemName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">服务名称</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="servName"
+							disabled class="required">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+			<header style="padding: 0px 0;">
+				<h6 id="upredisTitle"></h6>
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div class="row">
+					<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upredisArchName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="upredisSoftwareImageName" name="upredisSoftwareImageName">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="upredisMixed" name="upredisMixed">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">数据磁盘大小</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upredisDataSize" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">数据磁盘类型</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select disabled class="required "
+							id="upredisDataType" name="upredisDataType">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upredisScaleName" disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">日志磁盘大小</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="upredisLogSize"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">日志磁盘类型</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select disabled class="required "
+							id="upredisLogType" name="upredisLogType">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分片数量</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="shardingCount"
+							disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upredisNetworkBandwidth" disabled class="required" />
+						</label>
+					</section>
+				</div>
+			</fieldset>
+			<!-- <header style="padding: 0px 0;">
+				<h6 id="urproxyTitle"></h6>
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div class="row">
+					<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="urproxyArchName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="urproxySoftwareImageName" name="urproxySoftwareImageName">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="urproxyMixed" name="urproxyMixed">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="urproxyScaleName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="urproxyNetworkBandwidth" disabled class="required" />
+						</label>
+					</section>
+				</div>
+			</fieldset>
+			<header style="padding: 0px 0;">
+				<h6 id="sentinelTitle"></h6>
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div class="row">
+					<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="sentinelArchName"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="sentinelSoftwareImageName" name="sentinelSoftwareImageName">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="sentinelMixed" name="sentinelMixed">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="sentinelScaleName"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="sentinelNetworkBandwidth" disabled class="required" />
+						</label>
+					</section>
+				</div>
+			</fieldset> -->
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="button" class="btn btn-primary btn-sm" id="submitbtn">
+		执行</button>
+</div>
+
+<script>
+    pageSetUp();
+    
+    var areaName, $areaName;
+    var urproxySoftwareImageName, $urproxySoftwareImageName;
+    var upredisSoftwareImageName, $upredisSoftwareImageName;
+    var sentinelSoftwareImageName, $sentinelSoftwareImageName;
+    var upredisDataType, $upredisDataType;
+    var upredisLogType, $upredisLogType;
+    var urproxyMixed, $urproxyMixed;
+    var upredisMixed, $upredisMixed;
+    var sentinelMixed, $sentinelMixed;
+    var pagefunction = function() {
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        sendGet("/" + getProjectName() + "/v1.0/orders/"+rowData.id,fillForm,DialogAlert,null);  
+    };
+
+    var shardingCounts = 0;
+    
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function fillForm(data){
+    	var orderData=data['data'];
+        $('#siteName').val(orderData.siteName);
+        $('#businessSystemName').val(orderData.businessSystemName);
+        $('#businessSubSystemName').val(orderData.businessSubSystemName);
+        $('#owner').val(orderData.owner);
+        $('#servName').val(orderData.servName);
+        
+        sendGet("/" + getProjectName() + "/v1.0/selections/areas?site="+getSession("siteId")+"&enabled=1",fillSelect(orderData.areaId, orderData.areaName, 'areaName'),DialogAlert,null);
+        sendGet("/" + getProjectName() + "/v1.0/selections/storage_types",fillSelectType(orderData.subOrders),DialogAlert,null);
+        
+        var mixData = [
+        	{
+                "id": false,
+                "text": "非混合"
+            },
+            {
+            	"id": true,
+                "text": "混合"
+            }
+        ];        
+        
+        $.each(orderData.subOrders, function(index, order){
+        	if(order.type == "urproxy"){
+        		$('#urproxyTitle').text("UPREDIS代理");
+        		$('#urproxyArchName').val(order.archName);
+        		$('#urproxyScaleName').val(order.scaleName);
+        		$('#urproxyNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#urproxyDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#urproxyLogSize').val(BytesToSize(order.logDirSize));
+        		fillSelect(order.mixed, order.mixed, 'urproxyMixed')(mixData);
+        		
+        		sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=urproxy&enabled=1",fillSelect(order.softwareImageId, order.softwareImageName, 'urproxySoftwareImageName'),DialogAlert,null);
+        	} else if(order.type == "redis"){
+        		shardingCounts++;
+        		$('#upredisTitle').text("REDIS数据库");
+        		$('#upredisArchName').val(order.archName);
+        		$('#upredisScaleName').val(order.scaleName);
+        		$('#upredisNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#upredisDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#upredisLogSize').val(BytesToSize(order.logDirSize));
+        		fillSelect(order.mixed, order.mixed, 'upredisMixed')(mixData);
+        		
+        		sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=redis&enabled=1",fillSelect(order.softwareImageId, order.softwareImageName, 'upredisSoftwareImageName'),DialogAlert,null);
+        	} else if(order.type == "sentinel"){
+        		$('#sentinelTitle').text("UPREDIS高可用");
+        		$('#sentinelArchName').val(order.archName);
+        		$('#sentinelScaleName').val(order.scaleName);
+        		$('#sentinelNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#sentinelDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#sentinelLogSize').val(BytesToSize(order.logDirSize));
+        		fillSelect(order.mixed, order.mixed, 'sentinelMixed')(mixData);
+        		
+        		sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=sentinel&enabled=1",fillSelect(order.softwareImageId, order.softwareImageName, 'sentinelSoftwareImageName'),DialogAlert,null);
+        	}
+        });
+        if(orderData.sharding){
+        	$("#shardingCount").val(shardingCounts);
+        }else{
+        	shardingCounts = "无";
+        	$("#shardingCount").val(shardingCounts);
+        }
+    }
+    
+    function fillSelectType(subOrders){
+    	return function(data){
+    		$.each(subOrders, function(index, order){
+        		fillSelect(order.dataDirType, order.dataDirTypeText, order.type+'DataType')(data);
+        		fillSelect(order.logDirType, order.logDirTypeText, order.type+'LogType')(data);
+        	});
+    	}
+    }
+    function fillSelect(id, name, switchType){
+    	return function(data){
+    		
+    		var flg = false;
+    		$.each(data, function(k, v){
+    			if(v.id == id){
+    				flg = true;
+    			}
+    		});
+    		if(!flg){
+	    			data.push({id: id, text: name});
+    		}
+    		switch(switchType){
+    		case 'areaName':
+    			$areaName = $("#areaName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			areaName = $areaName[0].selectize;
+    			areaName.setValue([id]);
+    			break;
+    		case 'urproxySoftwareImageName': 
+    			$urproxySoftwareImageName = $("#urproxySoftwareImageName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			urproxySoftwareImageName = $urproxySoftwareImageName[0].selectize;
+    			urproxySoftwareImageName.setValue([id]);
+    			break;
+    		case 'upredisSoftwareImageName':
+    			$upredisSoftwareImageName = $("#upredisSoftwareImageName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upredisSoftwareImageName = $upredisSoftwareImageName[0].selectize;
+    			upredisSoftwareImageName.setValue([id]);
+    			break;
+    		case 'sentinelSoftwareImageName':
+    			$sentinelSoftwareImageName = $("#sentinelSoftwareImageName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			sentinelSoftwareImageName = $sentinelSoftwareImageName[0].selectize;
+    			sentinelSoftwareImageName.setValue([id]);
+    			break;
+    		case 'upredisDataType':
+    			$upredisDataType = $("#upredisDataType").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upredisDataType = $upredisDataType[0].selectize;
+    			upredisDataType.setValue([id]);
+    			break;
+    		case 'upredisLogType':
+    			$upredisLogType = $("#upredisLogType").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upredisLogType = $upredisLogType[0].selectize;
+    			upredisLogType.setValue([id]);
+    			break;
+    		case 'urproxyMixed':
+    			$urproxyMixed = $("#urproxyMixed").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			urproxyMixed = $urproxyMixed[0].selectize;
+    			urproxyMixed.setValue([id]);
+    			break;
+    		case 'upredisMixed':
+    			$upredisMixed = $("#upredisMixed").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upredisMixed = $upredisMixed[0].selectize;
+    			upredisMixed.setValue([id]);
+    			break;
+    		case 'sentinelMixed':
+    			$sentinelMixed = $("#sentinelMixed").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			sentinelMixed = $sentinelMixed[0].selectize;
+    			sentinelMixed.setValue([id]);
+    			break;
+    		default:
+    		}
+    	}
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	var jsonData={};
+    	jsonData.area = $('#areaName').val();
+    	jsonData.definitionSubServs = [
+    		{
+    		      "name": "redis",
+    		      "mixed": $('#urproxyMixed').text() == '混合' ? true : false
+    		    }
+    	];
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var orderID = rowData.id;
+    	sendPut("/" + getProjectName() + "/v1.0/orders/"+orderID+"/execution", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+    });
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/orders?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+</script>

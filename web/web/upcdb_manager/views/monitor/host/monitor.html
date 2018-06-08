@@ -1,0 +1,475 @@
+<section id="widget-grid" class="">
+	<div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+	<div class="row" style="padding-left:13px;padding-right:5px">
+	    <h4>基本信息</h4>
+	    <table class="table no-border">
+	        <tbody>
+	        <tr>
+	            <th id="id">主机ID: </th>
+	            <th id="name">主机名称: </th>
+	        </tr>
+	        <tr>
+	            <th id="sshIp">IP地址: </th>
+	            <th id="siteName">所在站点: </th>
+	        </tr>
+	        <tr>
+	            <th id="clusterName">所属集群: </th>
+	            <th id="os">系统版本: </th>
+	        </tr>
+	        <tr>
+	            <th id="statusText">运行状态: </th>
+	            <th id="inputDateTime">入库时间: </th>
+	        </tr>
+	        </tbody>
+	    </table>
+	    <h4>资源信息</h4>
+	    <table class="table no-border">
+	        <tbody>
+	        <tr>
+	            <th id="usedCpuCnt">CPU已分配: </th>
+	            <th id="cpuCnt">CPU总数: </th>
+	        </tr>
+	        <tr>
+	            <th id="usedMemCnt">内存已分配: </th>
+	            <th id="memCnt">内存容量: </th>
+	        </tr>
+	        <tr>
+	            <th id="usedHddCnt">HDD已分配: </th>
+	            <th id="hddCnt">HDD总量: </th>
+	        </tr>
+	        <tr>
+	            <th id="usedSsdCnt">SSD已分配: </th>
+	            <th id="ssdCnt">SSD总量: </th>
+	        </tr>
+	        </tbody>
+	    </table>
+	</div>
+	<div class="row">
+		<article class="col-sm-24 col-md-24 col-lg-12" style="padding-left:13px;padding-right:5px">
+			<div class="jarviswidget" id="wid-id-0"
+				data-widget-colorbutton="false" data-widget-editbutton="false"
+				data-widget-togglebutton="false" data-widget-deletebutton="false"
+				data-widget-fullscreenbutton="false" data-widget-custombutton="false"
+				data-widget-sortable="false" style="height: 280px;">
+				<header>
+					<span class="widget-icon"> <i class="glyphicon glyphicon-stats txt-color-darken"></i></span>
+					<h2>日资源使用监控</h2>
+					<div class="col-sm-4 col-md-4 col-lg-2"></div>
+					<div class="col-sm-6 col-md-6 col-lg-3 input-group">
+						<input class="form-control" id="timepicker" type="text" placeholder="Select time">
+						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+					</div>
+				</header>
+				<!-- widget div-->
+				<!-- widget edit box -->
+				<div class="jarviswidget-editbox"></div>
+				<!-- end widget edit box -->
+				<!-- content -->
+				<div id="rateChartDay" class="chart txt-color-blue" style="height: 260px;"></div>
+				<!-- end widget div -->
+			</div>
+		</article>
+	</div>
+	<div class="row">
+		<article class="col-sm-24 col-md-24 col-lg-12" style="padding-left:13px;padding-right:5px">
+			<div class="jarviswidget" id="wid-id-1"
+				data-widget-colorbutton="false" data-widget-editbutton="false"
+				data-widget-togglebutton="false" data-widget-deletebutton="false"
+				data-widget-fullscreenbutton="false" data-widget-custombutton="false"
+				data-widget-sortable="false" style="height: 280px;">
+				<header>
+					<span class="widget-icon"> <i class="glyphicon glyphicon-stats txt-color-darken"></i></span>
+					<h2>月资源使用监控</h2>
+					<a href="javascript:void(0);" id="monthRefresh" onclick="refresh()" class="btn"><i class="fa fa-refresh fs-spin"></i></a>
+				</header>
+				<!-- widget div-->
+				<!-- widget edit box -->
+				<div class="jarviswidget-editbox"></div>
+				<!-- end widget edit box -->
+				<!-- content -->
+				<div id="rateChartMonth" class="chart txt-color-blue" style="height: 260px;"></div>
+				<!-- end widget div -->
+			</div>
+		</article>
+	</div>
+</section>
+<script>
+    pageSetUp();
+    
+    var dayData = [],
+    	monthData = [],
+    	legendDayData = [],
+    	legendMonthData = [];
+    var dayIndex = monthIndex = 0;
+    
+    var now = new Date(),
+    	hour = 1000 * 60 * 60,
+    	day = hour * 24,
+    	month = 30 * day,
+    	nowLimit = Math.round(now / day) * day + day,
+    	month = 31 * day;
+    var yAxisDayGap = yAxisMonthGap = 0;
+    var cpuInterval = memInterval = hhdInterval = ssdInterval = 0;
+    
+    var rateChartDay = echarts.init(document.getElementById('rateChartDay'));
+    var rateChartMonth = echarts.init(document.getElementById('rateChartMonth'));
+    rateChartDay.showLoading();
+    rateChartMonth.showLoading();
+    rateChartDay.setOption({
+        legend: {
+            data: legendDayData
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (params) {
+            	var tooltip = '';
+            	$.each(params, function(k, v){
+            		var date = new Date(Number(v.name));
+            		tooltip += v.seriesName + '  ' + date.getFullYear() +  '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + '  ' + v.value[1];
+            		tooltip += "</br>";
+            	});
+                
+                return tooltip;
+            },
+            axisPointer: {
+                animation: false
+            }
+        },
+        xAxis: {
+            type: 'time'
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%'],
+            min: 0,
+            max: 100
+        },
+        dataZoom: genDayDataZoom(),
+        legend: {
+            data: legendDayData
+        },
+        series: dayData
+    });
+    
+    rateChartMonth.setOption({
+        legend: {
+            data: legendMonthData
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (params) {
+            	var tooltip = '';
+            	$.each(params, function(k, v){
+            		var date = new Date(Number(v.name));
+            		tooltip += v.seriesName + '  ' + date.getFullYear() +  '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + '  ' + v.value[1];
+            		tooltip += "</br>";
+            	});
+                
+                return tooltip;
+            },
+            axisPointer: {
+                animation: false
+            }
+        },
+        xAxis: {
+            type: 'time'
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%'],
+            min: 0,
+            max: 100
+        },
+        dataZoom: genMonthDataZoom(),
+        legend: {
+            data: legendMonthData
+        },
+        series: monthData
+    });
+    
+    $('#timepicker').datepicker({
+    	language: 'zh-CN',
+    	endDate: now,
+    	startDate: new Date(nowLimit - month),
+    	autoclose: true
+    }).datepicker('setDate', DateToStrYYYYMMDD(now))
+    	.on('changeDate', function(e) {
+    		cpuInterval != 0 ? clearInterval(cpuInterval) : cpuInterval;
+    		memInterval != 0 ? clearInterval(memInterval) : memInterval;
+    		cpuInterval = memInterval = hhdInterval = ssdInterval = 0;
+    		// TODO hhd ssd
+    		
+    		dayData = [];
+    		legendDayData = [];
+    		yAxisDayGap = 0;
+    		dayIndex = 0;
+    		
+    		rateChartDay.setOption({
+    			legend: {
+    	            data: legendDayData
+    	        },
+	        	series: dayData,
+		        dataZoom: genDayDataZoom()
+	    	});
+    		rateChartDay.showLoading();
+    		
+    		// e.date 内置date为UTC
+    		var d = e.date.getTime() + day == nowLimit - 8 * hour ?  new Date() : e.date;
+    		
+    		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/cpu_usage"+DateToDayParam(d),initCpuChart,ListAlert,null);
+		    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/mem_usage"+DateToDayParam(d),initMemChart,ListAlert,null);
+			// TODO hhd ssd
+    	})
+    	.on('show', function(e) {
+    		now = new Date();
+    		if(nowLimit < now.getTime()){
+    			nowLimit = Math.round(now / day) * day + day;
+    			$('#timepicker').datepicker('setEndDate', now);
+    			$('#timepicker').datepicker('setStartDate', new Date(nowLimit - month));
+    		}
+    	});
+    
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/hosts/"+getSession("hostId"),initHostDetail,ListAlert,null);
+    
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/cpu_usage"+DateToDayParam(now),initCpuDayChart,ListAlert,null);
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/mem_usage"+DateToDayParam(now),initMemDayChart,ListAlert,null);
+	// TODO hhd ssd
+    
+	sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/cpu_usage"+DateToMonthParam(now),initCpuMonthChart,ListAlert,null);
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/mem_usage"+DateToMonthParam(now),initMemMonthChart,ListAlert,null);
+	// TODO hhd ssd
+    
+	
+    function initHostDetail(data){
+    	var host = data.data;
+    	$("#id").append(host.id);
+    	$("#name").append(host.name);
+    	$("#sshIp").append(host.sshIp);
+    	$("#siteName").append(host.siteName);
+    	$("#clusterName").append(host.clusterName);
+    	$("#os").append(host.os);
+    	$("#statusText").append(host.statusText);
+    	$("#inputDateTime").append(host.inputDateTime);
+    	$("#usedCpuCnt").append(host.usedCpuCnt);
+    	$("#cpuCnt").append(host.cpuCnt);
+    	$("#usedMemCnt").append(BytesToGB(host.usedMemCnt) +'G');
+    	$("#memCnt").append(BytesToGB(host.memCnt) +'G');
+    	$("#usedHddCnt").append(BytesToGB(host.usedHddCnt) +'G');
+    	$("#hddCnt").append(BytesToGB(host.hddCnt) +'G');
+    	$("#usedSsdCnt").append(BytesToGB(host.usedSsdCnt) +'G');
+    	$("#ssdCnt").append(BytesToGB(host.ssdCnt) +'G');
+    }
+    
+    var cpuType = 'cpu_usage',
+    	memType = 'mem_usage';
+    
+    function initCpuDayChart(data){
+    	initDayChart(data, cpuType);
+    }
+    
+    function initMemDayChart(data){
+    	initDayChart(data, memType);
+    }
+    
+    function initCpuMonthChart(data){
+    	initMonthChart(data, cpuType);
+    }
+    
+    function initMemMonthChart(data){
+    	initMonthChart(data, memType);
+    }
+    
+    function initDayChart(data, type){
+    	var d = [];
+    	$.each(data.data, function(k, v){
+    		d.push({
+    			name: v.timestamp.toString(),
+                value: [
+                	v.timestamp,
+                	Math.round(v.value * 100) / 100
+                ]
+    		});
+    		yAxisDayGap < (Math.round(v.value * 100) / 100) ? (yAxisDayGap = Math.round(v.value * 100) / 100) : yAxisDayGap;
+    	});
+    	var title = '';
+    	switch(type)
+    	{
+    	case cpuType:
+    		title = 'cpu';
+    		break;
+    	case memType:
+    		title = '内存';
+    		break;
+    	default:
+    		title = '';
+    	}
+    	var i = dayIndex++;
+    	dayData.push({
+            name: title,
+            type: 'line',
+            data: d
+        });
+    	
+    	legendDayData.push(title);
+    	
+    	rateChartDay.setOption({
+    		legend: {
+	            data: legendDayData
+	        },
+	        series: dayData,
+	        dataZoom: genDayDataZoom()
+	    });
+    	if(i==0){
+    		rateChartDay.hideLoading();
+    	}
+    	
+    	
+		if(Math.round($('#timepicker').datepicker('getDate').getTime() / day) * day + day == nowLimit) {
+			var interval = setInterval(function () {
+	    		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/"+type,function(data){
+	    			dayData[i].data.shift();
+	    			dayData[i].data.push({
+	    	    		name: data.data.timestamp.toString(),
+	                    value: [
+	                    	data.data.timestamp,
+	                    	Math.round(data.data.value * 100) / 100
+	                    ]
+	    	    	});
+	    	    	rateChartDay.setOption({
+	        	        series: dayData
+	        	    });
+	    		},ListAlert,null);
+	    	}, 60 * 1000);
+	    	switch(type)
+	    	{
+	    	case cpuType:
+	    		cpuInterval = interval;
+	    		break;
+	    	case memType:
+	    		memInterval = interval;
+	    		break;
+	    	default:
+	    		title = '';
+	    	}
+		}
+    }
+    
+    function initMonthChart(data, type){
+    	var d = [];
+    	$.each(data.data, function(k, v){
+    		d.push({
+    			name: v.timestamp.toString(),
+                value: [
+                	v.timestamp,
+                	Math.round(v.value * 100) / 100
+                ]
+    		});
+    		yAxisMonthGap < (Math.round(v.value * 100) / 100) ? (yAxisMonthGap = Math.round(v.value * 100) / 100) : yAxisMonthGap;
+    	});
+    	var title = '';
+    	switch(type)
+    	{
+    	case cpuType:
+    		title = 'cpu';
+    		break;
+    	case memType:
+    		title = '内存';
+    		break;
+    	default:
+    		title = '';
+    	}
+    	var i = monthIndex++;
+    	monthData.push({
+            name: title,
+            type: 'line',
+            data: d
+        });
+    	
+    	legendMonthData.push(title);
+    	
+    	rateChartMonth.setOption({
+    		legend: {
+	            data: legendMonthData
+	        },
+	        series: monthData,
+	        dataZoom: genMonthDataZoom()
+	    });
+    	if(i==0){
+    		rateChartMonth.hideLoading();
+    	}
+    }
+    
+    function refresh(){
+    	now = new Date();
+    	monthData = [];
+		legendMonthData = [];
+		yAxisMonthGap = 0;
+		monthIndex = 0;
+		
+		rateChartMonth.setOption({
+			legend: {
+	            data: legendMonthData
+	        },
+        	series: monthData,
+	        dataZoom: genMonthDataZoom()
+    	});
+		rateChartMonth.showLoading();
+		
+		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/cpu_usage"+DateToMonthParam(now),initCpuMonthChart,ListAlert,null);
+	    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/hosts/"+getSession("hostId")+"/mem_usage"+DateToMonthParam(now),initMemMonthChart,ListAlert,null);
+		// TODO hhd ssd
+    }
+    
+    function genDayDataZoom(){
+    	return [
+            {
+                type: 'slider',
+                show: true,
+                xAxisIndex: [0]
+            },
+            {
+                type: 'slider',
+                show: true,
+                yAxisIndex: [0],
+                end: (yAxisDayGap + 10 < 100) ? yAxisDayGap + 10 : 100
+            },
+            {
+                type: 'inside',
+                xAxisIndex: [0]
+            },
+            {
+                type: 'inside',
+                yAxisIndex: [0],
+                end: (yAxisDayGap + 10 < 100) ? yAxisDayGap + 10 : 100
+            }
+        ];
+    }
+    
+    function genMonthDataZoom(){
+    	return [
+            {
+                type: 'slider',
+                show: true,
+                xAxisIndex: [0]
+            },
+            {
+                type: 'slider',
+                show: true,
+                yAxisIndex: [0],
+                end: (yAxisMonthGap + 10 < 100) ? yAxisMonthGap + 10 : 100
+            },
+            {
+                type: 'inside',
+                xAxisIndex: [0]
+            },
+            {
+                type: 'inside',
+                yAxisIndex: [0],
+                end: (yAxisMonthGap + 10 < 100) ? yAxisMonthGap + 10 : 100
+            }
+        ];
+    }
+</script>

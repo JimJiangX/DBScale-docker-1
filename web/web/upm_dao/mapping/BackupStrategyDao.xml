@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.BackupStrategyDao">
+	<resultMap id="backupStrategyResultMap" type="com.bsg.upm.entity.BackupStrategyEntity">
+		<id property="id" column="backup_strategy_id" />
+		<result property="type" column="backup_strategy_type" />
+		<result property="dbName" column="backup_strategy_db_name" />
+		<result property="tableNames" column="backup_strategy_table_names" />
+		<result property="cronExpression" column="backup_strategy_cron_expression" />
+		<result property="expireDatetime" column="backup_strategy_expire_datetime" />
+		<result property="retention" column="backup_strategy_retention" />
+		<result property="enabled" column="backup_strategy_enabled" />
+		<result property="remark" column="backup_strategy_remark" />
+		<result property="createDateTime" column="backup_strategy_create_datetime" />
+		<result property="createUserLoginName" column="backup_strategy_create_user_login_name" />
+		<association property="serv" resultMap="com.bsg.upm.dao.ServDao.servResultMap"/>
+	</resultMap>
+	
+	<select id="listEnabled" resultMap="backupStrategyResultMap" flushCache="true">
+		SELECT id AS backup_strategy_id,
+			type AS backup_strategy_type,
+			db_name AS backup_strategy_db_name,
+			table_names AS backup_strategy_table_names,
+			cron_expression AS backup_strategy_cron_expression,
+			expire_datetime AS backup_strategy_expire_datetime,
+			retention AS backup_strategy_retention,
+			enabled AS backup_strategy_enabled,
+			remark AS backup_strategy_remark,
+			serv_id,
+			create_datetime AS backup_strategy_create_datetime,
+			create_user_login_name AS backup_strategy_create_user_login_name
+		FROM tbl_backup_strategy
+		WHERE enabled = 1
+	</select>
+	
+	<select id="listByServId" resultMap="backupStrategyResultMap" flushCache="true">
+		SELECT id AS backup_strategy_id,
+			type AS backup_strategy_type,
+			db_name AS backup_strategy_db_name,
+			table_names AS backup_strategy_table_names,
+			cron_expression AS backup_strategy_cron_expression,
+			expire_datetime AS backup_strategy_expire_datetime,
+			retention AS backup_strategy_retention,
+			enabled AS backup_strategy_enabled,
+			remark AS backup_strategy_remark,
+			create_datetime AS backup_strategy_create_datetime,
+			create_user_login_name AS backup_strategy_create_user_login_name
+		FROM tbl_backup_strategy
+		WHERE serv_id = #{servId}
+		ORDER BY create_datetime DESC
+	</select>
+	
+	<select id="get" resultMap="backupStrategyResultMap" flushCache="true">
+		SELECT id AS backup_strategy_id,
+			type AS backup_strategy_type,
+			db_name AS backup_strategy_db_name,
+			table_names AS backup_strategy_table_names,
+			cron_expression AS backup_strategy_cron_expression,
+			expire_datetime AS backup_strategy_expire_datetime,
+			retention AS backup_strategy_retention,
+			enabled AS backup_strategy_enabled,
+			remark AS backup_strategy_remark,
+			create_datetime AS backup_strategy_create_datetime,
+			create_user_login_name AS backup_strategy_create_user_login_name
+		FROM tbl_backup_strategy
+		WHERE id = #{id}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.BackupStrategyEntity">
+		INSERT INTO tbl_backup_strategy
+		(
+			id,
+			type,
+			db_name,
+			table_names,
+			cron_expression,
+			expire_datetime,
+			retention,
+			enabled,
+			remark,
+			serv_id,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+		(
+			#{id},
+			#{type},
+			#{dbName},
+			#{tableNames},
+			#{cronExpression},
+			#{expireDatetime},
+			#{retention},
+			#{enabled},
+			#{remark},
+			#{serv.id},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.BackupStrategyEntity">
+		UPDATE tbl_backup_strategy
+		<set>
+			type = #{type},
+			db_name = #{dbName},
+			table_names = #{tableNames},
+			cron_expression = #{cronExpression},
+			expire_datetime = #{expireDatetime},
+			retention = #{retention}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateEnabled" parameterType="com.bsg.upm.entity.BackupStrategyEntity">
+		UPDATE tbl_backup_strategy
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_backup_strategy
+		WHERE id = #{id}
+	</delete>
+	
+	<delete id="removeByServId">
+		DELETE FROM tbl_backup_strategy
+		WHERE serv_id = #{servId}
+	</delete>
+
+</mapper>

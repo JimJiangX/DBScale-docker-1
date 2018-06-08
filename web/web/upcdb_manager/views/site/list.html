@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<style>
+			.deleteimg{
+				top : 0px;
+				right : 0px;
+				display: none;
+				position :absolute;
+				width : 20px;
+				height : 20px;
+				cursor: pointer;
+			}
+			.layout-line{
+				border: 1px solid #c0c0c0;
+				margin: 10px;
+			}
+			.talbe>tbody>tr>td{
+				border-top: 0px solid #ddd ;
+				margin: 10px;
+			}
+			.layout-inner-table{
+				position :relative;
+				margin: 20px;
+				border: 1px solid #c0c0c0 ;
+				color:#666666;
+				-webkit-border-radius: 5px;
+				-moz-border-radius: 5px;
+				border-radius: 5px;
+				padding: 5px;
+				font-size: 15px;
+				font-weight: bold;
+				text-align: left;
+				width : 300px;
+				height : 150px;
+				float:left;
+			}
+			.site-content{
+				margin-left: 20%;
+				margin-top: 10%;
+			}
+			.imgholder img{
+				max-width:100%;
+				background:#ccc;
+				display:block;
+			}
+			.site-btn{
+				margin: -5px 0 0 100px;
+			}
+		</style>
+		<meta charset="utf-8">
+		<title> 站点列表</title>
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">	
+		<!-- #CSS Links -->
+		<!-- Basic Styles -->
+		<link rel="stylesheet" type="text/css" media="screen" href="../../css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="../../css/font-awesome.min.css">
+		<!-- SmartAdmin Styles : Caution! DO NOT change the order -->
+		<link rel="stylesheet" type="text/css" media="screen" href="../../css/smartadmin-production-plugins.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="../../css/smartadmin-production.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="../../css/smartadmin-skins.min.css">
+		<!-- SmartAdmin RTL Support -->
+		<link rel="stylesheet" type="text/css" media="screen" href="../../css/smartadmin-rtl.min.css">	
+		<link href="../../css/selectize.default.css" rel="stylesheet" />
+		<link href="../../css/sweetalert-v2.css" rel="stylesheet" />		
+	</head>
+	<body class="animated">
+		<header id="header">
+			<div id="logo-group">
+				<span id="logo"> <!-- <img src="../../icon/unionpaylogo.svg" alt="UnionPay"> --> </span>
+			</div>
+		</header>
+			<!-- MAIN CONTENT -->
+			<div id="content" class="container">
+			<div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+				<div class="row" >
+				<div id="updating-chart" class="chart txt-color-blue" style="height: 400px; margin:0px 5px 10px 10px;"></div>
+				</div>
+				<div class="row" >
+					<h1 class="own_self_style_blue login-header-big"></h1>
+					<article class="col-sm-4">
+						<div class="modal fade" id="remoteModal" tabindex="-1" role="dialog" aria-labelledby="remoteModalLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+								</div>
+							</div>
+						</div>
+							<div>
+								<a href="add.html" data-toggle="modal" data-target="#remoteModal" class="btn btn-success"><i class="fa fa-plus"></i> 新增</a>
+							</div>
+					</article>
+				</div>
+				<div class="row">
+					<div class="layout-line"></div>
+				</div>
+		</div>
+		
+		
+		<!--================================================== -->	
+		<!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+		<script src="../../js/plugin/pace/pace.min.js"></script>
+	    <!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+	    <script src="../../js/libs/jquery-2.1.1.min.js"></script>
+		<script src="../../js/libs/jquery-ui-1.10.3.min.js"></script>
+		<!-- IMPORTANT: APP CONFIG -->
+		<script src="../../js/app.config.js"></script>
+		<!-- JS TOUCH : include this plugin for mobile drag / drop touch events 		
+		<script src="js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script> -->
+		<!-- BOOTSTRAP JS -->		
+		<script src="../../js/bootstrap/bootstrap.min.js"></script>
+		<!-- JQUERY VALIDATE -->
+		<script src="../../js/plugin/jquery-validate/jquery.validate.min.js"></script>		
+		<!-- JQUERY MASKED INPUT -->
+		<script src="../../js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+		<!--[if IE 8]>	
+			<h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>		
+		<![endif]-->
+		<!-- MAIN APP JS FILE -->
+		<script src="../../js/trans-ajax.js"></script>
+		<script src="../../js/sweetalert-dev-v2.js"></script>
+		<script src="../../js/app.min.js"></script>
+		<script src="../../layer/ajax.js"></script>
+		<script src="../../layer/layui.js"></script>
+		<script src="../../js/echarts.min.js"></script>
+		<script src="../../js/china.js"></script>
+		<script src="../../js/util.js"></script>
+		<script src="../../js/selectize.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function () {
+				sendGetWithoutLayer("/" + getProjectName() + "/v1.0/sites",initSitePage,ListAlert,null);
+			});
+			
+			function initSitePage(data){
+				var seriesData = [];
+				$.each(data.data, function(index, site){
+					var html = '<div class="layout-inner-table">';
+					html += '<i class="fa fa-minus pull-right"></i><img class="deleteimg" onclick="deletePC(\'' + site.id + '\')">';
+					html += '<div class="site-content" data-site-id="'+site.id+'" >';
+					html += '<table>';
+					html += '<tr><td>站点名称:</td><td>&nbsp;'+site.name+'</td></tr>';
+					html += '<tr><td>地域:</td><td>&nbsp;'+site.regionText+'</td></tr>';
+					html += '<tr><td>hs状态:</td><td>&nbsp;'+site.hsStatusText+'</td></tr>';
+					html += '<tr><td>mgm状态:</td><td>&nbsp;'+site.mgmStatusText+'</td></tr>';
+					html += '<tr><td></td><td><button class="btn btn-primary site-btn" data-site-id="'+site.id+'">进&nbsp;入</button></td></tr>';
+					html += '</table></div></div>';
+					$('.layout-line').append(html);
+					seriesData.push({name: site.name,selected:true});
+				});
+				//鼠标划过事件
+				$(".layout-inner-table").mouseover(function () {
+					//显示删除叉
+					$(this).find(".deleteimg").css("display", "block");
+				});
+				$(".layout-inner-table").mouseleave(function mouseOut(){
+					//显示删除叉
+					$(this).find(".deleteimg").css("display", "none");
+				});
+				$(".site-content").dblclick(function (e){
+					setSession("siteId",$(this).data('siteId'));//在跳转页面前在session中存储site的ID
+					window.location.href="/" + getProjectName() + "/index.html#views/homepage/homepage.html";
+				});
+				$(".site-btn").click(function (e){
+					setSession("siteId",$(this).data('siteId'));//在跳转页面前在session中存储site的ID
+					window.location.href="/" + getProjectName() + "/index.html#views/homepage/homepage.html";
+				});
+				
+				var myChart = echarts.init(document.getElementById('updating-chart'));
+				
+				var cityData = [
+					{name: '上海', value: 100},
+					{name: '北京', value: 100}
+				];
+				var geoCoordMap = {
+					'上海':[121.48,31.22],
+					'北京':[116.46,39.92]
+				}
+				var convertData = function (cityData) {
+				    var res = [];
+				    for (var i = 0; i < cityData.length; i++) {
+				        var geoCoord = geoCoordMap[cityData[i].name];
+				        if (geoCoord) {
+				            res.push({
+				                name: cityData[i].name,
+				                value: geoCoord.concat(cityData[i].value)
+				            });
+				        }
+				    }
+				    return res;
+				};
+				option = {
+						backgroundColor: '#404a59',
+					    title: {
+					        text: '站点分布图',
+					        subtext: '',
+					        sublink: '',
+					        left: 'center',
+					        textStyle: {
+					            color: '#fff'
+					        }
+					    },
+					    tooltip : {
+					        trigger: 'item'
+					    },
+					    legend: {
+					        orient: 'vertical',
+					        y: 'bottom',
+					        x:'right',
+					        data:['pm2.5'],
+					        textStyle: {
+					            color: '#fff'
+					        }
+					    },
+					    geo: {
+					        map: 'china',
+					        label: {
+					            emphasis: {
+					                show: false
+					            }
+					        },
+					        roam: false,
+					        itemStyle: {
+					            normal: {
+					                areaColor: '#323c48',
+					                borderColor: '#111'
+					            },
+					            emphasis: {
+					                areaColor: '#2a333d'
+					            }
+					        }
+					    },
+					    series : [
+					        {
+					            name: '城市',
+					            type: 'scatter',
+					            coordinateSystem: 'geo',
+					            data: convertData(cityData),
+					            symbolSize: function (val) {
+					                return val[2] / 10;
+					            },
+					            label: {
+					                normal: {
+					                    formatter: '{b}',
+					                    position: 'right',
+					                    show: false
+					                },
+					                emphasis: {
+					                    show: true
+					                }
+					            },
+					            itemStyle: {
+					                normal: {
+					                    color: '#ddb926'
+					                }
+					            }
+					        },
+					        {
+					            name: 'Top 5',
+					            type: 'effectScatter',
+					            coordinateSystem: 'geo',
+					            data: convertData(cityData.sort(function (a, b) {
+					                return b.value - a.value;
+					            }).slice(0, 6)),
+					            symbolSize: function (val) {
+					                return val[2] / 10;
+					            },
+					            showEffectOn: 'render',
+					            rippleEffect: {
+					                brushType: 'stroke'
+					            },
+					            hoverAnimation: true,
+					            label: {
+					                normal: {
+					                    formatter: '{b}',
+					                    position: 'right',
+					                    show: true
+					                }
+					            },
+					            itemStyle: {
+					                normal: {
+					                    color: '#f4e925',
+					                    shadowBlur: 10,
+					                    shadowColor: '#333'
+					                }
+					            },
+					            zlevel: 1
+					        }
+					    ]
+					};
+				myChart.setOption(option);
+				myChart.on('click', function (params) {//点击事件
+			        console.log(params);
+			        console.log(data);
+				});
+			}
+			
+			function deletePC(siteId){
+				swal({ 
+					  title: "提示", 
+					  text: "确定要删除该站点么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+							sendDelete("/" + getProjectName() + "/v1.0/sites/"+siteId, function(data){ location.reload(true);}, ListAlert, null);
+						}
+				});
+			}
+		</script>
+	</body>
+</html>

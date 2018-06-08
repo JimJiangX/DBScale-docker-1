@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.NetworkingDao">
+	<resultMap id="networkingResultMap" type="com.bsg.upm.entity.NetworkingEntity">
+		<id property="id" column="networking_id" />
+		<result property="name" column="networking_name" />
+		<result property="startIp" column="networking_start_ip" />
+		<result property="endIp" column="networking_end_ip" />
+		<result property="vlanId" column="networking_vlan_id" />
+		<result property="prefix" column="networking_prefix" />
+		<result property="gateway" column="networking_gateway" />
+		<result property="enabled" column="networking_enabled" />
+		<result property="description" column="networking_description" />
+		<result property="createDateTime" column="networking_create_datetime" />
+		<result property="createUserLoginName" column="networking_create_user_login_name" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+	</resultMap>
+
+	<resultMap id="networkingDetailResultMap" type="com.bsg.upm.entity.NetworkingEntity"
+		extends="networkingResultMap">
+		<association property="cluster"
+			resultMap="com.bsg.upm.dao.ClusterDao.clusterResultMap" />
+	</resultMap>
+
+	<select id="list" parameterType="java.util.Map" resultMap="networkingDetailResultMap" flushCache="true">
+		SELECT n.id AS networking_id, 
+			n.name AS networking_name, 
+			n.start_ip AS networking_start_ip, 
+			n.end_ip AS networking_end_ip, 
+			n.vlan_id AS networking_vlan_id, 
+			n.prefix AS networking_prefix, 
+			n.gateway AS networking_gateway, 
+			n.enabled AS networking_enabled, 
+			n.description AS networking_description, 
+			n.create_datetime AS networking_create_datetime, 
+			n.create_user_login_name AS networking_create_user_login_name, 
+			site.id AS site_id, 
+			site.name AS site_name,
+			temp.area_id,
+			temp.area_name,
+			temp.area_enabled,
+			temp.cluster_id, 
+			temp.cluster_name,
+			temp.cluster_enabled
+		FROM tbl_networking n
+			LEFT JOIN (SELECT c.id AS cluster_id, 
+							c.name AS cluster_name, 
+							c.enabled AS cluster_enabled,
+							cn.networking_id,
+							a.id AS area_id,
+							a.name AS area_name,
+							a.enabled AS area_enabled
+					   FROM tbl_cluster c, tbl_cluster_networking cn, tbl_area a
+					   WHERE c.id = cn.cluster_id
+					   	AND c.area_id = a.id) temp 
+			ON n.id = temp.networking_id, tbl_site site
+		WHERE n.site_id = site.id
+		AND site.id = #{siteId}
+		ORDER BY site.create_datetime DESC, n.create_datetime DESC
+	</select>
+	
+	<select id="listUnusedName" resultMap="networkingResultMap" flushCache="true">
+		SELECT n.id AS networking_id, 
+			n.name AS networking_name,
+			n.description AS networking_description
+		FROM tbl_networking n 
+		WHERE n.site_id = #{siteId}
+		<if test="enabled!=null">
+			AND n.enabled = #{enabled}
+		</if>
+			AND n.id NOT IN (SELECT networking_id FROM tbl_cluster_networking)
+		ORDER BY n.name
+	</select>
+	
+	<select id="listStartAndEndIpBySiteId" resultMap="networkingResultMap" flushCache="true">
+		SELECT n.id AS networking_id, 
+			n.name AS networking_name, 
+			n.start_ip AS networking_start_ip, 
+			n.end_ip AS networking_end_ip
+		FROM tbl_networking n
+		WHERE n.site_id = #{siteId}
+	</select>
+
+	<select id="get" resultMap="networkingDetailResultMap" flushCache="true">
+		SELECT n.id AS networking_id, 
+			n.name AS networking_name, 
+			n.start_ip AS networking_start_ip, 
+			n.end_ip AS networking_end_ip, 
+			n.vlan_id AS networking_vlan_id, 
+			n.prefix AS networking_prefix, 
+			n.gateway AS networking_gateway, 
+			n.enabled AS networking_enabled, 
+			n.description AS networking_description, 
+			n.create_datetime AS networking_create_datetime, 
+			n.create_user_login_name AS networking_create_user_login_name, 
+			site.id AS site_id, 
+			site.name AS site_name,
+			temp.area_id,
+			temp.area_name,
+			temp.area_enabled,
+			temp.cluster_id, 
+			temp.cluster_name,
+			temp.cluster_enabled
+		FROM tbl_networking n
+			LEFT JOIN (SELECT c.id AS cluster_id, 
+							c.name AS cluster_name, 
+							c.enabled AS cluster_enabled,
+							cn.networking_id,
+							a.id AS area_id,
+							a.name AS area_name,
+							a.enabled AS area_enabled
+					   FROM tbl_cluster c, tbl_cluster_networking cn, tbl_area a
+					   WHERE c.id = cn.cluster_id
+					   	AND c.area_id = a.id) temp 
+			ON n.id = temp.networking_id, tbl_site site
+		WHERE n.site_id = site.id
+			AND n.id = #{id}
+	</select>
+	
+	<select id="countBySiteId" resultType="int" flushCache="true">
+        SELECT COUNT(n.id)
+        FROM tbl_networking n
+        WHERE n.site_id = #{siteId}
+    </select>
+	
+	<select id="countBySiteIdAndName" resultType="int" flushCache="true">
+		SELECT COUNT(n.id)
+		FROM tbl_networking n
+		WHERE n.site_id = #{siteId}
+		  	AND n.name = #{name}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.NetworkingEntity">
+		INSERT INTO tbl_networking
+		(
+			id,
+            site_id,
+			name,
+			start_ip,
+			end_ip,
+			vlan_id,
+			prefix,
+			gateway,
+			enabled,
+			description,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+		(
+			#{id},
+            #{site.id},
+			#{name},
+			#{startIp},
+			#{endIp},
+			#{vlanId},
+			#{prefix},
+			#{gateway},
+			#{enabled},
+			#{description},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<update id="updateEnabled" parameterType="com.bsg.upm.entity.NetworkingEntity">
+		UPDATE tbl_networking
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.NetworkingEntity">
+		UPDATE tbl_networking
+		<set>
+			name = #{name},
+			description = #{description}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="remove">
+		DELETE FROM tbl_networking
+		WHERE id = #{id}
+	</delete>
+
+</mapper>

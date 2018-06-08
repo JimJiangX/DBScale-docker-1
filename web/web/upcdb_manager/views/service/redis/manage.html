@@ -1,0 +1,2155 @@
+<div class="widget-body ">
+	<div class="">
+		<h3>信息</h3>
+		<table class="table no-border">
+
+			<tbody>
+				<tr>
+					<th id="siteName">所属站点:</th>
+					<th id="areaName">所属区域:</th>
+					<th id="owner">所属用户:</th>
+				</tr>
+				<tr>
+					<th id="businessSystemName">所属系统:</th>
+					<th id="businessSubSystemName">所属子系统:</th>
+					<th id="servName">服务名称:</th>
+				</tr>
+				<tr>
+					<th id="softwareVersion">数据库版本:</th>
+					<th id="scaleName">性能套餐:</th>
+					<th id="createDateTime">创建时间:</th>
+				</tr>
+				<tr>
+					<th id="networkBandwidth">带宽:</th>
+					<th id="dateDirType">存储类型:</th>
+					<th id="dateSize">表空间:</th>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+	<div class="row">
+		<div id="list-alert"></div>
+	</div>
+	<ul id="myTab1" class="nav nav-tabs bordered">
+		<li><a id="graphTab" onclick="graphTabClick()" href="#s13" data-toggle="tab" style="margin-right: 1px;">部署架构</a></li>
+		<li class="active"><a id="upsqlTab" onclick="upsqlTabClick()"
+			href="#s1" data-toggle="tab">REDIS</a></li>
+		<li><a id="upproxyTab" onclick="upproxyTabClick()" href="#s1"
+			data-toggle="tab">代理</a></li>
+		<li><a id="swmTab" onclick="swmTabClick()" href="#s1"
+			data-toggle="tab">高可用</a></li>
+		<li><a id="upsqlParamTab" onclick="paramTabClick('upredis')"
+			href="#s2" data-toggle="tab">REDIS参数管理</a></li>
+		<li><a id="upproxyParamTab" onclick="paramTabClick('urproxy')"
+			href="#s2" data-toggle="tab">代理节点参数管理</a></li>
+		<!-- <li><a id="monitorTab" href="#s12" data-toggle="tab">监控指标</a></li> -->
+		<li><a id="monitorEventInfosTab"
+			onclick="monitorEventInfosTabClick()" href="#sEvent" data-toggle="tab" style="margin-right: 1px;">事件配置</a>
+		</li>
+		<li><a id="monitorMetricclassInfosTab"
+			onclick="monitorMetricclassInfosTabClick()" href="#sMetricclass" data-toggle="tab" style="margin-right: 1px;">监控项配置</a>
+		</li>
+	</ul>
+	<div id="myTabContent1" class="tab-content">
+		<div class="tab-pane fade" id="sEvent">
+			<div class="modal fade" id="sEventModal" tabindex="-1"
+				role="dialog" aria-labelledby="sEventModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br>
+			<a href="javascript:void(0);" class="btn btn-info"
+				onclick="eventClick('update')" id="eventUpdate">编辑</a>
+			<a href="javascript:void(0);" class="btn btn-success"
+				onclick="eventClick('start')" id="eventEnable">启用</a>
+			<a href="javascript:void(0);" class="btn btn-danger"
+				onclick="eventClick('stop')" id="eventDisable">停用</a>
+			<a href="javascript:void(0);" class="btn btn-success"
+				onclick="eventClick('alarmStart')" id="eventAlarmEnable">告警启用</a>
+			<a href="javascript:void(0);" class="btn btn-danger"
+				onclick="eventClick('alarmStop')" id="eventAlarmDisable">告警停用</a>
+			<div class="col-xs-2">
+			<select id="subServ_eventType" name="subServ_eventType" class="form-control">
+				<option value="upredis">数据库模块</option>
+				<option value="urproxy">代理模块</option>
+				<option value="sentinel">高可用模块</option>
+			</select>
+			</div>
+			<p>&nbsp;</p>
+			<table id="jqgridEvent"></table>
+			<div id="pjqgridEvent"></div>
+		</div>
+		<div class="tab-pane fade" id="sMetricclass">
+			<div class="modal fade" id="sMetricclassModal" tabindex="-1"
+				role="dialog" aria-labelledby="sMetricclassModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br>
+			<a href="javascript:void(0);" class="btn btn-info"
+				onclick="metricclassClick('update')" id="metricclassUpdate">监控频率</a>
+			<a href="javascript:void(0);" class="btn btn-success"
+				onclick="metricclassClick('start')" id="metricclassEnable">启用</a>
+			<a href="javascript:void(0);" class="btn btn-danger"
+				onclick="metricclassClick('stop')" id="metricclassDisable">停用</a>
+			<div class="col-xs-2">
+			<select id="subServ_metricType" name="subServ_metricType" class="form-control">
+				<option value="upredis">数据库模块</option>
+				<option value="urproxy">代理模块</option>
+				<option value="sentinel">高可用模块</option>
+			</select>
+			</div>
+			<p>&nbsp;</p>
+			<table id="jqgridMetricclass"></table>
+			<div id="pjqgridMetricclass"></div>
+		</div>
+	
+		<div class="tab-pane fade in active " id="s1">
+			<!-- Dynamic Modal -->
+			<div class="modal fade" id="s1remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s1remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br> <a href="javascript:void(0);" class="btn btn-success"
+				onclick="unit('start')">启动</a> <a href="javascript:void(0);"
+				class="btn btn-danger" onclick="unit('stop')">停止</a> 
+			    <a href="javascript:void(0);" class="btn btn-info" onclick="unit('migrate')" id="migrateBtn">迁移</a> 
+				<a href="javascript:void(0);" class="btn btn-danger" onclick="unit('rebuild')" id="rebuildBtn">重建</a>
+				<a
+				href="javascript:void(0);" class="btn btn-danger"
+				onclick="unit('recover')" id="recoverBtn">回切</a>
+				<a
+				href="javascript:void(0);" class="btn btn-warning"
+				onclick="unit('failover')" id="failoverBtn">切换</a>
+				
+				<a href="javascript:void(0);" class="btn btn-success"
+				onclick="resetPassword()" id="resetPassword">重置密码</a>
+				<a href="javascript:void(0);" class="btn btn-primary" style="margin-left: 50px;" onclick="unit('monitor')" id="unitMonitor">监控</a>
+				<a href="javascript:void(0);" id="refresh" class="btn btn-primary" style="float: right; margin-right: 10px;" onclick="showReturnManageAll()">刷新</a>
+			<p>&nbsp;</p>
+			<table id="jqgrid"></table>
+			<div id="pjqgrid"></div>
+		</div>
+		<div class="tab-pane fade" id="s2">
+			<div class="modal fade" id="s2remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s2remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br> <a href="javascript:void(0);" class="btn btn-info"
+				onclick="editParam()" id="updateParam">编辑</a>
+			<p>&nbsp;</p>
+			<table id="jqgridParam"></table>
+			<div id="pjqgridParam"></div>
+		</div>
+		<div class="tab-pane fade" id="s3">
+			<div class="modal fade" id="s3remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s3remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br>
+			<p>&nbsp;</p>
+			<table id="jqgridBackupList"></table>
+			<div id="pjqgridBackupList"></div>
+		</div>
+		<div class="tab-pane fade" id="s4">
+			<div class="modal fade" id="s4remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s4remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br> <a href="javascript:void(0);" class="btn btn-info"
+				onclick="addBackupStrategyClick()" id="addBackupStrategy">增加</a> <a
+				href="javascript:void(0);" class="btn btn-info"
+				id="editBackupStrategy">编辑</a> <a href="javascript:void(0);"
+				class="btn btn-info" onclick="backupStrategyClick('delete')"
+				id="deleteBackupStrategy">删除</a> <a href="javascript:void(0);"
+				class="btn btn-info" onclick="backupStrategyClick('start')"
+				id="startBackupStrategy">启用</a> <a href="javascript:void(0);"
+				class="btn btn-info" onclick="backupStrategyClick('stop')"
+				id="stopBackupStrategy">停止</a>
+			<p>&nbsp;</p>
+			<table id="jqgridBackupStrategy"></table>
+			<div id="pjqgridBackupStrategy"></div>
+		</div>
+		<div class="tab-pane fade" id="s5">
+			<div class="modal fade" id="s5remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s5remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br>
+			<p>&nbsp;</p>
+			<table id="jqgridRelation"></table>
+			<div id="pjqgridRelation"></div>
+		</div>
+		<div class="tab-pane fade" id="s6">
+			<div class="modal fade" id="s6remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s6remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br> <a href="javascript:void(0);" class="btn btn-info"
+				onclick="userClick('add')" id="addUser">增加</a>
+			<p>&nbsp;</p>
+			<table id="jqgridUser"></table>
+			<div id="pjqgridUser"></div>
+		</div>
+		<div class="tab-pane fade" id="s7">
+			<div class="modal fade" id="s7remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s7remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<br> <a href="javascript:void(0);" class="btn btn-info"
+				onclick="databaseClick('add')" id="addDatabase">增加</a> <a
+				href="javascript:void(0);" class="btn btn-info"
+				onclick="databaseClick('delete')" id="deleteDatabase">删除</a>
+			<p>&nbsp;</p>
+			<table id="jqgridDatabase"></table>
+			<div id="pjqgridDatabase"></div>
+		</div>
+		<div class="tab-pane fade" id="s12">
+			<!-- 监控-↓ -->
+		</div>
+		<div class="tab-pane fade" id="s13">
+			<div class="row">
+				<article class="col-sm-24 col-md-24 col-lg-12"
+					style="padding-left: 13px; padding-right: 5px">
+						<div id="chartGraph" class="chart txt-color-blue"
+							style="height: 800px;width: 1300px"></div>
+						<!-- end widget div -->
+			</div>
+		</div>
+		<!-- myTabContent1 end -->
+	</div>
+	<div class="modal fade" id="s12remoteModal" tabindex="-1"
+				role="dialog" aria-labelledby="s12remoteModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" style="width: 1300px;">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="s12remoteModalLabel">监控图</h4>
+						</div>
+						<div class="modal-body">
+				<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						<div class="row" style="height: 600px;  width: 960px;">
+					<article class="col-sm-24 col-md-24 col-lg-12"
+						style="padding-left: 13px; padding-right: 5px">
+						<div class="jarviswidget" id="wid-id-0"
+							data-widget-colorbutton="false" data-widget-editbutton="false"
+							data-widget-togglebutton="false" data-widget-deletebutton="false"
+							data-widget-fullscreenbutton="false"
+							data-widget-custombutton="false" data-widget-sortable="false"
+							style="height: 520px;  width: 960px;">
+							<header>
+								<span class="widget-icon"> <i
+									class="glyphicon glyphicon-stats txt-color-darken"></i></span>
+								<h2>视图</h2>
+								<div class="col-sm-4 col-md-4 col-lg-2">
+									<label class="select"> <select class="required"
+										style="width: 200px" id="metricSelectDay"
+										name="metricSelectDay">
+											<option value="">选择监控项</option>
+									</select>
+									</label>
+								</div>
+								<div class="col-sm-2 col-md-2 col-lg-1">
+										</div>
+										<h2>开始日期:</h2><div class="col-sm-4 col-md-4 col-lg-2">
+											<input class="form-control" id="timepickerStart" type="text"
+												placeholder="Select time"></input>
+										</div>
+										<h2>结束日期:</h2><div class="col-sm-4 col-md-4 col-lg-2">
+											<input class="form-control" id="timepickerEnd" type="text"
+												placeholder="Select time"></input>
+										</div>
+							</header>
+							<!-- widget div-->
+							<!-- widget edit box -->
+							<div class="jarviswidget-editbox"></div>
+							<!-- end widget edit box -->
+							<!-- content -->
+							<div id="chartDay" class="chart txt-color-blue"
+								style="height: 520px; width: 960px;"></div>
+							<!-- end widget div -->
+						</div>
+					</article>
+				</div>
+				<div class="row" style="height: 520px;  width: 960px;">
+					<article class="col-sm-24 col-md-24 col-lg-12"
+						style="padding-left: 13px; padding-right: 5px; height: 600px;width: 960px;" >
+						<div class="jarviswidget" id="wid-id-1"
+							data-widget-colorbutton="false" data-widget-editbutton="false"
+							data-widget-togglebutton="false" data-widget-deletebutton="false"
+							data-widget-fullscreenbutton="false"
+							data-widget-custombutton="false" data-widget-sortable="false"
+							style="height: 560px;width: 960px;">
+							<header>
+								<span class="widget-icon"> <i
+									class="glyphicon glyphicon-stats txt-color-darken"></i></span>
+								<h2>月视图</h2>
+								<div class="col-sm-4 col-md-4 col-lg-2">
+									<label class="select"> <select class="required"
+										style="width: 200px" id="metricSelectMonth"
+										name="metricSelectMonth">
+											<option value="">选择监控项</option>
+									</select>
+									</label>
+								</div>
+							</header>
+							<!-- widget div-->
+							<!-- widget edit box -->
+							<div class="jarviswidget-editbox"></div>
+							<!-- end widget edit box -->
+							<!-- content -->
+							<div id="chartMonth" class="chart txt-color-blue"
+								style="height: 520px; width: 960px;"></div>
+							<!-- end widget div -->
+						</div>
+					</article>
+				</div>
+				</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+							</button>
+						</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="taskModal" tabindex="-1" role="dialog"
+		aria-labelledby="taskModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width: 1200px;" id="dialogmodal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="taskModalLabel">任务状态提示</h4>
+				</div>
+				<div class="modal-body">
+					<div class="table-responsive">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>所属者</th>
+									<th>操作时间</th>
+									<th>对象类型</th>
+									<th>对象名称</th>
+									<th>任务类型</th>
+									<th>状态</th>
+									<th>回执信息</th>
+								</tr>
+							</thead>
+							<tbody id="mainframestate">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+					</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<!-- content will be filled here -->
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="migrateRebuildModal" tabindex="-1" role="dialog" aria-labelledby="migrateRebuildModalLabel" aria-hidden="true">
+			<div class="modal-dialog" style="width: 300px; margin-top:200px">
+				<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+				</div>
+			</div>
+	</div>
+</div>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId"),fillForm,ListAlert,null);
+    	});
+    });
+    $("#migrateBtn").hide();
+    var metricSelectDay, $metricSelectDay;
+    var metricSelectMonth, $metricSelectMonth;
+    
+    var chartDay = echarts.init(document.getElementById('chartDay'));
+	function chartToolTipFormatter(params) {
+    	var tooltip = '';
+    	var date = "";
+    	$.each(params, function(k, v){
+    		date = new Date(Number(v.value[0]));
+    		tooltip += v.seriesName + ':  ' + v.value[1];
+    		tooltip += "</br>";
+    	});
+    	tooltip = date.getFullYear() +  '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + "</br>" + tooltip;
+        
+        return tooltip;
+    }
+    var chartDayOption = {
+            legend: {
+            	type: 'scroll',
+                orient: 'vertical',
+                right: 10,
+                top: 120,
+                bottom: 20,
+                data: []
+            },
+            xAxis: {
+                type: 'time',
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+                type: 'value',
+                splitLine: {
+                    show: false
+                }
+            },
+            toolbox: {
+            	left: 'center',
+                feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                formatter: chartToolTipFormatter,
+                axisPointer: {
+                    animation: false
+                }
+            },
+            xAxis: {
+                type: 'time',
+                splitLine: {
+                	show: false
+                }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                max: 'dataMax',
+                axisLabel: {
+	        		formatter: yAxisFormatterDay
+	        	},
+	        	splitLine: {
+                	show: false
+                }
+            },
+            dataZoom: genDataZoom(),
+            visualMap: {},
+            series: []
+        };
+    var chartMonth = echarts.init(document.getElementById('chartMonth'));
+    var chartMonthOption = {
+            legend: {
+            	type: 'scroll',
+                orient: 'vertical',
+                right: 10,
+                top: 120,
+                bottom: 20,
+                data: []
+            },
+            xAxis: {
+                type: 'time',
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+                type: 'value',
+                splitLine: {
+                    show: false
+                }
+            },
+            toolbox: {
+            	left: 'center',
+                feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                formatter: chartToolTipFormatter,
+                axisPointer: {
+                    animation: false
+                }
+            },
+            xAxis: {
+                type: 'time',
+                splitLine: {
+                	show: false
+                }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                max: 'dataMax',
+                axisLabel: {
+	        		formatter: yAxisFormatterMonth
+	        	},
+	        	splitLine: {
+                	show: false
+                }
+            },
+            dataZoom: genDataZoom(),
+            visualMap: {},
+            series: []
+        };    
+    var upsqlGraphChart = echarts.init(document.getElementById('chartGraph'));
+    
+    var dayData = [],
+		monthData = [],
+		legendDayData = [],
+		legendMonthData = [];
+    var now = new Date(),
+		hour = 1000 * 60 * 60,
+		day = hour * 24,
+		month = 30 * day,
+		nowLimit = Math.round(now / day) * day + day,
+		month = 31 * day;
+    var yAxisDayGap = yAxisMonthGap = 0;
+    var dayInterval = 0;
+    var dayMonitorType = monthMonitorType = "";
+    
+    var monitorUnitId;
+    
+	var monitorMarkLineArray = [];
+	var dateDirTypeFlag = "hdd";
+	var dateDirTypeFlagPro = "hdd";
+    var dateDirTypeFlagSw = "hdd";
+	
+    function fillForm(data){
+    	$("#siteName").append(data.data['siteName']);
+        $("#areaName").append(data.data['areaName']);
+        $("#owner").append(data.data['owner']);
+        $("#businessSystemName").append(data.data['businessSystemName']);
+        $("#businessSubSystemName").append(data.data['businessSubSystemName']);
+        $("#servName").append(data.data['servName']);
+        $("#createDateTime").append(data.data['createDateTime']);
+        for(var i = 0;i<data.data['subServs'].length;i++){
+        	if(data.data['subServs'][i]['type'] == 'upredis'){
+        		 $("#softwareVersion").append(data.data['subServs'][i]['softwareVersion']);
+        	     $("#scaleName").append(data.data['subServs'][i]['scaleName']);
+        	     $("#dateSize").append(Number(data.data['subServs'][i]['dateSize'])/1024/1024/1024+"G");
+        	     $("#dateDirType").append(data.data['subServs'][i]['dateDirTypeText']);
+        	     
+        	     if (data.data['subServs'][i]['dateDirType'] == 'san') {
+        	    	 dateDirTypeFlag = "san";
+        	    	 $("#migrateBtn").show();
+        	    	 $("#rebuildBtn").hide();
+        	     }
+        	     break;
+        	}
+        }
+        for(var i = 0;i<data.data['subServs'].length;i++){
+        	if(data.data['subServs'][i]['type'] == 'urproxy'){
+        		$("#networkBandwidth").append(data.data['subServs'][i]['networkBandwidth'] == 0 ? "无限制" :data.data['subServs'][i]['networkBandwidth']+"M");
+        		if (data.data['subServs'][i]['dateDirType'] == 'san') {
+	       	    	 dateDirTypeFlagPro = "san";
+	       	    	 $("#migrateBtn").show();
+	       	    	 $("#rebuildBtn").hide();
+       	     	}
+        		break;
+        	}
+        }
+        for(var i = 0;i<data.data['subServs'].length;i++){
+        	if(data.data['subServs'][i]['type'] == 'sentinel'){
+        		if (data.data['subServs'][i]['dateDirType'] == 'san') {
+	       	    	 dateDirTypeFlagSw = "san";
+	       	    	 $("#migrateBtn").show();
+	       	    	 $("#rebuildBtn").hide();
+       	     	}
+        		break;
+        	}
+        }
+        
+        $metricSelectDay = $("#metricSelectDay").selectize({
+    		valueField: 'id',
+    		labelField: 'text',
+    		searchField: 'text',
+    		create: true,
+    		sortField: {field: 'sortField'},
+    		options: []
+    	});
+        metricSelectDay = $metricSelectDay[0].selectize;
+        $("#metricSelectDay").change(function(){
+        	dayInterval != 0 ? clearInterval(dayInterval) : dayInterval;
+    		dayInterval = 0;
+    		
+    		dayData = [];
+    		legendDayData = [];
+    		yAxisDayGap = 0;
+    		dayIndex = 0;
+    		
+    		chartDayOption.series = dayData;
+    		v = getVisualMap(metricSelectDay.getValue());
+    		if(v === 0){
+    			delete(chartDayOption.visualMap);
+    		} else {
+    			chartDayOption.visualMap = getVisualMap(metricSelectDay.getValue());
+    		}
+    		if(metricSelectDay.getValue() == 'network'
+    			|| metricSelectDay.getValue() == 'sql_press'
+    			|| metricSelectDay.getValue() == 'dir_usage'
+    			|| metricSelectDay.getValue() == 'thread_connection'){
+    			chartDayOption.legend = {
+    					type: 'scroll',
+		                orient: 'vertical',
+		                right: 10,
+		                top: 120,
+		                bottom: 20,
+		                data: legendDayData
+    			}
+    		} else {
+    			delete(chartDayOption.legend);
+    		}
+    		chartDay.clear();
+    		chartDay.setOption(chartDayOption);
+    		chartDay.showLoading();
+    		
+    		dayMonitorType = $(this.selectedOptions).val();
+    		
+    		/* var to = $('#timepickerEnd').datepicker('getDate').getTime() + day == nowLimit - 8 * hour ?  new Date() : $('#timepickerEnd').datepicker('getDate').getTime();
+    		var from = $('#timepickerStart').datepicker('getDate').getTime();
+    		var param = "?start_time="+Math.round(from/1000)+"&end_time="+Math.round(to/1000); */
+    		
+    		var dateStart = $('#timepickerStart').datepicker('getDate').getTime();
+    		var dateEnd = $('#timepickerEnd').datepicker('getDate').getTime();
+    		var param = "?start_time="+Math.round(dateStart/1000)+"&end_time="+Math.round((dateEnd+86399000)/1000);
+    		
+    		if($(this.selectedOptions).val() != ""){
+    			console.log("/" + getProjectName() + "/v1.0/monitor/unit/"+monitorUnitId+"/"+$(this.selectedOptions).val()+param);
+            	sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/unit/"+monitorUnitId+"/"+$(this.selectedOptions).val()+param,initDayChart,ListAlert,null);
+    		}
+    	});
+        
+        $metricSelectMonth = $("#metricSelectMonth").selectize({
+    		valueField: 'id',
+    		labelField: 'text',
+    		searchField: 'text',
+    		create: true,
+    		sortField: {field: 'sortField'},
+    		options: []
+    	});
+        metricSelectMonth = $metricSelectMonth[0].selectize;
+        
+        $("#metricSelectMonth").change(function(){
+    		monthData = [];
+    		legendMonthData = [];
+    		yAxisMonthGap = 0;
+    		monthIndex = 0;
+    		
+			chartMonth.series = monthData;
+    		v = getVisualMap(metricSelectMonth.getValue());
+    		if(v === 0){
+    			delete(chartMonthOption.visualMap);
+    		} else {
+    			chartMonthOption.visualMap = getVisualMap(metricSelectMonth.getValue());
+    		}
+    		if(metricSelectMonth.getValue() == 'network'
+    			|| metricSelectMonth.getValue() == 'sql_press'
+    			|| metricSelectMonth.getValue() == 'dir_usage'
+    			|| metricSelectMonth.getValue() == 'thread_connection'){
+    			chartMonthOption.legend = {
+    					type: 'scroll',
+		                orient: 'vertical',
+		                right: 10,
+		                top: 120,
+		                bottom: 20,
+		                data: legendMonthData
+    			}
+    		} else {
+    			delete(chartMonthOption.legend);
+    		}
+    		chartMonth.clear();
+    		chartMonth.setOption(chartDayOption);
+    		chartMonth.showLoading();
+    		
+    		chartMonth.setOption(chartMonthOption);
+    		chartMonth.showLoading();
+    		
+    		monthMonitorType = $(this.selectedOptions).val();
+    		
+    		if($(this.selectedOptions).val() != ""){
+    			// e.date 内置date为UTC
+        		var d = new Date();
+        		var dateStart = $('#timepickerStart').datepicker('getDate').getTime();
+        		var dateEnd = $('#timepickerEnd').datepicker('getDate').getTime();
+        		console.log("/" + getProjectName() + "/v1.0/monitor/unit/compress/"+monitorUnitId+"/"+$(this.selectedOptions).val()+DateToMonthParam(dateStart,dateEnd));
+            	sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/unit/compress/"+monitorUnitId+"/"+$(this.selectedOptions).val()+DateToMonthParam(dateStart,dateEnd),initMonthChart,ListAlert,null);
+    		}
+
+    	});
+        
+        function datepickerOnchangeFunc(e) {
+    		dayInterval != 0 ? clearInterval(dayInterval) : dayInterval;
+    		dayInterval = 0;
+    		
+    		dayData = [];
+    		legendDayData = [];
+    		yAxisDayGap = 0;
+    		dayIndex = 0;
+    		
+    		chartDayOption.series = dayData;
+    		v = getVisualMap(metricSelectDay.getValue());
+    		if(v === 0){
+    			delete(chartDayOption.visualMap);
+    		} else {
+    			chartDayOption.visualMap = getVisualMap(metricSelectDay.getValue());
+    		}
+    		if(metricSelectDay.getValue() == 'network'
+    			|| metricSelectDay.getValue() == 'sql_press'
+    			|| metricSelectDay.getValue() == 'dir_usage'
+    			|| metricSelectDay.getValue() == 'thread_connection'){
+    			chartDayOption.legend = {
+    					type: 'scroll',
+		                orient: 'vertical',
+		                right: 10,
+		                top: 120,
+		                bottom: 20,
+		                data: legendDayData
+    			}
+    		} else {
+    			delete(chartDayOption.legend);
+    		}
+    		chartDay.clear();
+    		chartDay.setOption(chartDayOption);
+    		chartDay.showLoading();
+    		
+    		// e.date 内置date为UTC
+    		/* var to = $('#timepickerEnd').datepicker('getDate').getTime() + day == nowLimit - 8 * hour ?  new Date() : $('#timepickerEnd').datepicker('getDate').getTime();
+    		var from = $('#timepickerStart').datepicker('getDate').getTime();
+    		var param = "?start_time="+Math.round(from/1000)+"&end_time="+Math.round(to/1000); */
+    		
+    		var dateStart = $('#timepickerStart').datepicker('getDate').getTime();
+    		var dateEnd = $('#timepickerEnd').datepicker('getDate').getTime();
+    		var param = "?start_time="+Math.round(dateStart/1000)+"&end_time="+Math.round((dateEnd+86399000)/1000);
+    		
+    		console.log("/" + getProjectName() + "/v1.0/monitor/unit/"+monitorUnitId+"/"+metricSelectDay.getValue()+param);
+    		sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/unit/"+monitorUnitId+"/"+metricSelectDay.getValue()+param,initDayChart,ListAlert,null);
+    	}
+        
+        $('#timepickerEnd').datepicker({
+        	language: 'zh-CN',
+        	endDate: now,
+        	startDate: new Date(nowLimit - month),
+        	autoclose: true
+        }).datepicker('setDate', DateToStrYYYYMMDD(now))
+        	.on('changeDate', datepickerOnchangeFunc)
+        	.on('show', function(e) {
+        		now = new Date();
+        		if(nowLimit < now.getTime()){
+        			nowLimit = Math.round(now / day) * day + day;
+        			$('#timepickerEnd').datepicker('setEndDate', now);
+        			$('#timepickerEnd').datepicker('setStartDate', new Date(nowLimit - month));
+        		}
+        	});
+        
+        $('#timepickerStart').datepicker({
+        	language: 'zh-CN',
+        	autoclose: true
+        }).datepicker('setDate', DateToStrYYYYMMDD(new Date(now - day)))
+        	.on('changeDate', datepickerOnchangeFunc);
+        
+		chartDayOption.series = dayData;
+		v = getVisualMap(metricSelectDay.getValue());
+		if(v === 0){
+			delete(chartDayOption.visualMap);
+		} else {
+			chartDayOption.visualMap = getVisualMap(metricSelectDay.getValue());
+		}
+		if(metricSelectDay.getValue() == 'network'
+			|| metricSelectDay.getValue() == 'sql_press'
+			|| metricSelectDay.getValue() == 'dir_usage'
+			|| metricSelectDay.getValue() == 'thread_connection'){
+			chartDayOption.legend = {
+					type: 'scroll',
+	                orient: 'vertical',
+	                right: 10,
+	                top: 120,
+	                bottom: 20,
+	                data: legendDayData
+			}
+		} else {
+			delete(chartDayOption.legend);
+		}
+		chartDay.clear();
+        chartDay.setOption(chartDayOption);
+        
+        chartMonthOption.series = monthData;
+        delete(chartDayOption.visualMap);
+		if(metricSelectMonth.getValue() == 'network'
+			|| metricSelectMonth.getValue() == 'sql_press'
+			|| metricSelectMonth.getValue() == 'dir_usage'
+			|| metricSelectMonth.getValue() == 'thread_connection'){
+			chartMonthOption.legend = {
+					type: 'scroll',
+	                orient: 'vertical',
+	                right: 10,
+	                top: 120,
+	                bottom: 20,
+	                data: legendMonthData
+			}
+		} else {
+			delete(chartMonthOption.legend);
+		}
+		chartMonth.clear();
+        chartMonth.setOption(chartMonthOption);
+        
+        sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId"),createGrid_redis,ListAlert,null);
+        
+        createGrid_mysql_m5(relationDataGen(data));
+    }
+    
+    $("#graphTab").click();
+    
+    function relationDataGen(data){
+    	var relationData = [];
+        $.each(data.data.subServs, function(indexSubServ, subServ){
+        	$.each(subServ.units, function(indexUnit, unit){
+        		if(unit.type == "upsql"){
+        			relationData.push({
+            			relateName: unit.relateName,
+            			serverIp: unit.serverIp,
+            			portValue: unit.portValue,
+            			hostIp: unit.hostIp,
+            			hostName: unit.hostName,
+            			statusText: unit.statusText,
+            			containerStatus: unit.containerStatus,
+            			role: unit.role
+            		});
+        		}
+        	});
+        });
+        return relationData;
+    }
+    
+    $('#taskModal').on("show.bs.modal", function(e){
+    	ListAlertClear();
+    	$("#mainframestate").empty();
+    	sendGet("/" + getProjectName() + "/v1.0/tasks?obj_id="+$(e.relatedTarget).data('upsql-id'),createGrid_serviceDetail,ListAlert,null);
+    });
+    
+    function upsqlTabClick(){
+    	ListAlertClear();
+    	if(dateDirTypeFlag == "hdd"){
+    		$("#migrateBtn").hide();
+    		$("#rebuildBtn").show();
+    	}else{
+    		$("#migrateBtn").show();
+    		$("#rebuildBtn").hide();
+    	}
+    	$("#restoreBtn").show();
+    	$("#resetPassword").show();
+    	$("#jqgrid").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId"),createGrid_redis,ListAlert,null);
+    }
+    
+    function upproxyTabClick(){
+    	ListAlertClear();
+    	if(dateDirTypeFlagPro == "hdd"){
+    		$("#migrateBtn").hide();
+    		$("#rebuildBtn").show();
+    	}else{
+    		$("#migrateBtn").show();
+    		$("#rebuildBtn").hide();
+    	}
+    	$("#restoreBtn").hide();
+    	$("#resetPassword").hide();
+    	$("#jqgrid").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/subservs/urproxy',createGrid_redis_urproxy,ListAlert,null);
+    }
+    
+    function swmTabClick(){
+    	ListAlertClear();
+    	if(dateDirTypeFlagSw == "hdd"){
+    		$("#migrateBtn").hide();
+    		$("#rebuildBtn").show();
+    	}else{
+    		$("#migrateBtn").show();
+    		$("#rebuildBtn").hide();
+    	}
+    	$("#restoreBtn").hide();
+    	$("#resetPassword").hide();
+    	$("#jqgrid").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/subservs/sentinel',createGrid_redis_sentinel,ListAlert,null);
+    }
+    
+    function relationMonitorTabClick(){
+    	ListAlertClear();
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId"),reloadRelationMonitorGrid,ListAlert,null);
+    }
+    
+    //事件配置
+    $("#subServ_eventType").change(function(){
+    	var subServ_eventType = $("#subServ_eventType").val();
+    	ListAlertClear();
+    	$("#jqgridEvent").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/serv/config/"+subServ_eventType+"/event-infos?serv_id="+getSession("serviceUpsqlId"),eventInfosGrid,ListAlert,null);
+    });
+    
+    function monitorEventInfosTabClick(){
+    	ListAlertClear();
+    	$("#jqgridEvent").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/serv/config/upredis/event-infos?serv_id="+getSession("serviceUpsqlId"),eventInfosGrid,ListAlert,null);
+    }
+    
+    function showReturnEventInfos(){
+    	var subServ_eventType = $("#subServ_eventType").val();
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/serv/config/"+subServ_eventType+"/event-infos?serv_id="+getSession("serviceUpsqlId"),reloadGridEventInfos,ListAlert,null);
+	}
+    function reloadGridEventInfos(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];  	
+    	$("#jqgridEvent").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    //监控配置
+    $("#subServ_metricType").change(function(){
+    	var subServ_metricType = $("#subServ_metricType").val();
+    	ListAlertClear();
+    	$("#jqgridMetricclass").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/serv/config/"+subServ_metricType+"/metricclass-infos?serv_id="+getSession("serviceUpsqlId"),metricclassInfosGrid,ListAlert,null);
+    });
+    
+    function monitorMetricclassInfosTabClick(){
+    	ListAlertClear();
+    	$("#jqgridMetricclass").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/serv/config/upredis/metricclass-infos?serv_id="+getSession("serviceUpsqlId"),metricclassInfosGrid,ListAlert,null);
+    }
+    
+    function showReturnMetricclassInfos(){
+    	var subServ_metricType = $("#subServ_metricType").val();
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/serv/config/"+subServ_metricType+"/metricclass-infos?serv_id="+getSession("serviceUpsqlId"),reloadGridMetricclassInfos,ListAlert,null);
+	}
+    function reloadGridMetricclassInfos(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];  	
+    	$("#jqgridMetricclass").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }    
+    
+    function eventClick(type){
+    	ListAlertClear();
+    	var s = $("#jqgridEvent").jqGrid('getGridParam', 'selarrrow');
+    	var metric = $("#jqgridEvent").jqGrid('getRowData',s).metric;
+    	var level = $("#jqgridEvent").jqGrid('getRowData',s).event_level;
+    	var subServ_type = $("#subServ_eventType").val();
+    	var jsonData = {};
+    	if(s.length == 1){
+    		switch(type){
+   		 	case "update":
+   		 		var id = $("#eventUpdate");
+	   		 	id.attr("data-toggle","modal");
+	            id.attr("data-target","#sEventModal");
+	            id.attr("href","views/service/redis/eventUpdate.html");
+   		 		break;
+   		 	case "alarmStart":
+		 		jsonData = {
+		 		    metric:metric,
+		 	    	serv:getSession("serviceUpsqlId"),
+		 	  		subServ_type:subServ_type,
+		 	    	level:level
+		 		}
+		 		swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+					 		sendPut("/" + getProjectName() + "/v1.0/monitor/serv/config/alarm/enable",showReturnEventInfos,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+		 		break;
+		 	case "alarmStop":
+		 		jsonData = {
+		 		    metric:metric,
+		 	    	serv:getSession("serviceUpsqlId"),
+		 	  		subServ_type:subServ_type,
+		 	    	level:level
+		 		}
+		 		swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+					 		sendPut("/" + getProjectName() + "/v1.0/monitor/serv/config/alarm/disable",showReturnEventInfos,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+		 		break;
+   		 	case "start":
+   		 		jsonData = {
+   		 		    metric:metric,
+   		 	    	serv:getSession("serviceUpsqlId"),
+   		 	  		subServ_type:subServ_type,
+   		 	    	level:level
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/serv/config/event/level/enable",showReturnEventInfos,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+		 		break;
+   		 	case "stop":
+   		 		jsonData = {
+   		 		    metric:metric,
+   		 	    	serv:getSession("serviceUpsqlId"),
+   		 	  		subServ_type:subServ_type,
+   		 	    	level:level
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/serv/config/event/level/disable",showReturnEventInfos,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+	 			break;
+   		 	default:
+    		}
+    	}else{
+	   		 ListAlert("请勾选一行数据");
+	         id.removeAttr("data-toggle");
+	         id.removeAttr("data-target");
+	         id.removeAttr("href");
+	 	}
+    }
+    
+    function metricclassClick(type){
+    	ListAlertClear();
+    	var s = $("#jqgridMetricclass").jqGrid('getGridParam', 'selarrrow');
+    	var metric_class = $("#jqgridMetricclass").jqGrid('getRowData',s).metric_class;
+    	var subServ_type = $("#subServ_metricType").val();
+    	var jsonData = {};
+    	if(s.length == 1){
+    		switch(type){
+   		 	case "update":
+	   		 	var id = $("#metricclassUpdate");
+	   		 	id.attr("data-toggle","modal");
+	            id.attr("data-target","#sMetricclassModal");
+	            id.attr("href","views/service/redis/metricclassUpdate.html");
+   		 		break;
+   		 	case "start":
+   		 		jsonData = {
+   		 			metric_class:metric_class,
+   		 	    	serv:getSession("serviceUpsqlId"),
+   		 	    	subServ_type:subServ_type
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/serv/config/metricclass/enable",showReturnMetricclassInfos,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+		 		break;
+   		 	case "stop":
+   		 		jsonData = {
+   		 			metric_class:metric_class,
+   		 	    	serv:getSession("serviceUpsqlId"),
+   		 	    	subServ_type:subServ_type
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/serv/config/metricclass/disable",showReturnMetricclassInfos,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+	 			break;
+   		 	default:
+    		}
+    	}else{
+	   		 ListAlert("请勾选一行数据");
+	         id.removeAttr("data-toggle");
+	         id.removeAttr("data-target");
+	         id.removeAttr("href");
+	 	}
+    }
+    
+    function databaseTabClick(){
+    	ListAlertClear();
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/databases',reloadDatabaseGrid,ListAlert,null);
+    }
+    
+    function backupListTabClick(){
+    	sendGet("/" + getProjectName() + "/v1.0/backupfiles?serv="+getSession("serviceUpsqlId")+'&site='+getSession("siteId"),createGrid_mysql_m4,ListAlert,null);
+    }
+    
+    function backupStrategyTabClick(){
+    	ListAlertClear();
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/backup_strategys',createGrid_mysql_m3,ListAlert,null);
+    }
+    
+    function reloadRelationMonitorGrid(data){
+    	ListAlertClear();  	
+    	$("#jqgrid").clearGridData().setGridParam({data:relationDataGen(data)}).trigger("reloadGrid");
+    }
+    
+    function reloadUnitGrid(data){
+    	ListAlertClear();
+    	var colornum = '';
+    	var dataArray=new Array();
+    	for(var i=0;i<data['data'].length;i++){
+    		(i%2 ==0) ?colornum = "333333":colornum = "900323";
+    		for(var k=0;k<data['data'][i]['units'].length;k++){
+    			data['data'][i]['units'][k]['fontcolor'] = colornum;
+    			data['data'][i]['units'][k]['subServsId'] = data['data'][i]['id'];
+    			dataArray.push(data['data'][i]['units'][k]);
+    		}
+    	}
+    	var jq_data=dataArray;
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    function reloadDatabaseGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgridDatabase").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    function reloadBackupListGrid(data){
+    	ListAlertClear();  	
+    	$("#jqgridBackupList").clearGridData().setGridParam({data:relationDataGen(data)}).trigger("reloadGrid");
+    }
+    
+    function reloadBackupStrategyGrid(data){
+    	ListAlertClear();  	
+    	$("#jqgridBackupStrategy").clearGridData().setGridParam({data:relationDataGen(data)}).trigger("reloadGrid");
+    }
+    
+    function unit(type){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	var id = $("#restoreBtn");
+    	if(s.length == 1){
+    		 var unitId = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 var taskCancelId = $("#jqgrid").jqGrid('getRowData',s).taskId;
+    		 switch(type){
+    		 case "start":
+    			 swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			    			 sendPut("/" + getProjectName() + "/v1.0/units/"+unitId+"/start",unitShowReturn,ListAlert,null,null);
+						}
+				});
+    			 break;
+    		 case "stop":
+    			 swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+		    			 sendPut("/" + getProjectName() + "/v1.0/units/"+unitId+"/stop",unitShowReturn,ListAlert,null,null);
+						}
+				});
+    			 break;
+    		 case "backup":
+    			 swal({ 
+					  title: "提示", 
+					  text: "确定要备份么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			    			 sendPut("/" + getProjectName() + "/v1.0/units/"+unitId+"/backup",unitShowReturn,ListAlert,null,null);
+						}
+				});
+    			 break;
+    		 case "restore":
+    			 ListAlertClear();
+		            id.attr("href",'views/service/upsql/restore.html');
+		            id.attr("data-toggle","modal");
+		            id.attr("data-target","#myModal");
+    			 break;
+    		 case "migrate":
+    			 ListAlertClear();
+    			 id = $("#migrateBtn");
+    			 var myhref="views/service/redis/migrate.html";
+		            id.attr("href",myhref);
+		            id.attr("data-toggle","modal");
+		            id.attr("data-target","#migrateRebuildModal");
+    			 break;
+    		 case "rebuild":
+    			 ListAlertClear();
+    			 id = $("#rebuildBtn");
+    			 var myhref="views/service/redis/rebuild.html";
+		            id.attr("href",myhref);
+		            id.attr("data-toggle","modal");
+		            id.attr("data-target","#migrateRebuildModal");
+    			 break;
+    		 case "recover":
+    			 swal({ 
+					  title: "提示", 
+					  text: "确定要回切么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			    			 sendPut("/" + getProjectName() + "/v1.0/units/"+unitId+"/recover",unitShowReturn,ListAlert,null,null);
+						}
+				});
+    			 break;
+    		 case "failover":
+    			 swal({ 
+					  title: "提示", 
+					  text: "确定要切换么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			    			 sendPut("/" + getProjectName() + "/v1.0/units/"+unitId+"/failover",unitShowReturn,ListAlert,null,null);
+						}
+				});
+    			 break;
+    		 case "monitor":
+    			 var monitorId = $("#unitMonitor");
+    			 monitorUnitId = unitId;
+    			 monitorTabToggle($("#myTab1").find("li.active").eq(0).find("a").attr("id"));
+    			 //$('#monitorTab').tab('show');
+    			 monitorId.attr("data-toggle","modal");
+    			 monitorId.attr("data-target","#s12remoteModal");
+    			 break;
+    		 case "taskCancel":
+    			 swal({ 
+					  title: "提示", 
+					  text: "确定要取消任务么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			    			 sendPut("/" + getProjectName() + "/v1.0/tasks/"+taskCancelId+"/cancel",showReturn,ListAlert,null, null);
+						}
+				});
+    			 break;
+    		 default:
+    		 }
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+             id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }
+    
+    function resetPassword(){
+    	 ListAlertClear();
+		 var id = $("#resetPassword");
+            id.attr("href",'views/service/redis/resetPassword.html');
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#myModal");
+    }
+    
+    function paramTabClick(type){
+    	ListAlertClear();
+    	switch(type){
+    	case "upredis":
+    		$("#jqgridParam").jqGrid('GridUnload');
+    		sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/subservs/upredis/configs",createGrid_mysql_m2,ListAlert,null);
+			 break;
+		 case "urproxy":
+			 $("#jqgridParam").jqGrid('GridUnload');
+			 sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/subservs/urproxy/configs",createGrid_mysql_m2,ListAlert,null);
+			 break;
+		 default:
+    	}
+    }
+    
+    upsqlGraphChart.on('click', function (params) {
+        if(params.componentType == "series" && params.componentSubType == "graph" && params.dataType == "node"){
+        	switch(params.data.type){
+        	case "urproxy":
+        		$("#upproxyTab").click();
+    			break;
+    		case "upredis":
+    			$("#upsqlTab").click();
+    			break;
+    		default:
+    		}
+        }
+    });
+    function graphTabClick(data){
+    	ListAlertClear();
+    	upsqlGraphChart.showLoading();
+    	sendGetWithoutLayer("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId"),function(data){
+    		drawRedisGraph(data)
+    	},ListAlert,null);
+    }
+    
+    function userClick(type){
+    	ListAlertClear();
+    	switch(type){
+    	case "add":
+    		var id = $("#addUser");
+            id.attr("href","views/service/upsql/addUser.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#myModal");
+			break;
+		 default:
+    	}
+    }
+    
+    function databaseClick(type){
+    	ListAlertClear();
+    	switch(type){
+    	case "add":
+    		var id = $("#addDatabase");
+            id.attr("href","views/service/upsql/addDatabase.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#myModal");
+			break;
+		 case "delete":
+			var s = $("#jqgridDatabase").jqGrid('getGridParam', 'selarrrow');
+			var databaseName = $("#jqgridDatabase").jqGrid('getRowData',s).name;
+			sendDelete("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/databases/"+databaseName, databaseShowReturn, ListAlert, null);
+			break;
+		 default:
+    	}
+    }
+    
+    function databaseShowReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/databases',reloadDatabaseGrid,ListAlert,null);
+    }
+    
+    function reloadParamGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgridParam").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    function reloadBackupStrategyGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgridBackupStrategy").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    function unitShowReturn(){
+    	ListAlertClear();
+		 switch($("#myTab1").find("li.active").eq(0).find("a").attr("id")){
+		 case "upsqlTab":
+			 upsqlTabClick();
+			 break;
+		 case "upproxyTab":
+			 upproxyTabClick();
+			 break;
+		 case "swmTab":
+			 swmTabClick();
+			 break;
+		 default:
+		 }
+	}
+    
+    function editParam(){
+    	ListAlertClear();
+        s = $("#jqgridParam").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var id=$("#updateParam");
+        if(s.length==1){
+            id.attr("href","views/service/redis/param.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#myModal");
+        } else {
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function addBackupStrategyClick(){
+        var id=$("#addBackupStrategy");
+        id.attr("href","views/service/upsql/addBackupStrategy.html");
+        id.attr("data-toggle","modal");
+        id.attr("data-target","#myModal");
+    }
+    
+    function monitorTabToggle(tabType){
+    	dayInterval != 0 ? clearInterval(dayInterval) : dayInterval;
+		dayInterval = 0;
+		
+    	metricSelectDay.clearOptions();
+    	metricSelectMonth.clearOptions();
+    	switch(tabType){
+    	case 'upsqlTab':
+    		metricSelectDay.addOption({id:"avg_cpu_usage", text:"CPU使用率", sortField: 1});
+    		metricSelectDay.addOption({id:"mem_usage", text:"内存使用率", sortField: 2});
+    		metricSelectDay.addOption({id:"network", text:"网络吞吐量", sortField: 3});
+    		metricSelectDay.addOption({id:"instantaneous_ops_per_sec", text:"每秒操作数量(OPS)", sortField: 4});
+    		metricSelectDay.addOption({id:"connection_info", text:"连接客户端数量", sortField: 5});
+    		metricSelectDay.addOption({id:"status", text:"服务状态", sortField: 6});
+    		metricSelectDay.addOption({id:"used_memory_pct", text:"Redis内存使用率", sortField: 7});
+    		metricSelectDay.addOption({id:"dir_usage", text:"表空间使用率", sortField: 8});
+    		metricSelectDay.addOption({id:"key_info", text:"KEY的监控", sortField: 9});
+    		metricSelectDay.addOption({id:"mem_fragmentation_ratio", text:"内存碎片率", sortField: 10});
+    		metricSelectDay.addOption({id:"rdb_last_bgsave_time_sec", text:"持久化耗时（秒）", sortField: 11});
+    		metricSelectDay.addOption({id:"rdb_last_save_time", text:"持久化时间戳", sortField: 12});
+    		metricSelectDay.setValue(['avg_cpu_usage']);
+    		
+    		metricSelectMonth.addOption({id:"avg_cpu_usage", text:"CPU使用率", sortField: 1});
+    		metricSelectMonth.addOption({id:"mem_usage", text:"内存使用率", sortField: 2});
+    		metricSelectMonth.addOption({id:"network", text:"网络吞吐量", sortField: 3});
+    		metricSelectMonth.addOption({id:"instantaneous_ops_per_sec", text:"每秒操作数量(OPS)", sortField: 4});
+    		metricSelectMonth.addOption({id:"connection_info", text:"连接客户端数量", sortField: 5});
+    		metricSelectMonth.addOption({id:"status", text:"服务状态", sortField: 6});
+    		metricSelectMonth.addOption({id:"used_memory_pct", text:"Redis内存使用率", sortField: 7});
+    		metricSelectMonth.addOption({id:"dir_usage", text:"表空间使用率", sortField: 8});
+    		metricSelectMonth.addOption({id:"key_info", text:"KEY的监控", sortField: 9});
+    		metricSelectMonth.addOption({id:"mem_fragmentation_ratio", text:"内存碎片率", sortField: 10});
+    		metricSelectMonth.addOption({id:"rdb_last_bgsave_time_sec", text:"持久化耗时（秒）", sortField: 11});
+    		metricSelectMonth.addOption({id:"rdb_last_save_time", text:"持久化时间戳", sortField: 12});
+    		metricSelectMonth.setValue(['avg_cpu_usage']);
+    		break;
+    	case 'upproxyTab':
+    		metricSelectDay.addOption({id:"avg_cpu_usage", text:"CPU使用率", sortField: 1});
+    		metricSelectDay.addOption({id:"mem_usage", text:"内存使用率", sortField: 2});
+    		metricSelectDay.addOption({id:"network", text:"网络吞吐量", sortField: 3});
+    		metricSelectDay.addOption({id:"status", text:"服务状态", sortField: 4});
+    		metricSelectDay.addOption({id:"connection", text:"连接数", sortField: 5});
+    		metricSelectDay.setValue(['avg_cpu_usage']);
+    		
+    		metricSelectMonth.addOption({id:"avg_cpu_usage", text:"CPU使用率", sortField: 1});
+    		metricSelectMonth.addOption({id:"mem_usage", text:"内存使用率", sortField: 2});
+    		metricSelectMonth.addOption({id:"network", text:"网络吞吐量", sortField: 3});
+    		metricSelectMonth.addOption({id:"status", text:"服务状态", sortField: 4});
+    		metricSelectMonth.addOption({id:"connection", text:"连接数", sortField: 5});
+    		metricSelectMonth.setValue(['avg_cpu_usage']);
+    		break;
+    	case 'swmTab':
+    		metricSelectDay.addOption({id:"status", text:"服务状态", sortField: 1});
+    		metricSelectDay.setValue(['status']);
+    		
+    		metricSelectMonth.addOption({id:"status", text:"服务状态", sortField: 1});
+    		metricSelectMonth.setValue(['status']);
+    		break;
+    	default:
+    	}
+    }
+    
+    function initDayChart(data){
+    	console.log(data);
+    	legendDayData = [];
+    	dayData = [];
+    	if(dayInterval != 0){
+    		clearInterval(dayInterval);
+    	}
+    	var metricSelectDayType = metricSelectDay.getValue();
+    	switch(metricSelectDayType){
+		case "avg_cpu_usage":
+		case "mem_usage":
+		case "status":
+		case "instantaneous_ops_per_sec":
+		case "used_memory_pct":
+		case "mem_fragmentation_ratio":
+		case "rdb_last_bgsave_time_sec":
+		case "rdb_last_save_time":
+			if(data.data.length == 0){
+				alert('get empty data');
+				return;
+			}
+			var d = [];
+			
+    		legendDayData.push(metricSelectDay.options[metricSelectDayType].text);
+    		$.each(data.data, function(i, v){
+    			if(metricSelectDayType == "status"){
+    				d.push({
+            			name: metricSelectDayType,
+                        value: [
+                        	v.timestamp,
+                        	v.value == "passing" ? 0 : (v.value == "connecting" ? 1 : (v.value == "critical" ? 2 : 3)) 
+                        ]
+            		});
+    				yAxisDayGap = 2;
+    			} else if(metricSelectDayType == "TODO"){
+    				d.push({
+            			name: metricSelectDayType,
+                        value: [
+                        	v.timestamp,
+                        	Math.round(v.value / 1024 / 1024) + 1
+                        ]
+            		});
+    				yAxisDayGap < (Math.round(v.value * 100) / 100) ? (yAxisDayGap = Math.round(v.value * 100) / 100) : yAxisDayGap;
+    			} else {
+    				d.push({
+            			name: metricSelectDayType,
+                        value: [
+                        	v.timestamp,
+                        	Math.round(v.value * 100) / 100
+                        ]
+            		});
+    				yAxisDayGap < (Math.round(v.value * 100) / 100) ? (yAxisDayGap = Math.round(v.value * 100) / 100) : yAxisDayGap;
+    			}
+    		});
+    		dayData.push({
+                name: metricSelectDay.options[metricSelectDayType].text,
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: d,
+                markLine: getMarkLine(metricSelectDayType)
+            });
+    		break;
+		case "key_info":
+		case "network":
+		case "dir_usage":
+		case "connection_info":
+			$.each(data.data, function(key, value){
+				var d = [];
+	    		legendDayData.push(key);
+	    		$.each(value, function(k, v){
+	    			if(metricSelectDayType == "network"){
+	    				d.push({
+		        			name: k,
+		                    value: [
+		                    	v.timestamp,
+		                    	Math.round(v.value / 1024 /1024)
+		                    ]
+		        		});
+		        		yAxisDayGap < (Math.round(v.value * 100) / 100) ? (yAxisDayGap = Math.round(v.value * 100) / 100) : yAxisDayGap;
+	    			} else {
+	    				d.push({
+		        			name: k,
+		                    value: [
+		                    	v.timestamp,
+		                    	Math.round(v.value * 100) / 100
+		                    ]
+		        		});
+		        		yAxisDayGap < (Math.round(v.value * 100) / 100) ? (yAxisDayGap = Math.round(v.value * 100) / 100) : yAxisDayGap;
+	    			}
+	    		});
+	    		dayData.push({
+	                name: key,
+	                type: 'line',
+	                showSymbol: false,
+	                hoverAnimation: false,
+	                data: d,
+	                markLine: getMarkLine(metricSelectDayType)
+	            });
+			});
+			break;
+		default:
+		}
+    	
+		chartDayOption.series = dayData;
+		v = getVisualMap(metricSelectDayType);
+		if(v === 0){
+			delete(chartDayOption.visualMap);
+		} else {
+			chartDayOption.visualMap = v;
+		}
+		if(metricSelectDay.getValue() == 'network'
+			|| metricSelectDay.getValue() == 'key_info'
+			|| metricSelectDay.getValue() == 'dir_usage'
+			|| metricSelectDay.getValue() == 'connection_info'){
+			chartDayOption.legend = {
+					type: 'scroll',
+	                orient: 'vertical',
+	                right: 10,
+	                top: 120,
+	                bottom: 20,
+	                data: legendDayData
+			}
+		} else {
+			delete(chartDayOption.legend);
+		}
+		chartDay.clear();
+		console.log(chartDayOption);
+    	chartDay.setOption(chartDayOption);
+    	chartDay.hideLoading();
+    	
+		if (Math.round($('#timepickerEnd').datepicker('getDate').getTime() / day) * day + day == nowLimit && data.data.length != 0) {
+			dayInterval = setInterval(function () {
+				if($("#chartDay")[0] == undefined){
+					clearInterval(dayInterval);
+					return;
+				}
+				sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/unit/"+monitorUnitId+"/"+metricSelectDayType,function(data){
+					if(data.data == undefined){
+						clearInterval(dayInterval);
+						alert("/" + getProjectName() + "/v1.0/monitor/unit/"+monitorUnitId+"/"+metricSelectDayType+' get data error');
+					}
+	    			if(metricSelectDayType == "status"){
+	    				dayData[0].data.shift();
+	    				dayData[0].data.push({
+		    	    		name: metricSelectDayType,
+		    	    		showSymbol: false,
+		    	    		hoverAnimation: false,
+		    	    		value: [
+		                    	data.data.timestamp,
+		                    	v.value == "passing" ? 0 : (v.value == "connecting" ? 1 : (v.value == "critical" ? 2 : 3))
+		                    ]
+		    	    	});
+	    			} else if(metricSelectDayType == "avg_cpu_usage" ||
+	    					metricSelectDayType == "mem_usage" ||
+	    					metricSelectDayType == "used_memory_pct" ||
+	    					metricSelectDayType == "mem_fragmentation_ratio"
+	    					){
+	    				dayData[0].data.shift();
+	    				dayData[0].data.push({
+		    	    		name: metricSelectDayType,
+		    	    		showSymbol: false,
+		    	    		hoverAnimation: false,
+		    	    		value: [
+		                    	data.data.timestamp,
+		                    	Math.round(data.data.value * 100) / 100
+		                    ]
+		    	    	});
+	    			} else if(metricSelectDayType == "network" ||
+	    					metricSelectDayType == "key_info" ||
+	    					metricSelectDayType == "dir_usage" ||
+	    					metricSelectDayType == "connection_info"
+	    					){
+	    				for(var i = 0; i < dayData.length; i++){
+	    					dayData[i].data.shift();
+	    				}
+	    				$.each(data.data, function(key, value){
+	    					for(var i = 0; i < dayData.length; i++){
+	    						if(dayData[i].name == key){
+	    							if(metricSelectDayType == "network"){
+	    								dayData[i].data.push({
+		    			    	    		name: metricSelectDayType,
+		    			    	    		showSymbol: false,
+		    			    	    		hoverAnimation: false,
+		    			    	    		value: [
+		    			    	    			value.timestamp,
+		    			                    	Math.round(value.value / 1024 / 1024)
+		    			                    ]
+		    			    	    	});
+	    							} else {
+	    								dayData[i].data.push({
+		    			    	    		name: metricSelectDayType,
+		    			    	    		showSymbol: false,
+		    			    	    		hoverAnimation: false,
+		    			    	    		value: [
+		    			    	    			value.timestamp,
+		    			                    	Math.round(value.value * 100) / 100
+		    			                    ]
+		    			    	    	});
+	    							}
+	    							break;
+	    						}
+		    				}
+	    				});
+	    			} else {
+	    				clearInterval(dayInterval);
+	    				alert("metric not exist");
+	    			}
+	    			
+	    	    	chartDay.setOption({
+	        	        series: dayData
+	        	    });
+	    		},function(msg) {
+	    			clearInterval(dayInterval);
+	    			alert(msg);
+	    		},null);
+	    	}, 60 * 1000);
+		}
+    }
+    
+    function initMonthChart(data){
+    	console.log(data);
+    	var compress = {};
+    	var metricSelectMonthType = metricSelectMonth.getValue();
+    	switch(metricSelectMonthType){
+    	case "avg_cpu_usage":
+		case "mem_usage":
+		case "status":
+		case "instantaneous_ops_per_sec":
+		case "used_memory_pct":
+		case "mem_fragmentation_ratio":
+		case "rdb_last_bgsave_time_sec":
+		case "rdb_last_save_time":
+			compress = data.data;
+			break;
+		case "key_info":
+		case "network":
+		case "dir_usage":
+		case "connection_info":
+			$.each(data.data, function(metricKey, metricVal){
+				$.each(metricVal, function(key, val){
+					compress[metricKey + key] = val;
+				});
+			});
+			break;
+		default:
+		}
+    	
+    	$.each(compress, function(key, value){
+			var d = [];
+    		legendMonthData.push(key);
+    		if(metricSelectMonthType == "status"){
+    			$.each(value, function(k, v){
+        			d.push({
+            			name: k,
+                        value: [
+                        	v.timestamp,
+                        	v.value == "passing" ? 0 : (v.value == "connecting" ? 1 : (v.value == "critical" ? 2 : 3))
+                        ]
+            		});
+            		yAxisMonthGap < (Math.round(v.value * 100) / 100) ? (yAxisMonthGap = Math.round(v.value * 100) / 100) : yAxisMonthGap;
+        		});
+    		} else if(metricSelectMonthType == "network"){
+    			$.each(value, function(k, v){
+        			d.push({
+            			name: k,
+                        value: [
+                        	v.timestamp,
+                        	Math.round(v.value /1204 /1024)
+                        ]
+            		});
+            		yAxisMonthGap < (Math.round(v.value * 100) / 100) ? (yAxisMonthGap = Math.round(v.value * 100) / 100) : yAxisMonthGap;
+        		});
+    		} else if(metricSelectMonthType == "TODO"){
+    			$.each(value, function(k, v){
+        			d.push({
+            			name: k,
+                        value: [
+                        	v.timestamp,
+                        	Math.round(v.value /1204 /1024) + 1
+                        ]
+            		});
+            		yAxisMonthGap < (Math.round(v.value * 100) / 100) ? (yAxisMonthGap = Math.round(v.value * 100) / 100) : yAxisMonthGap;
+        		});
+    		} else {
+    			$.each(value, function(k, v){
+        			d.push({
+            			name: k,
+                        value: [
+                        	v.timestamp,
+                        	Math.round(v.value * 100) / 100
+                        ]
+            		});
+            		yAxisMonthGap < (Math.round(v.value * 100) / 100) ? (yAxisMonthGap = Math.round(v.value * 100) / 100) : yAxisMonthGap;
+        		});
+    		}
+    		monthData.push({
+                name: key,
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: d,
+                markLine: getMarkLine(metricSelectMonthType)
+            });
+		});
+    	
+    	chartMonthOption.series = monthData;
+    	delete(chartMonthOption.visualMap);
+		chartMonthOption.legend = {
+				type: 'scroll',
+                orient: 'vertical',
+                right: 10,
+                top: 120,
+                bottom: 20,
+                data: legendMonthData
+		}
+		chartMonth.clear();
+		console.log(chartMonthOption);
+    	chartMonth.setOption(chartMonthOption);
+    	chartMonth.hideLoading();
+    }
+    
+    function genDataZoom(){
+    	return [
+    		{
+                type: 'slider',
+                show: true,
+                start: 0,
+                end: 100,
+                handleSize: 30
+            },
+            {
+                type: 'inside',
+                start: 0,
+                end: 100
+            },
+            {
+                type: 'slider',
+                show: false
+            }
+        ];
+    }
+    
+    function yAxisFormatterDay(value, index){
+		switch(metricSelectDay.getValue()){
+		case "avg_cpu_usage":
+		case "mem_usage":
+		case "dir_usage":
+			return value + '%';
+		case "status":
+			switch(value){
+			case 0:
+				return "正常";
+			case 1:
+				return "告警";
+			case 2:
+				return "异常";
+			case 3:
+				return "未知";
+			default:
+				return value;
+			}
+		case "network":
+			return value + 'MB';
+		default:
+			return value;
+		}
+	}
+    
+    function yAxisFormatterMonth(value, index){
+		switch(metricSelectMonth.getValue()){
+		case "avg_cpu_usage":
+		case "mem_usage":
+		case "dir_usage":
+			return value + '%';
+		case "status":
+			switch(value){
+			case 0:
+				return "正常";
+			case 1:
+				return "告警";
+			case 2:
+				return "异常";
+			case 3:
+				return "未知";
+			default:
+				return value;
+			}
+		case "network":
+			return value + 'MB';
+		default:
+			return value;
+		}
+	}
+    
+    function crontabToLabel(crontab){
+    	var crons = crontab.split(' ');
+    	var ret = "";
+    	if(crons[2] == "*" && crons[3] == "*" && crons[4] == "*"){
+    		ret += '每天 ';
+    	} else {
+    		return 'TODO';
+    	}
+    	ret += crons[1]+':'+crons[0];
+    	return ret;
+    }
+    
+    function showReturnManageAll(){
+    	ListAlertClear();
+    	switch($("#myTab1").find("li.active").eq(0).find("a").attr("id")){
+		 case "upsqlTab":
+			 sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId"),reloadGrid,ListAlert,null);
+			 break;
+		 case "upproxyTab":
+			 sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/subservs/urproxy',reloadGrid,ListAlert,null);
+			 break;
+		 case "swmTab":
+			 sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/subservs/sentinel',reloadGrid,ListAlert,null);
+			 break;
+		 default:
+		 }
+    }
+    
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var colornum = '';
+		var dataArray=new Array();
+		var masterNum = 0;
+		var masterIp = '';
+		var typeUpredis = 'error';
+    	switch($("#myTab1").find("li.active").eq(0).find("a").attr("id")){
+		 case "upsqlTab":
+			 	for(var i=0;i<data['data']['subServs'].length;i++){
+					(i%2 ==0) ?colornum = "333333":colornum = "000000";
+					
+					if(data['data']['subServs'][i]['type'] == 'upredis'){
+						for(var k=0;k<data['data']['subServs'][i]['units'].length;k++){
+							if(data['data']['subServs'][i]['units'][k]['role'] == "master"){
+								masterIp = data['data']['subServs'][i]['units'][k]['serverIp'];
+								masterNum ++;
+							};
+						}
+					}
+					
+					if(data['data']['subServs'][i]['type'] == 'upredis'){
+						if(masterNum == 1){
+							typeUpredis = 'success';
+						}
+						for(var k=0;k<data['data']['subServs'][i]['units'].length;k++){
+							if(data['data']['subServs'][i]['units'][k]['role'] == "slave"){
+								if(masterIp == data['data']['subServs'][i]['units'][k]['replicationMasterIp'] && masterNum == 1){
+									typeUpredis = 'success';
+								}else{
+									typeUpredis = 'error';
+								}
+							};
+							if(data['data']['subServs'][i]['units'][k]['role'] == null || data['data']['subServs'][i]['units'][k]['role'] == 'unknown'){
+									typeUpredis = 'unknown';
+							};
+						}
+					}
+					
+					if(data['data']['subServs'][i]['type'] == 'upredis'){
+						for(var k=0;k<data['data']['subServs'][i]['units'].length;k++){
+							data['data']['subServs'][i]['units'][k]['fontcolor'] = colornum;
+							data['data']['subServs'][i]['units'][k]['typeUpredis'] = typeUpredis;
+							data['data']['subServs'][i]['units'][k]['subServsId'] = data['data']['subServs'][i]['id'];
+							dataArray.push(data['data']['subServs'][i]['units'][k]);
+						}
+						masterNum = 0;
+						masterIp = '';
+					}
+				}
+			 break;
+		 case "upproxyTab":
+			 	for(var i=0;i<data['data'].length;i++){
+					(i%2 ==0) ?colornum = "333333":colornum = "000000";
+					for(var k=0;k<data['data'][i]['units'].length;k++){
+						data['data'][i]['units'][k]['fontcolor'] = colornum;
+						data['data'][i]['units'][k]['subServsId'] = data['data'][i]['id'];
+						dataArray.push(data['data'][i]['units'][k]);
+					}
+				}
+			 break;
+		 case "swmTab":
+			 	for(var i=0;i<data['data'].length;i++){
+					(i%2 ==0) ?colornum = "333333":colornum = "000000";
+					for(var k=0;k<data['data'][i]['units'].length;k++){
+						data['data'][i]['units'][k]['fontcolor'] = colornum;
+						data['data'][i]['units'][k]['subServsId'] = data['data'][i]['id'];
+						dataArray.push(data['data'][i]['units'][k]);
+					}
+				}
+			 break;
+		 default:
+		}
+    	$("#jqgrid").clearGridData().setGridParam({data:dataArray}).trigger("reloadGrid");
+    }
+    
+    //隐藏监听
+	$('#taskModal').on('hide.bs.modal', function () {
+		showReturnManageAll();
+	})
+    
+	function noRe(){
+	}
+    if(typeof(flag) != "undefined"){
+	 	clearInterval(flag);
+	 	var flag = setInterval(noRe, setTime);
+ 	}
+	
+	function getVisualMap(metricType){
+    	var normal = 0;
+    	var warning = 0;
+    	var crital = 0;
+    	$.each(monitorMarkLineArray, function(index, metricConfig){
+    		if(metricConfig.metric == metricType && metricConfig.event_level == "warning" && metricConfig.event_enable == true && !isNaN(metricConfig.start) && !isNaN(metricConfig.end)){
+    			normal = Number(metricConfig.start);
+    			warning = Number(metricConfig.end) + 1;
+    		} else if(metricConfig.metric == metricType && metricConfig.event_level == "critical" && metricConfig.event_enable == true && !isNaN(metricConfig.start) && !isNaN(metricConfig.end)){
+    			crital = Number(metricConfig.end);
+    		}
+    	});
+    	if(normal == 0 || warning == 0 || crital == 0){
+    		return 0;
+    	}
+    	return {
+            top: 10,
+            right: 10,
+            pieces: [{
+                gt: 0,
+                lte: normal,
+                color: 'green'
+            }, {
+                gt: normal,
+                lte: warning,
+                color: '#ff9933'
+            }, {
+                gt: warning,
+                lte: crital,
+                color: 'red'
+            }],
+            outOfRange: {
+                color: '#999'
+            },
+            show: true
+        };
+    }
+    
+    function getMarkLine(metricType){
+    	var normal = 0;
+    	var warning = 0;
+    	var critical = 0;
+    	$.each(monitorMarkLineArray, function(index, metricConfig){
+    		if(metricConfig.metric == metricType && metricConfig.event_level == "warning" && metricConfig.event_enable == true && !isNaN(metricConfig.start) && !isNaN(metricConfig.end)){
+    			normal = Number(metricConfig.start);
+    			warning = Number(metricConfig.end) + 1;
+    		} else if(metricConfig.metric == metricType && metricConfig.event_level == "critical" && metricConfig.event_enable == true && !isNaN(metricConfig.start) && !isNaN(metricConfig.end)){
+    			critical = Number(metricConfig.end);
+    		}
+    	});
+    	if(normal == 0 || warning == 0 || critical == 0){
+    		return {
+                silent: true,
+                data: []
+            };
+    	}
+    	return {
+            silent: true,
+            symbolSize: 0,
+            data: [{
+                yAxis: normal,
+            }, {
+                yAxis: warning,
+                lineStyle: {
+                	color: '#ff9933'
+                }
+            }, {
+                yAxis: critical,
+                lineStyle: {
+                	color: 'red'
+                }
+            }]
+        };
+    }
+</script>

@@ -1,0 +1,317 @@
+<div>
+    <!-- widget content -->
+    <div class="widget-body">
+
+        <form action="" method="post" id="checkout-form" class="smart-form">
+            <header>
+                <h2>
+                    编辑用户
+                    <button class="close"  data-dismiss="modal">
+                        x
+                    </button>
+                </h2>
+
+            </header>
+            <fieldset>
+            	<div id="dialog-alert">
+            	</div>
+                <div class="row">
+                    <label class="label col col-2"><label style="color:red">*</label>用户姓名</label>
+                    <section class="col col-4">
+                        <label class="input">
+                            <input type="text" id="name" name="name" placeholder=" 请输入用户姓名" class="required " disabled="disabled">
+                        </label>
+                    </section>
+                    <label class="label col col-2"><label style="color:red">*</label>电话</label>
+                    <section class="col col-4">
+                        <label class="input">
+                            <input type="text" id="telephone" name="telephone" placeholder=" 请输入电话" class="required ">
+                        </label>
+                    </section>
+                </div>
+                <div class="row">
+                    <label class="label col col-2"><label style="color:red">*</label>email</label>
+                    <section class="col col-4">
+                        <label class="input">
+                            <input type="text" id="email" name="email" email=" 请输入邮件地址" class="required ">
+                        </label>
+                    </section>
+                    <label class="label col col-2"><label style="color:red">*</label>所属单位</label>
+                    <section class="col col-4">
+                        <label class="input">
+                            <input type="text" id="company" name="company" placeholder=" 请输入所属单位" class="required " disabled="disabled">
+                        </label>
+                    </section>
+                </div>
+                <div class="row">
+                    <label class="label col col-2"><label style="color:red">*</label>备用联系人</label>
+                    <section class="col col-4">
+                        <label class="input">
+                            <input type="text" id="alternateContact" name="alternateContact" placeholder=" 请输入备用联系人" class="required ">
+                        </label>
+                    </section>
+                    <label class="label col col-2"><label style="color:red">*</label>联系人电话</label>
+                    <section class="col col-4">
+                        <label class="input">
+                            <input type="text" id="alternateContactTel" name="alternateContactTel" placeholder=" 请输入备用联系人电话" class="required ">
+                        </label>
+                    </section>
+                </div>
+                <div class="row">
+					<label class="label col col-2">角色</label>
+					<section class="col col-4">
+						<label class="select"> <select class="required " id="role"
+							name="role">
+								<option value="">请选择角色</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col col-2">自动审批</label>
+					<section class="col col-4">
+						<label class="select"> <select class="required " id="autoApprove"
+							name="autoApprove">
+							<option value="">请选择审批模式</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">用户组</label>
+					<section class="col col-4">
+						<label class="select"> <select class="required " id="group"
+							name="group">
+								<option value="">请选择用户组</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">默认站点</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="site" name="site" class="required " disabled="disabled">
+						</label>
+					</section>
+					<label class="label col col-2">默认区域</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="area" name="area" class="required " disabled="disabled">
+						</label>
+					</section>
+				</div>
+            </fieldset>
+        </form>
+
+    </div>
+    <!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+        取消
+    </button>
+    <button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+        保存
+    </button>
+</div>
+<script>
+    pageSetUp();
+    var role,$role;
+    var autoApprove,$autoApprove;
+    var group,$group;
+    var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+	var username = $("#jqgrid").jqGrid('getRowData',s).username;
+	
+    jQuery.validator.addMethod("isMobile", function(value, element) {  
+        var length = value.length;  
+        var mobile = /^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/;  
+        return this.optional(element) || (length == 11 && mobile.test(value));  
+    }, "请正确填写手机号码"); 
+    
+    var pagefunction = function() {
+    	$autoApprove = $("#autoApprove").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			sortField : {
+				field : 'text'
+			},
+			options : [
+			           {
+			        	   id:'1',
+			        	   text:'开启'
+			           },
+			           {
+			        	   id:'0',
+			        	   text:'关闭'
+			           }
+			      ]
+		});
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+            	name: "required",
+            	telephone: {
+		        	required: true,
+		        	isMobile: true
+		     	},
+            	email: {
+		        	required: true,
+		        	email: true
+		      	},
+		        company: {
+		        	required: true
+		        },
+		        alternateContact: {
+		        	required: true
+		        },
+		        alternateContactTel: {
+		        	required: true,
+		        	isMobile: true
+		     	},
+		      	role: "required",
+		      	autoApprove: "required"
+		    },
+            // Messages for form validation
+            messages:{
+            	name : {
+                    required : '请输入用户姓名'
+                },
+                telephone : {
+                    required : '请输入用户电话',
+                    isMobile : '请正确填写手机号码'
+                },
+                email : {
+                    required : '请输入邮箱地址',
+                    email : '请填写正确格式的邮箱地址'
+                },
+                company : {
+                    required : '请输入所属单位'
+                },
+                alternateContact : {
+                    required : '请输入备用联系人'
+                },
+                alternateContactTel : {
+                    required : '请输入备用联系人电话',
+                    isMobile : '请正确填写手机号码'
+                },
+                role : {
+                    required : '请选择角色'
+                },
+                autoApprove : {
+                    required : '请选择审批模式'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data={
+            			  name:$("#name").val(),
+            			  telephone:$("#telephone").val(),
+            			  email:$("#email").val(),
+            			  company:$("#company").val(),
+            			  alternateContact:$("#alternateContact").val(),
+            			  alternateContactTel:$("#alternateContactTel").val(),
+            			  autoApprove:$("#autoApprove").val() == '0'?false:true,
+            			  group:$("#group").val(),
+            			  role:$("#role").val()
+            			};
+            	sendPut("/" + getProjectName() + "/v1.0/users/"+username, postSuccess, DialogAlert,JSON.stringify(data),null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+	sendGet("/" + getProjectName() + "/v1.0/selections/roles",fillFormRoleData,DialogAlert,null);
+    function fillFormRoleData(data){
+    	$role = $("#role").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			sortField : {
+				field : 'text'
+			},
+			options : data
+		});
+    	sendGet("/" + getProjectName() + "/v1.0/selections/groups",fillFormGroupData,DialogAlert,null);
+    }
+    
+    function fillFormGroupData(data){
+    	$group = $("#group").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			sortField : {
+				field : 'text'
+			},
+			options : data
+		});
+    	sendGet("/" + getProjectName() + "/v1.0/users/"+username,fillFormData,DialogAlert,null);
+    }
+    
+    function fillFormData(data){
+    	$("#name").val(data.data.name);
+    	$("#telephone").val(data.data.telephone);
+    	$("#email").val(data.data.email);
+    	$("#company").val(data.data.company);
+    	$("#alternateContact").val(data.data.alternateContact);
+    	$("#alternateContactTel").val(data.data.alternateContactTel);
+    	
+    	role = $role[0].selectize;
+    	autoApprove = $autoApprove[0].selectize;
+    	group = $group[0].selectize;
+    	
+    	role.setValue(data.data.role.code);
+    	group.setValue(data.data.group.id);
+    	if(data.data.autoApprove){
+    		autoApprove.setValue('1');
+    	}else{
+    		autoApprove.setValue('0');
+    	}
+    	
+    	sendGet("/" + getProjectName() + "/v1.0/groups/"+data.data.group.id,fillSelect_site_area,DialogAlert,null);
+    }
+    
+    function fillSelect_site_area(data){
+    	$("#site").val(data.data.siteName);
+    	$("#area").val(data.data.areaName);
+    }
+    
+    $("#group").change(function(){
+    	sendGet("/" + getProjectName() + "/v1.0/groups/"+$(this.selectedOptions).val(),fillSelect_site_area,DialogAlert,null);
+	}); 
+
+    
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/users",reloadGrid,ListAlert,null);
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

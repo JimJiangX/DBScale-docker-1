@@ -1,0 +1,11 @@
+[template]
+src = "consul.toml"
+dest = "/WEB/upm_dao/config/jdbc.properties"
+owner = "root"
+mode = "0644"
+keys = [
+   "/mysql/ip",
+   "/port",
+   "/db/name",
+   "/pass",
+]

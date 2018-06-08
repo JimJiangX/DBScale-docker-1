@@ -1,0 +1,155 @@
+<div>
+    <!-- widget content -->
+    <div class="widget-body">
+
+        	<form action="" method="post" id="checkout-form" class="smart-form">
+				            <header>
+				                <h2>
+				                    事件编辑
+				                    <button class="close"  data-dismiss="modal">
+				                        x
+				                    </button>
+				                </h2>
+				
+				            </header>
+				            <fieldset>
+				            	<div id="dialog-alert">
+				            	</div>
+				                <div class="row">
+				                    <label class="label col col-2"><label style="color:red"></label>事件名称</label>
+				                    <section class="col col-4">
+				                        <label class="input">
+				                            <input type="text" id="event_name" name="event_name" class="required" disabled="disabled">
+				                        </label>
+				                    </section>
+				                    <label class="label col col-2"><label style="color:red"></label>监控项</label>
+				                    <section class="col col-4">
+				                        <label class="input">
+				                            <input type="text" id="metric_name" name="metric_name" class="required " disabled="disabled">
+				                        </label>
+				                    </section>
+				                </div>
+				                <div class="row">
+				                    <label class="label col col-2"><label style="color:red"></label>事件等级</label>
+				                    <section class="col col-4">
+				                        <label class="input">
+				                            <input type="text" id="level_name" name="level_name"  class="required " disabled="disabled">
+				                        </label>
+				                    </section>
+				                    <label class="label col col-2"><label style="color:red"></label>说明</label>
+				                    <section class="col col-4">
+				                        <label class="input">
+				                            <input type="text" id="event_description" name="event_description" class="required " disabled="disabled">
+				                        </label>
+				                    </section>
+				                </div>
+				                <div class="row">
+				                    <label class="label col col-2"><label style="color:red">*</label>开始阀值</label>
+				                    <section class="col col-4">
+				                        <label class="input">
+				                            <input type="text" id="start" name="start" class="required ">
+				                        </label>
+				                    </section>
+				                    <label class="label col col-2"><label style="color:red">*</label>结束阀值</label>
+				                    <section class="col col-4">
+				                        <label class="input">
+				                            <input type="text" id="end" name="end" class="required ">
+				                        </label>
+				                    </section>
+				                </div>
+				            </fieldset>
+				  </form>
+
+    </div>
+    <!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+        取消
+    </button>
+    <button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+        保存
+    </button>
+</div>
+<script>
+    pageSetUp();
+    var s = $("#jqgridEvent").jqGrid('getGridParam', 'selarrrow');
+    var metric = $("#jqgridEvent").jqGrid('getRowData',s).metric;
+	var level = $("#jqgridEvent").jqGrid('getRowData',s).event_level;
+	fillFormData();
+	
+    var pagefunction = function() {
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+		     	start: "required",
+		      	end: "required"
+		    },
+            // Messages for form validation
+            messages:{
+            	start : {
+                    required : '请输入开始阀值'
+                },
+                end : {
+                    required : '请输入结束阀值'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data={
+	            		  metric:metric,
+	            		  hosts:[getSession("eventHostId")],
+	            		  level:level,
+	            		  start:$("#start").val(),
+	            		  end:$("#end").val()
+            			};
+            	sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/event/level/update", postSuccess, DialogAlert,JSON.stringify(data),null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+
+    
+    function fillFormData(){
+    	$("#event_name").val($("#jqgridEvent").jqGrid('getRowData',s).event_name);
+    	$("#metric_name").val($("#jqgridEvent").jqGrid('getRowData',s).metric_name);
+    	$("#start").val($("#jqgridEvent").jqGrid('getRowData',s).start);
+    	$("#end").val($("#jqgridEvent").jqGrid('getRowData',s).end);
+    	$("#level_name").val($("#jqgridEvent").jqGrid('getRowData',s).level_name);
+    	$("#event_description").val($("#jqgridEvent").jqGrid('getRowData',s).event_description);
+    }
+    
+    function postSuccess(data){
+    	$("#sEventModal").modal('toggle');
+    	showReturn();
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

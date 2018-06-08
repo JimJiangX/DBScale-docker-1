@@ -1,0 +1,127 @@
+<div>
+    <!-- widget content -->
+    <div class="widget-body">
+
+        <form action="" method="post" id="checkout-form" class="smart-form">
+            <header>
+                <h2>
+                  克隆
+                    <button class="close"  data-dismiss="modal">
+                        x
+                    </button>
+                </h2>
+
+            </header>
+            <fieldset>
+            	<div id="dialog-alert">
+            	</div>
+                <div class="row">
+                    <label class="label col col-4" style="padding-right: 10px;"><label style="color:red">*</label>数量</label>
+                    <section class="col col-8">
+                        <label class="input">
+                            <input type="text" id="cloneNum" name="cloneNum"  class="required digits">
+                        </label>
+                    </section>
+                </div>
+            </fieldset>
+        </form>
+
+
+    </div>
+    <!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+        取消
+    </button>
+    <button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+        提交
+    </button>
+</div>
+<script>
+    pageSetUp();
+	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+	var rowData = $("#jqgrid").jqGrid('getRowData',s);
+	order_id = rowData.id;
+    
+	$("#cloneNum").spinner({
+	    min : 1,
+	    max : 30,
+	    step : 1,
+	    start : 1,
+	    numberFormat : "n",
+	    spin : function(event, data) {
+	    	
+	    }
+	});
+	
+    var pagefunction = function() {
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+            	cloneNum: {
+			        required: true,
+			        digits:true,
+			        min:1
+			    }
+            },
+            // Messages for form validation
+            messages:{
+            	cloneNum : {
+                    required : '请输入类型项名称',
+                    digits:'请输入整数数字',
+                    max:'最大输入值为30',
+                    min:'最小输入值为1'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var cloneNum = $("#cloneNum").val();
+            	if(cloneNum > 30){
+            		DialogAlert("克隆数量不得大于30");
+            	}else{
+	            	//在这里生成需要提交的json数据
+	            	sendPost("/" + getProjectName() + "/v1.0/orders/"+order_id+"/clone?cnt="+cloneNum, postSuccess,null,null);
+            	}
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function postSuccess(data){
+    	$("#myModal").modal('toggle');
+    	swal("提示","提交成功!","info");
+    	showReturn();
+    }
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/orders?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

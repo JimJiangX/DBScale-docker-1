@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.UserRoleDao">
+	<resultMap id="userRoleResultMap" type="com.bsg.upm.entity.UserRoleEntity">
+		<id property="code" column="user_role_code" />
+		<result property="name" column="user_role_name" />
+		<result property="level" column="user_role_level" />
+		<result property="dataScope" column="user_role_data_scope" />
+		<result property="description" column="user_role_description" />
+	</resultMap>
+
+	<resultMap id="userRoleDetailResultMap" type="com.bsg.upm.entity.UserRoleEntity"
+		extends="userRoleResultMap">
+		<collection property="users"
+			resultMap="com.bsg.upm.dao.UserDao.userResultMap" />
+	</resultMap>
+	
+	<select id="list" resultMap="userRoleResultMap" parameterType="java.util.Map">
+		SELECT r.code AS user_role_code,
+			r.name AS user_role_name,
+			r.level AS user_role_level,
+			r.data_scope AS user_role_data_scope,
+			r.description AS user_role_description
+		FROM tbl_user_role r
+	</select>
+	
+	<select id="listName" resultMap="userRoleResultMap">
+		SELECT r.code AS user_role_code,
+			r.name AS user_role_name,
+			r.description AS user_role_description
+		FROM tbl_user_role r
+	</select>
+	
+	<select id="get" resultMap="userRoleDetailResultMap">
+		SELECT r.code AS user_role_code,
+			r.name AS user_role_name,
+			r.level AS user_role_level,
+			r.data_scope AS user_role_data_scope,
+			r.description AS user_role_description,
+			u.username AS user_username, 
+			u.name AS user_name,
+			u.telephone AS user_telephone,
+			u.email AS user_email,
+			u.company AS user_company,
+			u.enabled AS user_enabled,
+			u.auth_type AS user_auth_type,
+			u.auto_approve AS user_auto_approve,
+			u.alternate_contact AS user_alternate_contact,
+			u.alternate_contact_telephone AS user_alternate_contact_telephone,
+          	u.create_datetime AS user_create_datetime
+		FROM tbl_user_role r LEFT JOIN tbl_user u ON r.code = u.user_role_code
+		WHERE r.code = #{id}
+	</select>
+	
+	<select id="countByCode" resultType="int">
+		SELECT COUNT(code)
+		FROM tbl_user_role
+		WHERE code = #{code}
+	</select>
+	
+	<select id="countByName" resultType="int">
+		SELECT COUNT(code)
+		FROM tbl_user_role
+		WHERE name = #{name}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.UserRoleEntity">
+		INSERT INTO tbl_user_role 
+		(
+			code,
+			name,
+			level,
+			data_scope,
+			description
+		)
+		VALUE
+		(
+			#{code},
+			#{name},
+			#{level},
+			#{dataScope},
+			#{description}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.UserRoleEntity">
+		UPDATE tbl_user_role
+		<set>
+			name = #{name},
+			level = #{level},
+			data_scope = #{dataScope},
+			description = #{description}
+		</set>
+		WHERE code = #{code}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_user_role
+		WHERE code = #{id}
+	</delete>
+</mapper>

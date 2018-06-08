@@ -1,0 +1,111 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>用户名</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="sshUser"
+							name="sshUser" placeholder=" 请输入用户名" class="required ">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>用户密码</label>
+					<section class="col col-4">
+						<label class="input"> <input type="password"
+							id="sshPassword" name="sshPassword" placeholder="请输入密码"
+							class="required ">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		出库</button>
+</div>
+<script>
+    pageSetUp();
+    var pagefunction = function() {
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+                sshPassword:{
+                	required : '请输入密码'
+                },
+                sshUser:{
+                	required : '请输入用户名'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var jsonData = {};
+            	jsonData.sshUser = $('#sshUser').val();
+            	jsonData.sshPassword = $('#sshPassword').val();
+            	
+            	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+            	var rowNum = ids.length - 1;
+        		var row;
+            	if(null != ids && ids.length != 0 && ids.length != 1){
+            		for(var i = 0;i<ids.length;i++){
+        		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+        		    	sendPutAll("/" + getProjectName() + "/v1.0/hosts/"+row.id+"/output", function(data,rowIndex,rowNum){
+        			        if(rowIndex == rowNum){
+        			        	postSuccess();
+        			   	   	}
+        				}, function(msg){
+        					DialogAlert(msg);
+        				},JSON.stringify(jsonData),null,i,rowNum);
+        		    }
+            	}
+            	
+            	if(ids.length == 1){
+            		var rowData = $("#jqgrid").jqGrid('getRowData',ids);
+	            	sendPut("/" + getProjectName() + "/v1.0/hosts/"+rowData.id+"/output",postSuccess,DialogAlert,JSON.stringify(jsonData),null);
+            	}
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/hosts?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

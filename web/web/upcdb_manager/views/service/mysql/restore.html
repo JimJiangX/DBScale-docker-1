@@ -1,0 +1,73 @@
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<header style="padding: 0 20px;">
+					<h2>
+						备份文件列表
+						<button class="close" data-dismiss="modal">x</button>
+					</h2>
+					<div id="dialog-alert"></div>
+				</header>
+			</div>
+		</article>
+	</div>
+	<div class="row" style="padding-left: 20px;">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+
+			<!-- end widget -->
+			<table id="jqgridrestore"></table>
+			<div id="pjqgridrestore"></div>
+		</article>
+	</div>
+</section>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		确认</button>
+</div>
+<script>
+	pageSetUp();
+	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+	var unitId = $("#jqgrid").jqGrid('getRowData', s).id;
+	
+	loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+
+	$('#submitbtn').click(function() {
+		DialogAlertClear();
+		var restore_s = $("#jqgridrestore").jqGrid('getGridParam', 'selarrrow');
+		var restore_id = restore_s[0];
+		if(restore_s.length == 1){
+			var jsonData = {
+					backupFileId : restore_id
+				};
+			swal({ 
+				  title: "提示", 
+				  text: "确定要还原么？", 
+				  type: "info",
+				  showCancelButton: true, 
+				  confirmButtonColor: "#DD6B55",
+				  confirmButtonText: "确定", 
+				  cancelButtonText: "取消",
+				  closeOnConfirm: true,
+				  closeOnCancel	:true
+				}).then((result) => {
+					if (result.value) { 
+						//在这里调用ajax方法提交
+						sendPut("/" + getProjectName() + "/v1.0/units/" + unitId + "/restore",postSuccess, DialogAlert, JSON.stringify(jsonData),null);
+					}
+			});
+		} else{
+			DialogAlert("请勾选一行数据");
+	 	}
+	});
+	function postSuccess(data) {
+		//提交成功的方法
+		$("#restoreModal").modal('toggle');
+		sendGet("/" + getProjectName() + "/v1.0/units?serv=" + getSession("serviceUpsqlId")
+				+ '&subserv_type=upsql', reloadUnitGrid, ListAlert, null);
+	}
+</script>

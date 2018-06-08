@@ -1,0 +1,177 @@
+  <!--主机-列表页面 -->
+<section id="widget-grid" class="">
+	<div style="    
+	font-family: unset;
+    font-size: 16px;
+    margin-bottom: 6px;
+    font-weight: bold;">
+		RG管理
+	</div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+            <div class="widget-body">
+                <!-- Dynamic Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:void(0);" onclick="add_rg()" id="addrg" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增</a>
+                <a href="javascript:void(0);" class="btn btn-danger" onclick="delete_rg()">删除</a>
+                <a href="javascript:void(0);"  class="btn btn-primary" onclick="rg_start()" id="rgstart">启用</a>
+                <a href="javascript:void(0);"  class="btn btn-warning" onclick="rg_end()" id="rgend">停用</a>
+            </div>
+            <p>
+                &nbsp;
+            </p>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+           
+        <div id="pjqgrid"></div>
+            <!-- end widget -->
+            <table id="jqgrid"></table>
+            
+        </article>
+
+    </div>
+</section>
+<div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 100%;" id="dialogmodal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="taskModalLabel">
+                   任务状态提示
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>存储名称</th>
+                            <th>所属站点</th>
+                            <th>品牌</th>
+                            <th>总量</th>
+                            <th>剩余容量</th>
+                            <th>登记时间</th>
+                            <th>id</th>
+                        </tr>
+                        </thead>
+                        <tbody id="mainframestate">
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		sendGet("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs",createGrid_rg,ListAlert,null);
+    	});
+    });
+    
+    function add_rg(){
+    	$("#addrg").attr("href","views/resource/san/rgadd.html");
+	}
+    
+    function delete_rg(){
+    	ListAlertClear();
+       	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var rg_id = $("#jqgrid").jqGrid('getRowData',s).number;
+    	     ListConfirm('delete', rg_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据！");
+    	 }
+
+    }
+    
+    function rg_start(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var rg_id = $("#jqgrid").jqGrid('getRowData',s).number;
+    		 ListConfirm('start', rg_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据！");
+    	 }
+    }
+    
+    function rg_end(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var rg_id = $("#jqgrid").jqGrid('getRowData',s).number;
+    		 ListConfirm('end', rg_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据！");
+    	 }
+    }
+    
+    function confirm(type, id){
+    	switch(type){
+    	case 'start':
+    		sendPut("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs/"+id+"/enable",rgshowReturn,ListAlert,null,null);
+    		break;
+    	case 'delete':
+   		 	sendDelete("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs/"+id, rgshowReturn, ListAlert, null);
+    		break;
+    	case 'end':
+    		sendPut("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs/"+id+"/disable",rgshowReturn,ListAlert,null,null);
+    		break;
+    	default:
+    	}
+    }
+    
+    function rgshowReturn(){
+		 sendGet("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs",reloadGrid,ListAlert,null);
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+   //模态框刷新启停
+    $(function () { 
+    	//显示监听
+    	$('#addModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#addModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(rgshowReturn, setTime);
+   		 	}
+    	})
+    	
+    }); 
+    
+    clearInterval(flag);
+
+</script>

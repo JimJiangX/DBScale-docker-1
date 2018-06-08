@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionSubServUnitScaleDao">
+	<resultMap id="definitionSubServUnitScaleResultMap"
+		type="com.bsg.upm.entity.DefinitionSubServUnitScaleEntity">
+		<id property="id" column="scale_id" />
+		<result property="name" column="scale_name" />
+		<result property="sequence" column="scale_sequence" />
+		<result property="cpuNum" column="scale_cpu_num" />
+		<result property="memSize" column="scale_mem_size" />
+		<result property="ioWeight" column="scale_io_weight" />
+		<result property="defaults" column="scale_default" />
+	</resultMap>
+
+	<resultMap id="definitionSubServUnitScaleDetailResultMap"
+		type="com.bsg.upm.entity.DefinitionSubServUnitScaleEntity"
+		extends="definitionSubServUnitScaleResultMap">
+		<association property="definitionSubServ"
+			resultMap="com.bsg.upm.dao.DefinitionSubServDao.definitionSubServResultMap">
+		</association>
+	</resultMap>
+	
+	<select id="list" resultMap="definitionSubServUnitScaleDetailResultMap" flushCache="true">
+		SELECT scale.id AS scale_id,
+			scale.name AS scale_name,
+			scale.cpu_num AS scale_cpu_num,
+			scale.sequence AS scale_sequence,
+			scale.mem_size AS scale_mem_size,
+			scale.io_weight AS scale_io_weight,
+			scale.default AS scale_default,
+			dfsubserv.id AS dfsubserv_id,
+            dfsubserv.name AS dfsubserv_name
+		FROM tbl_definition_subserv_unit_scale scale,
+            tbl_definition_subserv dfsubserv	
+        WHERE scale.definition_subserv_id = dfsubserv.id
+         <if test="definitionServCode!=null">
+            AND dfsubserv.definition_serv_code = #{definitionServCode}
+        </if>
+        <if test="definitionSubServName!=null">
+            AND dfsubserv.name = #{definitionSubServName}
+        </if>
+        ORDER BY dfsubserv.id, scale.sequence ASC
+	</select>
+
+	<select id="listScaleName" resultMap="definitionSubServUnitScaleResultMap" flushCache="true">
+		SELECT scale.id AS scale_id, 
+			scale.name AS scale_name
+		FROM tbl_definition_subserv_unit_scale scale,
+			tbl_definition_subserv dfsubserv
+		WHERE scale.definition_subserv_id = dfsubserv.id
+			AND dfsubserv.definition_serv_code = #{definitionServCode}
+			AND dfsubserv.name = #{definitionSubServName}
+			ORDER BY scale.sequence ASC
+	</select>
+	
+	<select id="get" resultMap="definitionSubServUnitScaleDetailResultMap" flushCache="true">
+		SELECT scale.id AS scale_id,
+            scale.name AS scale_name,
+            scale.cpu_num AS scale_cpu_num,
+            scale.sequence AS scale_sequence,
+            scale.mem_size AS scale_mem_size,
+            scale.io_weight AS scale_io_weight,
+            dfsubserv.id AS dfsubserv_id,
+            dfsubserv.name AS dfsubserv_name
+        FROM tbl_definition_subserv_unit_scale scale,
+            tbl_definition_subserv dfsubserv    
+        WHERE scale.definition_subserv_id = dfsubserv.id
+		  AND scale.id = #{id}	
+	</select>
+	
+</mapper>

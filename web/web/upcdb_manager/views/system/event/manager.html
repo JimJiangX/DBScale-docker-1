@@ -1,0 +1,66 @@
+<section id="widget-grid" class="">
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="widget-body">
+                <!-- Dynamic Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- content will be filled here -->
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:void(0);"  class="btn btn-info" id="btnOn" onclick="enable()">开启告警</a>
+                <a href="javascript:void(0);" class="btn btn-danger" id="btnOff" onclick="disable()">关闭告警</a>
+            </div>
+            <p>
+                &nbsp;
+            </p>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+
+    </div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			sendGet("/" + getProjectName() + "/v1.0/monitor/alarm?site="+getSession("siteId"),createGrid_event,ListAlert,null);
+    		});
+    	});
+    });
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/alarm/switch",monitorChangeAdminPhoto,ListAlert,null);
+    
+    function enable(){
+    	sendPut("/" + getProjectName() + "/v1.0/monitor/alarm/switch/enable",showReturn,ListAlert,null,null);
+    }
+    
+    function disable(){
+    	sendPut("/" + getProjectName() + "/v1.0/monitor/alarm/switch/disable",showReturn,ListAlert,null,null);
+    }
+    
+    function showReturn(data){
+    	//启用、停用执行成功后的操作方法，刷新表格
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/alarm?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    	sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/alarm/switch",monitorChangeAdminPhoto,ListAlert,null);
+	}
+    
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionMetricDao">
+	<resultMap id="ResultMap" type="com.bsg.upm.entity.DefinitionMetricEntity">
+		<result property="description" column="description" />
+		<result property="name" column="name" />
+		<result property="type" column="type" />
+ 		<result property="metric" column="metric" />
+ 		<result property="eventShowEnabled" column="event_show_enabled" />
+	</resultMap>
+
+	<select id="list" resultMap="ResultMap" parameterType="java.util.Map">
+		select  dm.type,dm.description,dm.name,dm.metric,dm.event_show_enabled
+		from tbl_definition_metric dm
+	</select>
+
+	
+</mapper>

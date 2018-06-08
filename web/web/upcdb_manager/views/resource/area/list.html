@@ -1,0 +1,156 @@
+  <!--区域-列表页面 -->
+<section id="widget-grid" class="">
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="widget-body">
+                <!-- Dynamic Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- content will be filled here -->
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:void(0);" onclick="add_region()" id="addregion" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增</a>
+                <a href="javascript:void(0);" class="btn btn-primary" onclick="start_region()">启用</a>
+                <a href="javascript:void(0);" class="btn btn-warning" onclick="stop_region()">停用</a>
+                <a href="javascript:void(0);"  class="btn btn-info" onclick="update_region()" id="updateregion">编辑</a>
+                <a href="javascript:void(0);" class="btn btn-danger" onclick="delete_region()">删除</a>
+              
+            </div>
+            <p>
+                &nbsp;
+            </p>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+
+    </div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			sendGet("/" + getProjectName() + "/v1.0/areas?site="+getSession("siteId"),createGrid_area,ListAlert,null);
+    		});
+    	});
+    });
+	var jq_data;
+    function delete_region(){
+    	ListAlertClear();
+        var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+        if(s.length==1){
+        	var areas_id = $("#jqgrid").jqGrid('getRowData',s).id;
+      	    ListConfirm('delete', areas_id);
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+      	}
+    }
+    function add_region(){
+    	$("#addregion").attr("href","views/resource/area/add.html");
+    }
+    function update_region(){
+    	ListAlertClear();
+        s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var id=$("#updateregion");
+        if(s.length==1){
+        	if(rowData.enabledStatus == "yes"){
+	            id.attr("href","views/resource/area/update.html");
+	            id.attr("data-toggle","modal");
+	            id.attr("data-target","#addModal");
+        	}else{
+        		ListAlert("请在停用状态下进行编辑!");
+                id.removeAttr("data-toggle");
+                id.removeAttr("data-target");
+                id.removeAttr("href");
+        	}
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    function start_region(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var areas_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('start', areas_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    function stop_region(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var areas_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('stop', areas_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+
+    function confirm(type, id){
+    	ListAlertClear();
+    	switch(type){
+    	case 'start':
+    		sendPut("/" + getProjectName() + "/v1.0/areas/"+id+"/enable",showReturn,ListAlert,null,null);
+    		break;
+    	case 'stop':
+   		    sendPut("/" + getProjectName() + "/v1.0/areas/"+id+"/disable",showReturn,ListAlert,null,null);
+    		break;
+    	case 'delete':
+    		sendDelete("/" + getProjectName() + "/v1.0/areas/"+id, showReturn, ListAlert, null);
+    		break;
+    	default:
+    	}
+    }
+    
+    function showReturn(data){
+    	//启用、停用执行成功后的操作方法，刷新表格
+		sendGet("/" + getProjectName() + "/v1.0/areas?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+		
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    
+    //模态框刷新启停
+    $(function () { 
+    	//显示监听
+    	$('#addModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#addModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(showReturn, setTime);
+   		 	}
+    	})
+    	
+    }); 
+    
+    clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

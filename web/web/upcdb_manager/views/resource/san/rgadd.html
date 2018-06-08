@@ -1,0 +1,97 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					RG登记
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-2">RG编号</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="code"
+							name="code" placeholder="" class="required ">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+    pageSetUp();
+    var pagefunction = function() {
+    	var siteid=getSession("siteId");
+    	$('#site').val(siteid);
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+            	 sanName : {
+                     required : true
+                 }
+		    },
+            // Messages for form validation
+            messages:{
+            	sanName : {
+                    required : '请输入RG编号'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToJson(data);
+            	//在这里调用ajax方法提交
+            	sendPost("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/sans/"+getSession("sanId")+"/rgs",reloadGrid,ListAlert,null);
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

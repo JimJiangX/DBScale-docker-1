@@ -1,0 +1,116 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					调整容器上限
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-4"><label style="color: red">*</label>容器上限</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text"
+							name="maxContainer" id="maxContainer" placeholder="请输入容器上限"
+							class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-4"><label style="color: red"></label>备注信息</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" id="description"
+							name="description" placeholder=" 在此输入备注信息..."
+							class="">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+
+<script>
+    pageSetUp();
+    var pagefunction = function() {
+    	//请求表单中的内容-如select并填充到页面
+    	var siteid=getSession("siteId");
+    	var s = gridCluster.jqGrid('getGridParam', 'selarrrow');
+        var hostid = $("#jqgrid").jqGrid('getRowData',s).id;
+        var mgm_num = $("#jqgrid").jqGrid('getRowData',s).maxContainer;
+        var description = $("#jqgrid").jqGrid('getRowData',s).description;
+        $("#maxContainer").val(mgm_num);
+        $("#description").val(description);
+        
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option={ 
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+             rules: {
+            	 maxContainer:{
+                	digits:true,
+                	required : true
+                 }
+		    },
+            // Messages for form validation
+            messages:{
+            	maxContainer : {
+            		digits:'请输入整数',
+                    required : '请输入容器上限'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToJson(data);
+            	jsonData.maxContainer = parseInt(jsonData.maxContainer);
+            	//在这里调用ajax方法提交
+            	sendPut("/" + getProjectName() + "/v1.0/hosts/"+hostid+"/mgm", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+    
+    function postSuccess(data){
+    	$("#mgmModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/hosts?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    
+</script>

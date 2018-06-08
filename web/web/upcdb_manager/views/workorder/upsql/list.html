@@ -1,0 +1,270 @@
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<!-- Dynamic Modal -->
+				<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+					aria-labelledby="addModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="width: 900px; margin-top: 14px;">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+				<a href="javascript:void(0);" id="examine" class="btn btn-success"
+					onclick="addExamine()">审批</a> 
+				<a href="javascript:void(0);"
+					id="execute" class="btn btn-primary" onclick="addExecute()">执行</a>
+				<a href="javascript:void(0);" id="detail" class="btn btn-info"
+					onclick="addDetail()">详情</a> 
+				<a href="javascript:void(0);"
+					id="delete" class="btn btn-danger" onclick="delOrder()">删除</a>
+				<a href="javascript:void(0);" id="clone" class="btn btn-warning" onclick="cloneOrder()">克隆</a>
+			</div>
+			<p>&nbsp;</p>
+		</article>
+	</div>
+	<div class="row">
+		<div id="list-alert"></div>
+	</div>
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+
+			<!-- end widget -->
+			<table id="jqgrid"></table>
+			<div id="pjqgrid"></div>
+		</article>
+	</div>
+</section>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width:400px;">
+			<div class="modal-content">
+				<!-- content will be filled here -->
+			</div>
+		</div>
+</div>
+<script type="text/javascript">
+	var order_type;
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){
+    			var siteid=getSession("siteId");
+    			sendGet("/" + getProjectName() + "/v1.0/orders?site="+siteid,createGrid_wo_1,ListAlert,null);	
+    		});
+    		
+    	});
+    });
+    var gridWorkOrder=$("#jqgrid");
+    function addExamine(){
+    	ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		var rowData = $("#jqgrid").jqGrid('getRowData',s);
+		order_type = rowData.servTypeName;
+		var id=$("#examine");
+    	if(null != s && s.length != 0 && s.length == 1){
+	    		if(order_type == "UPSQL"){
+	    			var myhref='views/workorder/upsql/examine.html';
+	    		}
+	    		if(order_type == "UPREDIS"){
+	    			var myhref='views/workorder/redis/examine.html';
+	    		}
+	    		if(order_type == "MYSQL"){
+	    			var myhref='views/workorder/mysql/examine.html';
+	    		}
+	    		if(order_type == "REDIS"){
+	    			var myhref='views/workorder/redis_new/examine.html';
+	    		}
+	    		
+	    		id.attr("href",myhref);
+	            id.attr("data-toggle","modal");
+	            id.attr("data-target","#addModal");
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+    		 id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }
+    function addExecute(){
+    	ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		var rowData = $("#jqgrid").jqGrid('getRowData',s);
+		order_type = rowData.servTypeName;
+		var id=$("#execute");
+    	if(null != s && s.length != 0 && s.length == 1){
+    		if(order_type == "UPSQL"){
+    			var myhref='views/workorder/upsql/execute.html';
+    		}
+    		if(order_type == "UPREDIS"){
+    			var myhref='views/workorder/redis/execute.html';
+    		}
+    		if(order_type == "MYSQL"){
+    			var myhref='views/workorder/mysql/execute.html';
+    		}
+    		if(order_type == "REDIS"){
+    			var myhref='views/workorder/redis_new/execute.html';
+    		}
+    		
+    		id.attr("href",myhref);
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#addModal");
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+    		 id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }
+    function addDetail(){
+    	ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		var rowData = $("#jqgrid").jqGrid('getRowData',s);
+		order_type = rowData.servTypeName;
+		var id=$("#detail");
+    	if(null != s && s.length != 0 && s.length == 1){
+    		if(order_type == "UPSQL"){
+    			var myhref='views/workorder/upsql/detail.html';
+    		}
+    		if(order_type == "UPREDIS"){
+    			var myhref='views/workorder/redis/detail.html';
+    		}
+    		if(order_type == "MYSQL"){
+    			var myhref='views/workorder/mysql/detail.html';
+    		}
+    		if(order_type == "REDIS"){
+    			var myhref='views/workorder/redis_new/detail.html';
+    		}
+    		
+    		id.attr("href",myhref);
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#addModal");
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+    		 id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }
+    
+    function cloneOrder(){
+    	ListAlertClear();
+		var id=$("#clone");
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(null != s && s.length != 0 && s.length == 1){
+    		 var myhref='views/workorder/upsql/clone.html';
+    		 id.attr("href",myhref);
+             id.attr("data-toggle","modal");
+             id.attr("data-target","#myModal");
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+    		 id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }    
+    
+    function showReturn(data){
+    	sendGet("/" + getProjectName() + "/v1.0/orders?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	for(var i=0;i<data['data'].length;i++){
+    		if(data['data'][i].servTypeName == 'upredis_urproxy_sentinel'){
+    			data['data'][i].servTypeName = "UPREDIS";
+    		}
+    		if(data['data'][i].servTypeName == 'upsql_upproxy_swm'){
+    			data['data'][i].servTypeName = "UPSQL";
+    		}
+    		if(data['data'][i].servTypeName == 'mysql'){
+    			data['data'][i].servTypeName = "MYSQL";
+    		}
+    		if(data['data'][i].servTypeName == 'redis'){
+    			data['data'][i].servTypeName = "REDIS";
+    		}
+    	}
+    	var jq_data=data['data'];
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    function delOrder(){
+    	ListAlertClear();
+		var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(null != ids && ids.length != 0){
+    		 ListConfirm('delete',ids);
+    	} else{
+    		 ListAlert("请勾选一行数据");
+    	}
+    }
+    
+    function confirm(type, ids){
+    	ListAlertClear();
+    	switch(type){
+    	case 'delete':
+    		ids = ids.split(",");
+        	var rowNum = ids.length - 1;
+    		var row;
+    		swal({ 
+				  title: "提示", 
+				  text: "您确认要继续删除么？", 
+				  type: "info",
+				  showCancelButton: true, 
+				  confirmButtonColor: "#DD6B55",
+				  confirmButtonText: "确认", 
+				  cancelButtonText: "取消",
+				  closeOnConfirm: true,
+				  closeOnCancel	:true
+				}).then((result) => {
+					if (result.value) { 
+						for(var i = 0;i<ids.length;i++){
+			    			row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+			    			sendDeleteAll("/" + getProjectName() + "/v1.0/orders/"+row.id, function(data,rowIndex,rowNum){
+			    		    	if(rowIndex == rowNum){
+			    		    		showReturn();
+			    		    	}
+							}, function(msg){
+								ListAlert(msg);
+							}, null,null,i,rowNum);
+			    		}
+					}
+			});
+    		break;
+    	default:
+    	}
+    }
+    
+    //模态框刷新启停
+    $(function () { 
+    	//显示监听
+    	$('#addModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#addModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(showReturn, setTime);
+   		 	}
+    	})
+    	
+    	//显示监听
+    	$('#myModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#myModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(showReturn, setTime);
+   		 	}
+    	})
+    	
+    }); 
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

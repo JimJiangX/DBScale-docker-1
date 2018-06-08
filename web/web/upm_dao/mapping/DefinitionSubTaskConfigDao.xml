@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionSubTaskConfigDao">
+	<resultMap id="ResultMap" type="com.bsg.upm.entity.DefinitionSubTaskConfigEntity">
+		<id property="module" column="module" />
+		<id property="action" column="action" />
+		<result property="timeout" column="timeout" />
+		<result property="searchFrequency" column="search_frequency" />
+		<result property="searchRetryCnt" column="search_retry_cnt" />
+		<result property="searchRetryIntervalTime" column="search_retry_interval_time" />
+	</resultMap>
+
+	<select id="list" resultMap="ResultMap" flushCache="true">
+		SELECT module, action, timeout, search_frequency, search_retry_cnt, search_retry_interval_time
+		FROM tbl_definition_subtask_config
+	</select>
+	
+	<select id="get" resultMap="ResultMap" flushCache="true">
+		SELECT module, action, timeout, search_frequency, search_retry_cnt, search_retry_interval_time
+		FROM tbl_definition_subtask_config 
+		WHERE module = #{module}
+			AND action = #{action}
+	</select>
+
+</mapper>

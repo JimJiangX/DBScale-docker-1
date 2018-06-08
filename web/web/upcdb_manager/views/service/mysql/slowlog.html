@@ -1,0 +1,62 @@
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<header style="padding: 0 20px;">
+					<h2>
+						慢日志列表
+						<button class="close" data-dismiss="modal">x</button>
+					</h2>
+				</header>
+				<!-- Dynamic Modal -->
+				<div class="modal fade" id="remoteModal" tabindex="-1" role="dialog"
+					aria-labelledby="remoteModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div style="margin-bottom: 5px;">
+				<span id="size" style="margin-left: 20px; font-size: 16px;"></span>
+				<span id="querySum" style="margin-left: 100px; font-size: 16px;"></span>
+				<span id="uniqueQuerySum"
+					style="margin-left: 100px; font-size: 16px;"></span>
+			</div>
+		</article>
+	</div>
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+
+			<!-- end widget -->
+			<table id="jqgridslowlog"></table>
+			<div id="pjqgridslowlog"></div>
+		</article>
+	</div>
+</section>
+<script type="text/javascript">
+	pageSetUp();
+	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+	var unit_id = $("#jqgrid").jqGrid('getRowData', s).id;
+
+	loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function() {
+		loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function() {
+			loadScript("js/create-jqgrid.js", function() {
+			});
+		});
+	});
+
+	function showReturn() {
+		sendGet("/" + getProjectName() + "/v1.0/units/" + unit_id + "/slowlog", reloadGrid,
+				null);
+	}
+	function reloadGrid(data) {
+		ListAlertClear();
+		var jq_data = data['data']['slowLogDetails'];
+		$("#jqgridslowlog").clearGridData().setGridParam({
+			data : jq_data
+		}).trigger("reloadGrid");
+	}
+</script>

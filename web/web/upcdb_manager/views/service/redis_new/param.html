@@ -1,0 +1,157 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					参数编辑
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-3">参数名称</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" name="paramName"
+							placeholder=" 输入参数名称" class="required " id="paramName"
+							disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3"><label style="color: red">*</label>默认值</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text" name="paramValue"
+							placeholder=" 输入默认值" class="required " id="paramValue">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">重启生效</label>
+					<section class="col col-8">
+						<label class="input"> <input type="text"
+							name="paramMustRestart" placeholder=" 输入默认值" class="required "
+							id="paramMustRestart" disabled="disabled">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">说明</label>
+					<section class="col col-8">
+						<label class="textarea textarea-resizeable"> <textarea
+								rows="3" name="paramDescription" id="paramDescription"
+								disabled="disabled" class="custom-scroll"></textarea>
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+	pageSetUp();
+	var pagefunction = function() {
+		s = $("#jqgridParam").jqGrid('getGridParam', 'selarrrow');
+		param = $("#jqgridParam").jqGrid('getRowData', s);
+		$("#paramName").val(param.name);
+		$("#paramValue").val(param.value);
+		$("#paramMustRestart").val(param.mustRestart);
+		$("#paramDescription").val(param.description);
+
+		var errorClass = 'invalid';
+		var errorElement = 'em';
+		var option = {
+			errorClass : errorClass,
+			errorElement : errorElement,
+			highlight : function(element) {
+				$(element).parent().removeClass('state-success').addClass(
+						"state-error");
+				$(element).removeClass('valid');
+			},
+			unhighlight : function(element) {
+				$(element).parent().removeClass("state-error").addClass(
+						'state-success');
+				$(element).addClass('valid');
+			},
+			// Rules for form validation
+			// Messages for form validation
+			messages : {
+				name : {
+					required : '请输入区域名称'
+				},
+				description : {
+					required : '请输入描述'
+				},
+				backupStorage : {
+					required : '请选择备份存储'
+				}
+			},
+			errorPlacement : function(error, element) {
+				if ($(element).next("div").hasClass("tooltip")) {
+					$(element).attr("data-original-title", $(error).text())
+							.tooltip("show");
+				} else {
+					$(element).attr("title", $(error).text()).tooltip("show");
+				}
+			},
+			submitHandler : function(form) {
+				//在这里生成需要提交的json数据
+				var data = {};
+				data.name = $("#paramName").val();
+				data.value = $("#paramValue").val();
+				var jsonData = JSON.stringify(data);
+				var paramType = "";
+				switch ($("#myTab1").find("li.active").eq(0).find("a").attr(
+						"id")) {
+				case "upsqlParamTab":
+					paramType = "upredis";
+					break;
+				case "upproxyParamTab":
+					paramType = "urproxy";
+					break;
+				default:
+				}
+				//在这里调用ajax方法提交
+				sendPut("/" + getProjectName() + "/v1.0/servs/"
+						+ getSession("serviceUpsqlId") + "/subservs/"
+						+ paramType + "/configs", postSuccess, DialogAlert, '['
+						+ jsonData + ']', null);
+			}
+		};
+		$('#checkout-form').validate(option);
+	};
+	loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+
+	$('#submitbtn').click(function() {
+		DialogAlertClear();
+		$('#checkout-form').submit();
+	});
+	function postSuccess(data) {
+		//提交成功的方法
+		$("#myModal").modal('toggle');
+		var paramType = "";
+		switch ($("#myTab1").find("li.active").eq(0).find("a").attr("id")) {
+		case "upsqlParamTab":
+			paramType = "upredis";
+			break;
+		case "upproxyParamTab":
+			paramType = "urproxy";
+			break;
+		default:
+		}
+		sendGet("/" + getProjectName() + "/v1.0/servs/" + getSession("serviceUpsqlId")
+				+ "/subservs/" + paramType + "/configs", reloadParamGrid,
+				ListAlert, null);
+	}
+</script>

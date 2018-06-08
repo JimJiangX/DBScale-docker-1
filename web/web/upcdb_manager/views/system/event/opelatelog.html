@@ -1,0 +1,93 @@
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<!-- Dynamic Modal -->
+				<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+					aria-labelledby="addModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="width: 900px;">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<p>&nbsp;</p>
+		</article>
+	</div>
+	<div class="row">
+		<div id="list-alert"></div>
+	</div>
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+
+			<!-- end widget -->
+			<table id="jqgrid"></table>
+			<div id="pjqgrid"></div>
+		</article>
+
+	</div>
+</section>
+<script type="text/javascript">
+	var username = JSON.parse(getSession("user")).username;
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){
+    			sendGet("/" + getProjectName() + "/v1.0/opelatelog",createGrid_opelatelog,ListAlert,null);	
+    		});
+    		
+    	});
+    });
+    var gridWorkOrder=$("#jqgrid");
+    function addSubsys(){
+    	$("#add").attr("href","views/workorder/subsys/add.html");
+    }
+    function updateSubsys(){
+    	ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+		var id=$("#update");
+    	if(s.length==1){
+    		id.attr("href","views/workorder/subsys/update.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#addModal");
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+    		 id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }
+    function delSubsys(){
+    	ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(s.length==1){
+    		var sysId = $("#jqgrid").jqGrid('getRowData',s).id;
+    		ListConfirm('delete', sysId);
+    	 } else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    
+    function confirm(type, id){
+    	switch(type){
+    	case 'delete':
+    		sendDelete("/" + getProjectName() + "/v1.0/business_subsystems/"+id, showReturn, ListAlert, null);
+    		break;
+    	default:
+    	}
+    }
+    
+    function showReturn(data){
+    	sendGet("/" + getProjectName() + "/v1.0/opelatelog?user="+username,reloadGrid,ListAlert,null);
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

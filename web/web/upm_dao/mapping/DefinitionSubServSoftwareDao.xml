@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionSubServSoftwareDao">
+	<resultMap id="dfSubServSoftwareResultMap" type="com.bsg.upm.entity.DefinitionSubServSoftwareEntity">
+		<id property="id" column="df_subserv_software_id" />
+		<result property="definitionSubServName" column="definition_subserv_name" />
+		<result property="majorVersion" column="df_subserv_software_major_version" />
+		<result property="minorVersion" column="df_subserv_software_minor_version" />
+	</resultMap>
+	
+	<select id="listMainAndMinorVersion" resultMap="dfSubServSoftwareResultMap" flushCache="true">
+		SELECT id AS df_subserv_software_id, 
+			major_version AS df_subserv_software_major_version, 
+			minor_version AS df_subserv_software_minor_version
+		FROM tbl_definition_subserv_software
+		WHERE definition_subserv_name = #{definitionSubServName}
+	</select>
+
+	<select id="list" resultMap="dfSubServSoftwareResultMap" flushCache="true">
+		SELECT id AS df_subserv_software_id, 
+			definition_subserv_name,
+			major_version AS df_subserv_software_major_version, 
+			minor_version AS df_subserv_software_minor_version
+		FROM tbl_definition_subserv_software		
+		ORDER BY definition_subserv_name, major_version DESC, minor_version DESC
+	</select>
+	
+	<select id="get" resultMap="dfSubServSoftwareResultMap" flushCache="true">
+		SELECT id AS df_subserv_software_id, 
+			definition_subserv_name,
+			major_version AS df_subserv_software_major_version, 
+			minor_version AS df_subserv_software_minor_version
+		FROM tbl_definition_subserv_software		
+		WHERE id = #{id}
+	</select>
+
+</mapper>

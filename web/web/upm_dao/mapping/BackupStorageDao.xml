@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.BackupStorageDao">
+	<resultMap id="backupStorageResultMap" type="com.bsg.upm.entity.BackupStorageEntity">
+		<id property="id" column="backup_storage_id" />
+		<result property="name" column="backup_storage_name" />
+		<result property="type" column="backup_storage_type" />
+		<result property="ip" column="backup_storage_ip" />
+		<result property="dir" column="backup_storage_dir" />
+		<result property="mountDir" column="backup_storage_mount_dir" />
+		<result property="mountOpts" column="backup_storage_mount_opts" />
+		<result property="enabled" column="backup_storage_enabled" />
+		<result property="description" column="backup_description" />
+		<result property="createDateTime" column="backup_storage_create_datetime" />
+		<result property="createUserLoginName" column="backup_storage_create_user_login_name" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+	</resultMap>
+
+	<select id="list" parameterType="java.util.Map" resultMap="backupStorageResultMap" flushCache="true">
+		SELECT bs.id AS backup_storage_id,
+			bs.name AS backup_storage_name,
+			bs.type AS backup_storage_type,
+			bs.ip AS backup_storage_ip,
+			bs.dir AS backup_storage_dir,
+			bs.mount_dir AS backup_storage_mount_dir,
+			bs.mount_opts AS backup_storage_mount_opts,
+			bs.enabled AS backup_storage_enabled,
+			bs.description AS backup_description,
+			bs.create_datetime AS backup_storage_create_datetime,
+			bs.create_user_login_name AS backup_storage_create_user_login_name,
+			site.id AS site_id,
+			site.name AS site_name
+		FROM tbl_backup_storage bs, tbl_site site
+		WHERE bs.site_id = site.id
+			AND bs.site_id = #{siteId}
+		<if test="enabled!=null">
+			AND bs.enabled = #{enabled}
+		</if>
+		ORDER BY site.create_datetime DESC, bs.create_datetime DESC
+	</select>
+	
+	<select id="listName" resultMap="backupStorageResultMap" flushCache="true">
+		SELECT bs.id AS backup_storage_id,
+			bs.name AS backup_storage_name,
+			bs.description AS backup_description
+		FROM tbl_backup_storage bs 
+		WHERE bs.site_id = #{siteId}
+		<if test="enabled!=null">
+			AND bs.enabled = #{enabled}
+		</if>
+		ORDER BY bs.name
+	</select>
+	
+	<select id="get" resultMap="backupStorageResultMap" flushCache="true">
+		SELECT bs.id AS backup_storage_id,
+			bs.name AS backup_storage_name,
+			bs.type AS backup_storage_type,
+			bs.ip AS backup_storage_ip,
+			bs.dir AS backup_storage_dir,
+			bs.mount_dir AS backup_storage_mount_dir,
+			bs.mount_opts AS backup_storage_mount_opts,
+			bs.enabled AS backup_storage_enabled,
+			bs.description AS backup_description,
+			bs.create_datetime AS backup_storage_create_datetime,
+			bs.create_user_login_name AS backup_storage_create_user_login_name,
+			site.id AS site_id,
+			site.name AS site_name
+		FROM tbl_backup_storage bs, tbl_site site
+		WHERE bs.site_id = site.id
+			AND bs.id = #{id}
+	</select>
+	
+	<select id="countBySiteId" resultType="int" flushCache="true">
+        SELECT COUNT(bs.id)
+        FROM tbl_backup_storage bs 
+        WHERE bs.site_id = #{siteId} 
+    </select>
+	
+	<select id="countBySiteIdAndName" resultType="int" flushCache="true">
+		SELECT COUNT(bs.id)
+		FROM tbl_backup_storage bs 
+		WHERE bs.site_id = #{siteId} 
+			AND bs.name = #{name}
+	</select>
+	
+	<select id="countBySiteIdAndIpAndDirAndMountDir" resultType="int" flushCache="true">
+		SELECT COUNT(bs.id)
+		FROM tbl_backup_storage bs 
+		WHERE bs.site_id = #{siteId} 
+			AND bs.dir = #{dir} 
+			AND bs.mount_dir = #{mountDir} 
+			AND bs.ip = #{ip}
+	</select>
+
+	<insert id="save" parameterType="com.bsg.upm.entity.BackupStorageEntity">
+		INSERT INTO tbl_backup_storage
+		(
+			id,
+			site_id,
+			name,
+			type,
+			ip,
+			dir,
+			mount_dir,
+			mount_opts,
+			enabled,
+			description,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+		(
+			#{id},
+			#{site.id},
+			#{name},
+			#{type},
+			#{ip},
+			#{dir},
+			#{mountDir},
+			#{mountOpts},
+			#{enabled},
+			#{description},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.BackupStorageEntity">
+		UPDATE tbl_backup_storage 
+		<set>
+			name = #{name},
+			description = #{description}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateEnabled" parameterType="com.bsg.upm.entity.BackupStorageEntity">
+		UPDATE tbl_backup_storage 
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_backup_storage
+		WHERE id = #{id}
+	</delete>
+
+</mapper>

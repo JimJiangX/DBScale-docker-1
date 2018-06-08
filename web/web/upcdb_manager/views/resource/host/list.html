@@ -1,0 +1,354 @@
+
+<!--主机-列表页面 -->
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<!-- Dynamic Modal -->
+				<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+					aria-labelledby="addModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog"
+					aria-labelledby="uploadModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="margin-top: 10%; width: 500px;">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="mgmModal" tabindex="-1" role="dialog"
+					aria-labelledby="mgmModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="margin-top: 10%; width: 300px;">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="taskModal" tabindex="-1" role="dialog"
+				aria-labelledby="taskModalLabel" aria-hidden="true">
+					<div class="modal-dialog" style="width: 1024px; padding:0 0 0 5px;">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+								<div class="row">
+									<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+										<div class="widget-body">
+											<header style="padding: 0 20px;">
+												<h2>
+													任务详情列表
+													<button class="close" data-dismiss="modal">x</button>
+												</h2>
+												<div id="dialog-alert"></div>
+											</header>
+										</div>
+									</article>
+								</div>
+								<div class="row" style="padding-left:20px;padding-bottom:10px;">
+									<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+										<table id="jqgridTask"></table>
+										<div id="pjqgridTask"></div>
+									</article>
+								</div>
+						</div>
+					</div>
+				</div>
+				<a href="javascript:void(0);" onclick="uploadExcel()"
+					class="btn btn-success" id="uploadExcel">批量注册</a> <a
+					href="javascript:void(0);" onclick="add_mainframe()"
+					id="addmainframe" class="btn btn-success" data-toggle="modal"
+					data-target="#addModal">注册</a> <a href="javascript:void(0);"
+					class="btn btn-info" onclick="update_mainframe()"
+					id="updatemainframe">编辑</a> <a href="javascript:void(0);"
+					class="btn btn-info" onclick="in_mainframe()">入库</a> <a
+					href="javascript:void(0);" class="btn btn-primary"
+					onclick="start_mainframe()">启用</a> <a href="javascript:void(0);"
+					class="btn btn-warning" onclick="stop_mainframe()">停用</a> <a
+					href="javascript:void(0);" class="btn btn-danger"
+					onclick="out_mainframe()" id="outmainframe">出库</a> <a
+					href="javascript:void(0);" class="btn btn-info"
+					onclick="hostDetail()" id="hostDetail">详情</a> <a
+					href="javascript:void(0);" class="btn btn-primary"
+					onclick="exportHost()">导出</a> <a href="javascript:void(0);"
+					class="btn btn-warning" onclick="exportExcel()">模板下载</a> <a
+					href="javascript:void(0);" class="btn btn-danger"
+					onclick="delete_mainframe()">注销</a> 
+					<a href="javascript:void(0);" id="refresh" class="btn btn-primary" style="float: right; margin-right: 10px;" onclick="showReturn()">刷新</a>
+			</div>
+			<p>&nbsp;</p>
+		</article>
+	</div>
+	<div class="row">
+		<div id="list-alert"></div>
+	</div>
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+
+			<div id="pjqgrid"></div>
+			<!-- end widget -->
+			<table id="jqgrid"></table>
+
+		</article>
+
+	</div>
+</section>
+<script>
+	
+    pageSetUp();
+    var jqgrid_data;
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+	    		var siteid=getSession("siteId");
+	    		sendGet("/" + getProjectName() + "/v1.0/hosts?site="+siteid,createGrid_host_1,ListAlert,null);
+	    		
+    		});
+    	});
+    });
+   
+    // load related plugins
+    var gridCluster=$("#jqgrid");
+	function add_mainframe(){
+    	$("#addmainframe").attr("href","views/resource/host/add.html");
+	}
+    function delete_mainframe(){
+    	ListAlertClear();
+       	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(null != ids && ids.length != 0){
+    	     ListConfirm('delete', ids);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+
+    }
+    function in_mainframe(){
+    	ListAlertClear();
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(null != ids && ids.length != 0){
+    		 ListConfirm('in', ids);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    function out_mainframe(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(null != s && s.length != 0){
+    		var id=$("#outmainframe");
+    		id.attr("href","views/resource/host/out.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#addModal");
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    		 id.removeAttr("data-toggle");
+             id.removeAttr("data-target");
+             id.removeAttr("href");
+    	 }
+    }
+    function update_mainframe(){
+    	ListAlertClear();
+        var s = gridCluster.jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var id=$("#updatemainframe");
+        if(s.length==1){
+        	if(rowData.status == "input_no"){
+	            id.attr("href","views/resource/host/update.html");
+	            id.attr("data-toggle","modal");
+	            id.attr("data-target","#addModal");
+        	} else if (rowData.status == "disable") {
+        		id.attr("href","views/resource/host/mgm.html");
+ 	            id.attr("data-toggle","modal");
+ 	            id.attr("data-target","#mgmModal");
+        	}else{
+	            ListAlert("请在非入库/停用状态下进行编辑!");
+                id.removeAttr("data-toggle");
+                id.removeAttr("data-target");
+                id.removeAttr("href");
+        	}
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function hostDetail(){
+    	ListAlertClear();
+        var s = gridCluster.jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var id=$("#hostDetail");
+        if(s.length==1){
+	            id.attr("href","views/resource/host/detail.html");
+	            id.attr("data-toggle","modal");
+	            id.attr("data-target","#addModal");
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function start_mainframe(){
+    	ListAlertClear();
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(null != ids && ids.length != 0){
+    		 ListConfirm('start', ids);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    function stop_mainframe(){
+    	ListAlertClear();
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(null != ids && ids.length != 0){
+    		 ListConfirm('stop', ids);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    
+    function confirm(type, id){
+    	ListAlertClear();
+    	var ids = id.split(",");
+    	var rowNum = ids.length - 1;
+		var row;
+    	switch(type){
+    	case 'start':
+    		for(var i = 0;i<ids.length;i++){
+		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+		    	sendPutAll("/" + getProjectName() + "/v1.0/hosts/"+row.id+"/enable", function(data,rowIndex,rowNum){
+			        if(rowIndex == rowNum){
+			       		showReturn();
+			   	   	}
+				}, function(msg){
+					ListAlert(msg);
+				}, null,null,i,rowNum);
+		    }
+    		break;
+    	case 'stop':
+    		for(var i = 0;i<ids.length;i++){
+		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+		    	sendPutAll("/" + getProjectName() + "/v1.0/hosts/"+row.id+"/disable", function(data,rowIndex,rowNum){
+			        if(rowIndex == rowNum){
+			       		showReturn();
+			   	   	}
+				}, function(msg){
+					ListAlert(msg);
+				}, null,null,i,rowNum);
+		    }
+    		break;
+    	case 'delete':
+    		for(var i = 0;i<ids.length;i++){
+		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+		    	sendDeleteAll("/" + getProjectName() + "/v1.0/hosts/"+row.id, function(data,rowIndex,rowNum){
+			        if(rowIndex == rowNum){
+			       		showReturn();
+			   	   	}
+				}, function(msg){
+					ListAlert(msg);
+				}, null,null,i,rowNum);
+		    }
+    		break;
+    	case 'in':
+    		for(var i = 0;i<ids.length;i++){
+		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+		    	sendPutAll("/" + getProjectName() + "/v1.0/hosts/"+row.id+"/input", function(data,rowIndex,rowNum){
+			        if(rowIndex == rowNum){
+			       		showReturn();
+			   	   	}
+				}, function(msg){
+					ListAlert(msg);
+				}, null,null,i,rowNum);
+		    }
+    		break;
+    	default:
+    	}
+    }
+    
+    //下载
+    function exportHost(){
+    	 var $eleForm = $("<form method='post'></form>");
+         $eleForm.attr("action","/" + getProjectName() + "/v1.0/hosts/download?site="+getSession("siteId"));
+         $(document.body).append($eleForm);
+         $eleForm.submit();
+    }
+    
+    //模板下载
+    function exportExcel(){
+   	 	var $eleForm = $("<form method='post'></form>");
+        $eleForm.attr("action","views/resource/host/file/host_upload_template.xls");
+        $(document.body).append($eleForm);
+        $eleForm.submit();
+    }
+    
+    //上传
+    function uploadExcel(){
+    	ListAlertClear();
+    		var id=$("#uploadExcel");
+    		id.attr("href","views/resource/host/upload.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#uploadModal");
+    }
+    
+  	//容器上限
+    function uploadMgm(){
+    	ListAlertClear();
+        var s = gridCluster.jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var id=$("#uploadMgm");
+        if(s.length==1){
+	            id.attr("href","views/resource/host/mgm.html");
+	            id.attr("data-toggle","modal");
+	            id.attr("data-target","#mgmModal");
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/hosts?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];  	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    $('#taskModal').on("show.bs.modal", function(e){
+    	ListAlertClear();
+    	$("#mainframestate").empty();
+    	$("#jqgridTask").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/tasks?obj_id="+$(e.relatedTarget).data('taskId'),createGrid_taskDetailModal,ListAlert,null);
+    });
+    
+    //模态框刷新启停
+    $(function () { 
+    	//隐藏监听
+    	$('#taskModal').on('hide.bs.modal', function () {
+    		showReturn();
+    	})
+
+    }); 
+
+    function noRe(){
+	}
+	clearInterval(flag);
+	var flag = setInterval(noRe, setTime);
+</script>

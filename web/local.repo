@@ -1,0 +1,6 @@
+[rhel-7-server-ose-3.6-rpms]
+baseurl = http://192.168.111.191:8080/yum/
+name = Red Hat OpenShift Container Platform 3.6 (RPMs)
+enabled = 1
+gpgcheck = 0
+

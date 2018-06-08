@@ -1,0 +1,98 @@
+@font-face {
+    font-family: 'SFNSText';
+    src: local(".SFNSText-Medium"), url('/fonts/SFNSText-Medium.woff') format('woff');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'SFNSText';
+    src: local(".SFNSText-Light"), url('/fonts/SFNSText-Light.woff') format('woff');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'SFNSDisplay-Numbers';
+    src: local(".SFNSDisplay-Ultralight"), url('/fonts/SFNSDisplay-Ultralight-Numbers.woff') format('woff');
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: 'SFNSDisplay';
+    src: local(".SFNSDisplay-Light"), url('/font/sf-pro-display_light.woff') format('woff');
+    font-weight: 300;
+}
+
+
+
+body.non-default {
+    background: none;
+}
+
+.center-login {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: 480px;
+    width: 640px;
+}
+
+.si-container[data-theme=lite] {
+    color: #fff;
+}
+
+.si-container {
+    text-align: center;
+    width: 100%;
+    padding: 0;
+}
+
+.widget-container {
+    height: 100%;
+    min-width: 310px;
+    margin: 0 auto;
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    align-items: center;
+    -webkit-flex-direction: vertical;
+    -moz-flex-direction: vertical;
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    justify-content: center;
+}
+
+app.css:1 .fade-in {
+    -webkit-animation: fade-in 500ms ease-in-out;
+    -o-animation: fade-in 500ms ease-in-out;
+    animation: fade-in 500ms ease-in-out;
+}
+
+app.css:1:lang(ja),
+:lang(ko),
+:lang(th),
+:lang(zh) {
+    font-style: normal;
+}
+
+app.css:1:lang(zh) {
+    quotes: "「" "」";
+}
+
+.widget-container .si-step,
+.widget-container .change-password-inline {
+    width: 100%;
+}

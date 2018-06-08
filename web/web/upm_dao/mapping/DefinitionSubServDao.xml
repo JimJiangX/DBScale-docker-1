@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionSubServDao">
+	<resultMap id="definitionSubServResultMap" type="com.bsg.upm.entity.DefinitionSubServEntity">
+		<id property="id" column="dfsubserv_id" />
+		<result property="name" column="dfsubserv_name" />
+		<result property="description" column="dfsubserv_description" />
+		<result property="type" column="dfsubserv_type" />
+		<result property="defaultDataDirSize" column="default_data_dir_size" />
+		<result property="defaultDataDirDeviceType" column="default_data_dir_device_type" />
+		<result property="defaultLogDirSize" column="default_log_dir_size" />
+		<result property="defaultLogDirDeviceType" column="default_log_dir_device_type" />
+		<result property="portKey" column="dfsubserv_port_key" />
+		<result property="priority" column="dfsubserv_priority" />
+		<result property="canBackup" column="dfsubserv_canbackup" />
+		<result property="compose" column="dfsubserv_compose" />
+	</resultMap>
+
+	<resultMap id="definitionSubServDetailResultMap"
+		type="com.bsg.upm.entity.DefinitionSubServEntity" extends="definitionSubServResultMap">
+		<association property="defaultDefinitionSubServArch"
+			resultMap="com.bsg.upm.dao.DefinitionSubServArchDao.definitionSubServArchResultMap" />
+		<association property="defaultDefinitionSubServUnitScale"
+			resultMap="com.bsg.upm.dao.DefinitionSubServUnitScaleDao.definitionSubServUnitScaleResultMap" />
+	</resultMap>
+
+	<select id="listName" resultType="String" flushCache="true">
+		SELECT DISTINCT name
+		FROM tbl_definition_subserv
+	</select>
+	
+	<select id="listByDefinitionServCode" resultMap="definitionSubServDetailResultMap" flushCache="true">
+		SELECT dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.description AS dfsubserv_description, 
+			dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.default_data_dir_size, 
+			dfsubserv.default_data_dir_device_type, 
+			dfsubserv.default_log_dir_size,
+			dfsubserv.default_log_dir_device_type,
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority, 
+			arch.id AS arch_id,
+			arch.name AS arch_name,
+			scale.id AS scale_id,
+			scale.name AS scale_name
+		FROM tbl_definition_subserv dfsubserv
+			LEFT JOIN tbl_definition_subserv_arch arch 
+				ON dfsubserv.id = arch.definition_subserv_id AND arch.default = 1
+			LEFT JOIN tbl_definition_subserv_unit_scale scale 
+				ON dfsubserv.id = scale.definition_subserv_id AND scale.default = 1
+		WHERE dfsubserv.definition_serv_code = #{definitionServCode}
+	</select>
+	
+	<select id="listByDefinitionSubServName" resultMap="definitionSubServResultMap" flushCache="true">
+		SELECT id AS dfsubserv_id, 
+			name AS dfsubserv_name
+		FROM tbl_definition_subserv
+		WHERE name = #{definitionSubServName}
+	</select>
+	
+	
+	<select id="getNameDesByDefinitionSubServName"  resultType="string"  flushCache="true">
+		SELECT description
+		FROM  tbl_definition_subserv
+		WHERE name = #{definitionSubServName}
+		LIMIT 1
+	</select>
+	
+	<select id="get" resultMap="definitionSubServResultMap" flushCache="true">
+		SELECT dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.description AS dfsubserv_description, 
+			dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.default_data_dir_size, 
+			dfsubserv.default_data_dir_device_type, 
+			dfsubserv.default_log_dir_size,
+			dfsubserv.default_log_dir_device_type,
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority
+		FROM tbl_definition_subserv dfsubserv
+		WHERE dfsubserv.id = #{id}
+	</select>
+
+</mapper>

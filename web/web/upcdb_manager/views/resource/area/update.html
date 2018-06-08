@@ -1,0 +1,156 @@
+<div>
+    <!-- widget content -->
+    <div class="widget-body">
+
+        <form action="" method="post" id="checkout-form" class="smart-form">
+            <header>
+                <h2>
+                    区域编辑
+                    <button class="close"  data-dismiss="modal">
+                        x
+                    </button>
+                </h2>
+            </header>
+            <fieldset>
+            	<div id="dialog-alert">
+            	</div>
+                <div class="row">
+                    <label class="label col col-3"><label style="color:red">*</label>区域名称</label>
+                    <section class="col col-8">
+                        <label class="input">
+                            <input type="text" name="name" placeholder=" 输入区域名称" class="required " id="name">
+                        </label>
+                    </section>
+                </div>
+                <div class="row">
+                    <label class="label col col-3"><label style="color:red">*</label>区域描述</label>
+                    <section class="col col-8">
+                        <label class="textarea">
+                            <textarea rows="3" name="description" class="custom-scroll required" placeholder=" 在此对区域进行描述" id="description"></textarea>
+                        </label>
+                    </section>
+                </div>
+                <div class="row">
+                    <label class="label col col-3"><label style="color:red">*</label>备份存储</label>
+                    <section class="col col-8">
+                        <label class="select">
+                            <select class="input-sm required" id="backupStorage" name="backupStorage" >
+                                <option value="">请选择备份存储</option>
+                               
+                            </select><i></i>
+                        </label>
+                    </section>
+                </div>
+                <div style="display:none;">
+                 	<input type="text" name="site" id="site" value="">
+              	</div>
+            </fieldset>
+        </form>
+    </div>
+    <!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+        取消
+    </button>
+    <button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+        保存
+    </button>
+</div>
+<script>
+    pageSetUp();
+    var areaid;
+    var backupStorage,$backupStorage;
+    var pagefunction = function() {
+        s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        areaid = $("#jqgrid").jqGrid('getRowData',s).id;
+        sendGet("/" + getProjectName() + "/v1.0/areas/"+areaid,fillForm,DialogAlert,null);  
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option ={
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+                name : {
+                    required : '请输入区域名称'
+                },
+                description : {
+                    required : '请输入描述'
+                },
+                backupStorage : {
+                    required : '请选择备份存储'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToString(data);
+            	//在这里调用ajax方法提交
+            	sendPut("/" + getProjectName() + "/v1.0/areas/"+areaid, postSuccess,DialogAlert,jsonData, null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+    function postSuccess(data){
+    	//提交成功的方法
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/areas?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    function fillForm(data){
+    	var areasdata=data['data'];
+    	$('#site').val(getSession("siteId"));
+    	$('#name').val(areasdata.name);
+    	$('#description').val(areasdata.description);
+    	
+    	$backupStorage = $("#backupStorage").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: []
+    	});
+    	sendGet("/" + getProjectName() + "/v1.0/selections/backup_storages?site="+getSession("siteId")+"&enabled=1",fillSelect(areasdata.backupStorageName),DialogAlert,null);
+    	
+    }
+    function fillSelect(text){
+    	return function(data){
+    		backupStorage = $backupStorage[0].selectize;
+        	backupStorage.clearOptions();
+        	var id;
+        	$.each(data, function(k, v){
+        		if(v.text == text){
+        			id = v.id;
+        		}
+        		backupStorage.addOption(v);
+        	});
+        	backupStorage.setValue([id]);
+    	}
+    }
+</script>

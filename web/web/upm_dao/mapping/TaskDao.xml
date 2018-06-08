@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.TaskDao">
+	<resultMap id="taskResultMap" type="com.bsg.upm.entity.TaskEntity">
+		<id property="id" column="id" />
+		<result property="objType" column="obj_type" />
+		<result property="objId" column="obj_id" />
+		<result property="objName" column="obj_name" />
+		<result property="actionType" column="action_type" />
+		<result property="startDateTime" column="start_datetime" />
+		<result property="endDateTime" column="end_datetime" />
+		<result property="status" column="status" />
+		<result property="msg" column="msg" />
+		<result property="owner" column="owner" />
+		<result property="createUserLoginName" column="create_user_login_name" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+	</resultMap>
+	
+	<resultMap id="taskDetailResultMap" type="com.bsg.upm.entity.TaskEntity"
+		extends="taskResultMap">
+		<collection property="subTasks"
+			resultMap="com.bsg.upm.dao.SubTaskDao.subTaskResultMap" >
+		</collection>
+	</resultMap>
+	
+	<select id="list" parameterType="java.util.Map" resultMap="taskResultMap" flushCache="true">
+		SELECT task.id, 
+			task.obj_type, 
+			task.obj_id, 
+			task.obj_name,
+			task.action_type, 
+			task.start_datetime, 
+			task.end_datetime, 
+			task.status, 
+			task.msg, 
+			task.owner, 
+			task.create_user_login_name,
+			site.id AS site_id,
+			site.name AS site_name
+		FROM tbl_task task, tbl_site site
+		WHERE task.site_id = site.id
+			<if test="objId!=null and objId!=''">
+				AND task.obj_id = #{objId}
+			</if>
+			<if test="owner!=null and owner!=''">
+				AND task.owner = #{owner}
+			</if>
+		ORDER BY task.start_datetime DESC
+	</select>
+	
+	<select id="listRunning" resultMap="taskResultMap" flushCache="true">
+		SELECT task.id, 
+            task.obj_type, 
+            task.obj_id, 
+            task.obj_name,
+            task.action_type, 
+            task.start_datetime, 
+            task.end_datetime, 
+            task.status, 
+            task.msg, 
+            task.owner, 
+            task.create_user_login_name
+		FROM tbl_task task
+		WHERE task.end_datetime IS NULL
+		ORDER BY task.start_datetime DESC
+	</select>
+	
+	<select id="get" resultMap="taskDetailResultMap" flushCache="true">
+		SELECT task.id, 
+			task.obj_type, 
+			task.obj_id, 
+			task.obj_name,
+			task.action_type, 
+			task.start_datetime, 
+			task.end_datetime, 
+			task.status, 
+			task.msg, 
+			task.owner, 
+			task.create_user_login_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			subtask.id AS subtask_id, 
+			subtask.obj_type AS subtask_obj_type, 
+			subtask.obj_id AS subtask_obj_id, 
+			subtask.obj_name AS subtask_obj_name, 
+			subtask.action_type AS subtask_action_type, 
+			subtask.async AS subtask_async, 
+			subtask.timeout AS subtask_timeout, 
+			subtask.start_datetime AS subtask_start_datetime, 
+			subtask.end_datetime AS subtask_end_datetime, 
+			subtask.status AS subtask_status, 
+			subtask.url AS subtask_url, 
+			subtask.method_type AS subtask_method_type, 
+			subtask.param AS subtask_param,
+			subtask.relate_task_id AS subtask_relate_task_id, 
+			subtask.relate_task_status AS subtask_relate_task_status, 
+			subtask.relate_task_msg AS subtask_relate_task_msg, 
+			subtask.priority AS subtask_priority
+		FROM tbl_task task, 
+			tbl_site site, 
+			tbl_subtask subtask
+		WHERE task.site_id = site.id
+			AND subtask.task_id = task.id
+			AND task.id = #{id}
+		ORDER BY subtask.priority ASC
+	</select>
+	
+	<select id="getLatestTaskByObjId" resultMap="taskResultMap" flushCache="true">
+		SELECT task.id, 
+            task.obj_type, 
+            task.obj_id, 
+            task.obj_name,
+            task.action_type, 
+            task.start_datetime, 
+            task.end_datetime, 
+            task.status, 
+            task.msg, 
+            task.owner, 
+            task.create_user_login_name
+		FROM tbl_task task
+		WHERE task.obj_id = #{objId} 
+		ORDER BY task.start_datetime DESC 
+		LIMIT 0,1
+	</select>
+	
+	<select id="getLatestTaskByObjIdAndActionType" resultMap="taskResultMap" flushCache="true">
+        SELECT task.id, 
+            task.obj_type, 
+            task.obj_id, 
+            task.obj_name,
+            task.action_type, 
+            task.start_datetime, 
+            task.end_datetime, 
+            task.status, 
+            task.msg, 
+            task.owner, 
+            task.create_user_login_name
+        FROM tbl_task task
+        WHERE task.obj_id = #{objId} 
+            AND task.action_type = #{actionType}
+        ORDER BY task.start_datetime DESC 
+        LIMIT 0,1
+    </select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.TaskEntity">
+		INSERT INTO tbl_task
+		(
+			id,
+			site_id,
+			obj_type, 
+			obj_id,
+			obj_name,
+			action_type,
+			start_datetime,
+			end_datetime,
+			status,
+			msg,
+			owner,
+			operate_log_id,
+			create_user_login_name
+		)
+		VALUES 
+		(
+			#{id},
+			#{site.id},
+			#{objType},
+			#{objId},
+			#{objName},
+			#{actionType},
+			#{startDateTime},
+			#{endDateTime},
+			#{status},
+			#{msg},
+			#{owner},
+			#{operateLog.id},
+			#{createUserLoginName}
+		)							
+	</insert>
+	
+	<insert id="saveRelativeSubTask" parameterType="com.bsg.upm.entity.TaskEntity">
+		INSERT INTO tbl_subtask
+		(
+			id,
+			obj_type, 
+			obj_id,
+			obj_name,
+			action_type,
+			async,
+			timeout,
+			start_datetime,
+			end_datetime,
+			status,
+			url,
+			method_type,
+			param,
+			relate_task_id,
+			relate_task_status,
+			relate_task_msg,
+			priority,
+			task_id
+		)
+		VALUES 
+		<foreach collection="subTasks" item="subTask" index="index" separator=",">
+		(
+			#{subTask.id},
+			#{subTask.objType},
+			#{subTask.objId},
+			#{subTask.objName},
+			#{subTask.actionType},
+			#{subTask.async},
+			#{subTask.timeout},
+			#{subTask.startDateTime},
+			#{subTask.endDateTime},
+			#{subTask.status},
+			#{subTask.url},
+			#{subTask.methodType},
+			#{subTask.param},
+			#{subTask.relateTaskId},
+			#{subTask.relateTaskStatus},
+			#{subTask.relateTaskMsg},
+			#{subTask.priority},
+			#{id}
+		)	
+		</foreach>
+	</insert>
+	
+	<update id="updateToEnd" parameterType="com.bsg.upm.entity.TaskEntity">
+		UPDATE tbl_task 
+		<set>
+			end_datetime = #{endDateTime},
+			status = #{status},
+			msg = #{msg}
+		</set>
+		WHERE id = #{id}
+	</update>
+</mapper>

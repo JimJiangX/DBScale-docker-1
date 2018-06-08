@@ -1,0 +1,315 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					性能变更
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row" style="margin-bottom: 15px; padding-left: 3%; font-weight: bold;"><h3 style="font-weight: bold;">数据库：</h3></div>
+				<div class="row">
+					<label class="label col col-3">带宽</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择带宽..." id="networkBandwidth"
+							name="networkBandwidth">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">性能规模</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择规模..." id="scales" name="scales">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">表空间大小</label>
+					<section class="col col-8">
+						<input id="dataDirSizeSlider" type="text"><input
+							style="width: 100%;" type="number" step="10" id="dataDirSize"
+							name="dataDirSize">
+					</section>
+				</div>
+			</fieldset>
+			<!-- <fieldset>
+				<div class="row" style="margin-bottom: 15px; padding-left: 3%; font-weight: bold;"><h3 style="font-weight: bold;">代 理：</h3></div>
+				<div class="row">
+					<label class="label col col-3">带宽</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择带宽..." id="networkBandwidthPro"
+							name="networkBandwidthPro">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">性能规模</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择规模..." id="scalesPro" name="scalesPro">
+						</select>
+						</label>
+					</section>
+				</div>
+			</fieldset> -->
+		</form>
+	</div>
+	<!-- end widget content -->
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+
+<script>
+	var scales, $scales;
+	var dateSizeSmall;
+	var networkBandwidth, $networkBandwidth;
+	var scalesPro,$scalesPro;
+	var networkBandwidthPro, $networkBandwidthPro;
+	var flgScales = true;
+	pageSetUp();
+	var pagefunction = function() {
+		$scales = $("#scales").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			options : []
+		});
+		$networkBandwidth = $("#networkBandwidth").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			sortField : {
+				field : 'text'
+			},
+			options : []
+		});
+		$scalesPro = $("#scalesPro").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			options : []
+		});
+		$networkBandwidthPro = $("#networkBandwidthPro").selectize({
+			valueField : 'id',
+			labelField : 'text',
+			searchField : 'text',
+			create : false,
+			sortField : {
+				field : 'text'
+			},
+			options : []
+		});
+		
+		$("#dataDirSizeSlider").ionRangeSlider({
+			min : 0,
+			max : 1000,
+			from : 0,
+			to : 1000,
+			type : 'single',
+			step : 10,
+			postfix : "GB",
+			onChange : function(data) {
+				if (data.from < dateSizeSmall) {
+					$("#dataDirSize").val(dateSizeSmall);
+					$("#dataDirSizeText").text(dateSizeSmall);
+				} else {
+					$("#dataDirSize").val(data.from);
+					$("#dataDirSizeText").text(data.from);
+				}
+			}
+		});
+		$("#dataDirSize").spinner({
+			min : 0,
+			max : 1000,
+			step : 10,
+			start : 0,
+			numberFormat : "n",
+			spin : function(event, data) {
+				$("#dataDirSizeSlider").data("ionRangeSlider").update({
+					from : data.value
+				});
+				$("#dataDirSizeText").text(data.value);
+			}
+		});
+
+		s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		serviceId = $("#jqgrid").jqGrid('getRowData', s).id;
+
+		sendGet("/" + getProjectName() + "/v1.0/servs/" + serviceId, fillForm, DialogAlert,
+				null);
+
+		var errorClass = 'invalid';
+		var errorElement = 'em';
+		var option = {
+			errorClass : errorClass,
+			errorElement : errorElement,
+			highlight : function(element) {
+				$(element).parent().removeClass('state-success').addClass(
+						"state-error");
+				$(element).removeClass('valid');
+			},
+			unhighlight : function(element) {
+				$(element).parent().removeClass("state-error").addClass(
+						'state-success');
+				$(element).addClass('valid');
+
+			},
+			// Rules for form validation
+			// Messages for form validation
+			messages : {},
+			errorPlacement : function(error, element) {
+				if ($(element).next("div").hasClass("tooltip")) {
+					$(element).attr("data-original-title", $(error).text())
+							.tooltip("show");
+				} else {
+					$(element).attr("title", $(error).text()).tooltip("show");
+				}
+			},
+			submitHandler : function(form) {
+				var jsondata = {
+					"definitionSubServs" : [
+							{
+								"name" : "mysql",
+								"scale" : $("#scales").val(),
+								"networkBandwidth" : parseInt($("#networkBandwidth").val()),
+								"dataDirSize" : ($("#dataDirSize").val()) * 1024 * 1024 * 1024
+							} ]
+				}
+				if(dataDirSizeNum > $("#dataDirSize").val()){
+					swal("提示","扩展后容量需大于之前的容量！","info");
+				}else{
+					//在这里调用ajax方法提交
+					sendPut("/" + getProjectName() + "/v1.0/servs/" + serviceId + "?type=scale_up", postSuccess, DialogAlert, JSON.stringify(jsondata), null);
+				}
+			}
+		};
+		$('#checkout-form').validate(option);
+	};
+	loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+
+	$('#submitbtn').click(function() {
+		DialogAlertClear();
+		$('#checkout-form').submit();
+	});
+	function postSuccess(data) {
+		//提交成功的方法
+		$("#changeModal").modal('toggle');
+		sendGet("/" + getProjectName() + "/v1.0/servs?site=" + getSession("siteId")+'&serv_type=mysql',
+				reloadGrid, ListAlert, null);
+		swal({ 
+			  title: "提交成功", 
+			  text: "请前往工单管理页面查看", 
+			  type: "success",
+			  showCancelButton: true, 
+			  confirmButtonColor: "#DD6B55",
+			  confirmButtonText: "前往", 
+			  cancelButtonText: "继续",
+			  closeOnConfirm: true,
+			  closeOnCancel	:true
+			}).then((result) => {
+				if (result.value) { 
+					window.location.href = "index.html#views/workorder/upsql/list.html";
+				} 
+		});
+	}
+
+	var dataDirSizeNum = $("#dataDirSize").val();
+	
+	function fillForm(data) {
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		var dateSize = $("#jqgrid").jqGrid('getRowData', s).dateSize;
+		dateSizeSmall = (dateSize / 1024 / 1024 / 1024).toFixed();
+		$("#dataDirSize").val(dateSizeSmall);
+		$("#dataDirSizeSlider").data("ionRangeSlider").update({
+			from : dateSizeSmall
+		});
+		sendGet(
+				"/" + getProjectName() + "/v1.0/selections/scales?serv_type=mysql&subserv_type=mysql",
+				fillSelect(1, 'scales'), DialogAlert, null);
+		sendGet("/" + getProjectName() + "/v1.0/selections/network_bandwidth", fillSelect(1,
+				'networkBandwidth'), DialogAlert, null);
+		
+		sendGet(
+				"/" + getProjectName() + "/v1.0/selections/scales?serv_type=mysql",
+				fillSelect(1, 'scalesPro'), DialogAlert, null);
+		/* sendGet("/" + getProjectName() + "/v1.0/selections/network_bandwidth", fillSelect(1,
+				'networkBandwidthPro'), DialogAlert, null); */
+	}
+	
+	function fillSelect(obj_id, type) {
+		return function(data) {
+			var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+			var scaleName = $("#jqgrid").jqGrid('getRowData', s).scaleName;
+			var networkBandwidthSize = $("#jqgrid").jqGrid('getRowData', s).networkBandwidth;
+			var scaleNamePro = $("#jqgrid").jqGrid('getRowData', s).scaleNamePro;
+			var networkBandwidthSizePro = $("#jqgrid").jqGrid('getRowData', s).networkBandwidthPro;			
+			
+			if (data.length == 0) {
+				flgScales = false;
+				DialogAlert("无可用性能套餐");
+				return;
+			}
+
+			switch (type) {
+			case 'scales':
+				scales = $scales[0].selectize;
+				scales.clearOptions();
+				$.each(data, function(k, v) {
+					scales.addOption(v);
+					if (scaleName == v.text) {
+						scales.setValue([ v.id ]);
+					}
+				});
+				break;
+			case 'networkBandwidth':
+				networkBandwidth = $networkBandwidth[0].selectize;
+				networkBandwidth.clearOptions();
+				$.each(data, function(k, v) {
+					networkBandwidth.addOption(v);
+					if (networkBandwidthSize == v.text) {
+						networkBandwidth.setValue([ v.id ]);
+					}
+				});
+				break;
+			case 'scalesPro':
+				scalesPro = $scalesPro[0].selectize;
+				scalesPro.clearOptions();
+				$.each(data, function(k, v) {
+					scalesPro.addOption(v);
+					if (scaleNamePro == v.text) {
+						scalesPro.setValue([ v.id ]);
+					}
+				});
+				break;
+			case 'networkBandwidthPro':
+				networkBandwidthPro = $networkBandwidthPro[0].selectize;
+				networkBandwidthPro.clearOptions();
+				$.each(data, function(k, v) {
+					networkBandwidthPro.addOption(v);
+					if (networkBandwidthSizePro == v.text) {
+						networkBandwidthPro.setValue([ v.id ]);
+					}
+				});
+				break;
+			}
+
+		}
+	}
+</script>

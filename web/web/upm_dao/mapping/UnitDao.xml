@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.UnitDao">
+    <resultMap id="unitResultMap" type="com.bsg.upm.entity.UnitEntity">
+        <id property="id" column="unit_id" />
+        <result property="relateId" column="unit_relate_id" />
+        <result property="relateName" column="unit_relate_name" />
+        <collection property="tasks"
+            resultMap="com.bsg.upm.dao.TaskDao.taskResultMap" columnPrefix="unit_task_">
+        </collection>
+    </resultMap>
+
+    <resultMap id="unitDetailResultMap" type="com.bsg.upm.entity.UnitEntity"
+        extends="unitResultMap">
+        <association property="subServ"
+            resultMap="com.bsg.upm.dao.SubServDao.subServDetailResultMap" />
+    </resultMap>
+    
+    
+    
+    <select  id="listBySubServId" resultMap="unitDetailResultMap" flushCache="true">
+	    SELECT   unit.id AS unit_id,
+	             unit.relate_id AS unit_relate_id,
+	             unit.relate_name AS unit_relate_name,
+	             subserv.id AS subserv_id,
+	             subserv.relate_id AS subserv_relate_id 
+	    FROM     tbl_unit unit,
+	             tbl_subserv subserv
+	    WHERE    unit.subserv_id = #{subServId}
+	             AND unit.subserv_id = subserv.id        
+    </select>
+
+    
+    <select id="listBySiteId" resultMap="unitDetailResultMap" flushCache="true">
+        SELECT unit.id AS unit_id,
+            unit.relate_id AS unit_relate_id,
+            unit.relate_name AS unit_relate_name,
+            subserv.id AS subserv_id,
+            subserv.relate_id AS subserv_relate_id,
+            suborder.id AS suborder_id,
+            dfsubserv.id AS dfsubserv_id, 
+            dfsubserv.name AS dfsubserv_name, 
+            serv.id AS serv_id,
+            serv.serv_name,
+            o.id AS order_id,
+            o.owner AS order_owner,
+            o.sharding AS order_sharding,
+            temp.business_system_id, 
+            temp.business_system_name,
+            temp.subsystem_id, 
+            temp.subsystem_name,
+            area.id AS area_id,
+            area.name AS area_name,
+            site.id AS site_id,
+            site.name AS site_name
+        FROM tbl_unit unit,
+            tbl_subserv subserv,
+            tbl_suborder suborder,
+            tbl_definition_subserv dfsubserv,
+            tbl_serv serv,
+            tbl_order o LEFT JOIN (
+            SELECT system.id AS business_system_id,
+                system.name AS business_system_name,
+                subsystem.id AS subsystem_id,
+                subsystem.name AS subsystem_name,
+                subsystem_order.order_id
+            FROM tbl_business_system system,
+                tbl_business_subsystem subsystem,
+                tbl_business_subsystem_order subsystem_order
+            WHERE system.id = subsystem.business_system_id
+                AND subsystem.id = subsystem_order.business_subsystem_id
+        ) temp ON temp.order_id = o.id,
+            tbl_area area,
+            tbl_site site
+        WHERE unit.subserv_id = subserv.id
+            AND subserv.suborder_id = suborder.id
+            AND suborder.definition_subserv_id = dfsubserv.id
+            AND subserv.serv_id = serv.id
+            AND serv.order_id = o.id
+            AND o.area_id = area.id
+            AND area.site_id = site.id
+            AND site.id = #{siteId}     
+    </select>
+    
+    
+     <select id="list" resultMap="unitDetailResultMap" flushCache="true">
+        SELECT unit.id AS unit_id,
+            unit.relate_id AS unit_relate_id,
+            unit.relate_name AS unit_relate_name,
+            subserv.id AS subserv_id,
+            subserv.relate_id AS subserv_relate_id,
+            suborder.id AS suborder_id,
+            dfsubserv.id AS dfsubserv_id, 
+            dfsubserv.name AS dfsubserv_name, 
+            serv.id AS serv_id,
+            serv.serv_name,
+            o.id AS order_id,
+            o.owner AS order_owner,
+            o.sharding AS order_sharding,
+            area.id AS area_id,
+            area.name AS area_name,
+            site.id AS site_id,
+            site.name AS site_name
+        FROM tbl_unit unit,
+            tbl_subserv subserv,
+            tbl_suborder suborder,
+            tbl_definition_subserv dfsubserv,
+            tbl_serv serv,
+            tbl_order o,
+            tbl_area area,
+            tbl_site site
+        WHERE unit.subserv_id = subserv.id
+            AND subserv.suborder_id = suborder.id
+            AND suborder.definition_subserv_id = dfsubserv.id
+            AND subserv.serv_id = serv.id
+            AND serv.order_id = o.id
+            AND o.area_id = area.id
+            AND area.site_id = site.id                
+           
+            <if test="siteId !=null and siteId !=''">
+		    	AND site.id = #{siteId}
+		    </if> 
+		              
+            <if test="servId !=null and servId !=''">
+		    	AND serv.id = #{servId}
+		    </if> 
+		    
+		     <if test="subServId != null and subServId !=''">
+		     	AND subserv.id = #{subServId}
+		    </if> 
+		       
+    </select>
+    
+    <select id="get" resultMap="unitDetailResultMap" flushCache="true">
+        SELECT unit.id AS unit_id,
+            unit.relate_id AS unit_relate_id,
+            unit.relate_name AS unit_relate_name,
+            subserv.id AS subserv_id,
+            subserv.relate_id AS subserv_relate_id,
+            port.id AS port_id,
+            port.port_value,
+            suborder.id AS suborder_id,
+            arch.id AS arch_id, 
+			arch.name AS arch_name,
+			arch.code AS arch_code,
+			arch.type AS arch_type,
+			arch.unit_num AS arch_unit_num,
+            dfsubserv.id AS dfsubserv_id, 
+            dfsubserv.name AS dfsubserv_name, 
+            dfsubserv.port_key AS dfsubserv_port_key, 
+            dfsubserv.canbackup AS dfsubserv_canbackup,
+            dfsubserv.compose AS dfsubserv_compose,
+            serv.id AS serv_id,
+            o.id AS order_id,
+            o.owner AS order_owner,
+            o.sharding AS order_sharding,
+            dfserv.code AS definition_serv_code,
+            area.id AS area_id,
+            area.name AS area_name,
+            site.id AS site_id,
+            site.name AS site_name
+        FROM tbl_unit unit,
+            tbl_subserv subserv,
+            tbl_port port,
+            tbl_suborder suborder,
+            tbl_definition_subserv_arch arch,
+            tbl_definition_subserv dfsubserv,
+            tbl_serv serv,
+            tbl_order o,
+            tbl_definition_serv dfserv,
+            tbl_area area,
+            tbl_site site
+        WHERE unit.subserv_id = subserv.id
+            AND port.subserv_id = subserv.id
+            AND subserv.suborder_id = suborder.id
+            AND suborder.definition_subserv_arch_id = arch.id
+            AND suborder.definition_subserv_id = dfsubserv.id
+            AND subserv.serv_id = serv.id
+            AND serv.order_id = o.id
+            AND o.area_id = area.id
+            AND o.definition_serv_code = dfserv.code 
+            AND area.site_id = site.id
+            AND unit.id = #{id}     
+    </select>
+    
+    <select id="getByRelateId" resultMap="unitDetailResultMap" flushCache="true">
+        SELECT unit.id AS unit_id,
+            unit.relate_id AS unit_relate_id,
+            unit.relate_name AS unit_relate_name,
+            subserv.id AS subserv_id,
+            subserv.relate_id AS subserv_relate_id,
+            suborder.id AS suborder_id,
+            dfsubserv.id AS dfsubserv_id, 
+            dfsubserv.name AS dfsubserv_name, 
+            dfsubserv.canbackup AS dfsubserv_canbackup,
+            serv.id AS serv_id,
+            o.id AS order_id,
+            o.owner AS order_owner,
+            o.sharding AS order_sharding,
+            temp.business_system_id, 
+            temp.business_system_name,
+            temp.subsystem_id, 
+            temp.subsystem_name,
+            area.id AS area_id,
+            area.name AS area_name,
+            site.id AS site_id,
+            site.name AS site_name
+        FROM tbl_unit unit,
+            tbl_subserv subserv,
+            tbl_suborder suborder,
+            tbl_definition_subserv dfsubserv,
+            tbl_serv serv,
+            tbl_order o LEFT JOIN (
+            SELECT system.id AS business_system_id,
+                system.name AS business_system_name,
+                subsystem.id AS subsystem_id,
+                subsystem.name AS subsystem_name,
+                subsystem_order.order_id
+            FROM tbl_business_system system,
+                tbl_business_subsystem subsystem,
+                tbl_business_subsystem_order subsystem_order
+            WHERE system.id = subsystem.business_system_id
+                AND subsystem.id = subsystem_order.business_subsystem_id
+        ) temp ON temp.order_id = o.id,
+            tbl_area area,
+            tbl_site site
+        WHERE unit.subserv_id = subserv.id
+            AND subserv.suborder_id = suborder.id
+            AND suborder.definition_subserv_id = dfsubserv.id
+            AND subserv.serv_id = serv.id
+            AND serv.order_id = o.id
+            AND o.area_id = area.id
+            AND area.site_id = site.id
+            AND unit.relate_id = #{relateId}     
+    </select>
+    
+    <select id="getByRelateName" resultMap="unitDetailResultMap" flushCache="true">
+        SELECT unit.id AS unit_id,
+            unit.relate_id AS unit_relate_id,
+            unit.relate_name AS unit_relate_name,
+            subserv.id AS subserv_id,
+            subserv.relate_id AS subserv_relate_id,
+            suborder.id AS suborder_id,
+            dfsubserv.id AS dfsubserv_id, 
+            dfsubserv.name AS dfsubserv_name, 
+            serv.id AS serv_id,
+            o.id AS order_id,
+            o.owner AS order_owner,
+            o.sharding AS order_sharding,
+            temp.business_system_id, 
+            temp.business_system_name,
+            temp.subsystem_id, 
+            temp.subsystem_name,
+            area.id AS area_id,
+            area.name AS area_name,
+            site.id AS site_id,
+            site.name AS site_name
+        FROM tbl_unit unit,
+            tbl_subserv subserv,
+            tbl_suborder suborder,
+            tbl_definition_subserv dfsubserv,
+            tbl_serv serv,
+            tbl_order o LEFT JOIN (
+            SELECT system.id AS business_system_id,
+                system.name AS business_system_name,
+                subsystem.id AS subsystem_id,
+                subsystem.name AS subsystem_name,
+                subsystem_order.order_id
+            FROM tbl_business_system system,
+                tbl_business_subsystem subsystem,
+                tbl_business_subsystem_order subsystem_order
+            WHERE system.id = subsystem.business_system_id
+                AND subsystem.id = subsystem_order.business_subsystem_id
+        ) temp ON temp.order_id = o.id,
+            tbl_area area,
+            tbl_site site
+        WHERE unit.subserv_id = subserv.id
+            AND subserv.suborder_id = suborder.id
+            AND suborder.definition_subserv_id = dfsubserv.id
+            AND subserv.serv_id = serv.id
+            AND serv.order_id = o.id
+            AND o.area_id = area.id
+            AND area.site_id = site.id
+            AND unit.relate_name = #{relateName}     
+    </select>
+    
+    <insert id="save" parameterType="com.bsg.upm.entity.UnitEntity">
+		INSERT INTO tbl_unit
+		(
+			id,
+			relate_id,
+			relate_name,
+			subserv_id
+		)
+		VALUE
+		(
+			#{id},
+			#{relateId},
+			#{relateName},
+			#{subServ.id}
+		)	
+	</insert>
+    
+    <update id="updateRelateIdAndName" parameterType="com.bsg.upm.entity.UnitEntity">
+        UPDATE tbl_unit
+        <set>
+            relate_id = #{relateId},
+            relate_Name = #{relateName}
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

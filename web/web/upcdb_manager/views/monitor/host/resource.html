@@ -1,0 +1,160 @@
+<section id="widget-grid" class="">
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 10px;">
+    	<article class="col-xs-8 col-sm-8 col-md-8 col-lg-3">
+	    	<form class="form-inline">
+	  			<div class="form-group">
+	    			<label for="limitText"><strong>修改阈值(即时生效)</strong></label>
+	    			<input type="number" class="form-control" id="limitText" placeholder="输入0~100的数字" value="80">
+	  			</div>
+			</form>
+		</article>
+		<a href="javascript:void(0);" class="btn btn-primary"
+				onclick="host_event_download()" id="download" style="margin-left: -15px;">导 出</a>
+		<a href="javascript:void(0);" class="btn btn-info"
+				onclick="event_infos_manage()" id="event_infos" style="float:right;margin-right: 16px;">事件配置</a>
+		<a href="javascript:void(0);" class="btn btn-info"
+				onclick="metricclass_infos_manage()" id="metricclass_infos" style="float:right;margin-right: 4px;">监控配置</a>
+    </div>
+    <div class="row">
+        <article class="col-xs-24 col-sm-24 col-md-24 col-lg-12">
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+    </div>
+</section>
+<div class="modal fade" id="unitModal" tabindex="-1" role="dialog" aria-labelledby="unitModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="" id="dialogmodal">
+        <div class="modal-content" style="width: 120%;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="unitModalLabel">
+                   实例单元详细信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>用户</th>
+                            <th>业务系统</th>
+                            <th>业务子系统</th>
+                            <th>单元名称</th>
+                            <th>角色</th>
+                            <th>单元类型</th>
+                            <th>状态</th>
+                        </tr>
+                        </thead>
+                        <tbody id="mainframestate">
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script>
+	var hostResourceData = [];
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			sendGet("/" + getProjectName() + "/v1.0/monitor/hosts?site="+getSession("siteId"),success,ListAlert,null);
+    		});
+    	});
+    });
+    
+    function event_infos_manage(){
+    	ListAlertClear();
+    	var id=$("#event_infos");
+        var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        if(s.length==1){
+        	var host_id = $("#jqgrid").jqGrid('getRowData',s).id;
+        	setSession('eventHostId', host_id);
+            id.attr("href","index.html#views/monitor/host/event.html");
+        } else{
+        	ListAlert("请勾选一行数据！");
+            id.removeAttr("href");
+        }
+    }
+    
+    function metricclass_infos_manage(){
+    	ListAlertClear();
+    	var id=$("#metricclass_infos");
+        var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        if(s.length==1){
+        	var host_id = $("#jqgrid").jqGrid('getRowData',s).id;
+        	setSession('eventHostId', host_id);
+            id.attr("href","index.html#views/monitor/host/metricclass.html");
+        } else{
+        	ListAlert("请勾选一行数据！");
+            id.removeAttr("href");
+        }
+    }
+    
+    function success(data){
+    	hostResourceData = data.data;
+    	$("#jqgrid").jqGrid('GridUnload');
+    	createGridMonitorHostResource(data);
+    }
+    function forwardHostResourceDetail(id, statusText){
+    	ListAlertClear();
+    	if(statusText == '未入库'){
+    		ListAlert("主机未入库,请先入库");
+    		return false;
+    	}
+    	setSession('hostId', id);
+    	
+		window.location.href='index.html#views/monitor/host/monitor.html';
+    }
+    
+    $('#unitModal').on("show.bs.modal", function(e){
+    	ListAlertClear();
+    	$("#mainframestate").empty();
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/component/host/containers?host="+$(e.relatedTarget).data('unit-id'),createGridUnitDetail,ListAlert,null);
+    });
+    
+    function host_event_download(){
+    	 var $eleForm = $("<form method='post'></form>");
+         $eleForm.attr("action","/" + getProjectName() + "/v1.0/monitor/hosts/download?site="+getSession("siteId"));
+         $(document.body).append($eleForm);
+         $eleForm.submit();
+    }
+    
+    $('#limitText').on('change', function(e) {
+    	setSession('hostResourceLimit', e.target.value);
+    	var data={
+  			  value:Number($('#limitText').val())
+  			};
+  		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/threshold", showReturn, DialogAlert,JSON.stringify(data),null);
+    });
+    
+    sendGet("/" + getProjectName() + "/v1.0/monitor/hosts/threshold",fill_hosts_threshold,ListAlert,null);
+    function fill_hosts_threshold(data){
+    	$('#limitText').val(data['data'].value);
+    }
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/hosts?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    
+    function reloadGrid(data){
+	   	ListAlertClear();
+	   	var jq_data=data['data'];  	
+	   	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

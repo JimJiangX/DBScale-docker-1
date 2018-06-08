@@ -1,0 +1,135 @@
+ <!-- 备份存储列表页面 -->
+<section id="widget-grid" class="">
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="widget-body">
+            <!-- Dynamic Modal -->
+            <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- content will be filled here" -->
+                    </div>
+                </div>
+            </div>
+            <a href="javascript:void(0);" onclick="add_bs()" id="addbs" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增</a>
+            <a href="javascript:void(0);" class="btn btn-primary" onclick="start_bs()">启用</a>
+            <a href="javascript:void(0);" class="btn btn-warning" onclick="stop_bs()">停用</a>
+            <a href="javascript:void(0);" class="btn btn-danger" onclick="delete_bs()">删除</a>
+        </div>
+            <p>
+                &nbsp;
+            </p>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">        
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+    </div>
+</section>
+
+<script type="text/javascript">
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){ 
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			$.jgrid.defaults.styleUI = 'Bootstrap';
+    			sendGet("/" + getProjectName() + "/v1.0/backup_storages?site="+getSession("siteId"),createGrid_bs,ListAlert,null);
+    		});
+    	});
+    });
+</script>
+<script>
+    function delete_bs(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var backup_storage_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    	     ListConfirm('delete', backup_storage_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }       
+        
+    }
+    function add_bs(){
+    	$("#addbs").attr("href","views/resource/backup_storage/add.html");
+    }
+    function start_bs(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var backup_storage_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('start', backup_storage_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    function stop_bs(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var backup_storage_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('stop', backup_storage_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    
+    function confirm(type, id){
+    	ListAlertClear();
+    	switch(type){
+    	case 'start':
+    		sendPut("/" + getProjectName() + "/v1.0/backup_storages/"+id+"/enable",showReturn,ListAlert,null,null);
+    		break;
+    	case 'stop':
+   		    sendPut("/" + getProjectName() + "/v1.0/backup_storages/"+id+"/disable",showReturn,ListAlert,null,null);
+    		break;
+    	case 'delete':
+    		sendDelete("/" + getProjectName() + "/v1.0/backup_storages/"+id, showReturn, ListAlert, null);
+    		break;
+    	default:
+    	}
+    }
+    
+    function showReturn(data){
+		sendGet("/" + getProjectName() + "/v1.0/backup_storages?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    function deleteReturn(data){
+    	ListAlertClear();
+    	/*删除操作成功后执行的方法 */
+    }
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    
+  //模态框刷新启停
+    $(function () { 
+    	//显示监听
+    	$('#addModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#addModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(showReturn, setTime);
+   		 	}
+    	})
+    	
+    }); 
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

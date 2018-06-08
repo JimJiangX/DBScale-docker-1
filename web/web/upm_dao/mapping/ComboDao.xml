@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.ComboDao">
+	<resultMap id="comboResultMap" type="com.bsg.upm.entity.ComboEntity">
+		<id property="id" column="combo_id" />
+		<result property="name" column="combo_name" />
+		<result property="description" column="combo_description" />
+		<result property="enabled" column="area_enabled" />
+		<association property="definitionServ"
+			resultMap="com.bsg.upm.dao.DefinitionServDao.dfServResultMap" />
+		<collection property="subCombos" ofType="com.bsg.upm.entity.SubComboEntity">
+            <id property="id" column="subcombo_id" />
+            <result property="dataDirSize" column="subcombo_data_dir_size" />
+            <result property="dataDirDeviceType" column="subcombo_data_dir_device_type" />
+            <result property="logDirSize" column="subcombo_log_dir_size" />
+            <result property="logDirDeviceType" column="subcombo_log_dir_device_type" />
+            <result property="networkBandwidth" column="subcombo_network_bandwidth" />
+            <result property="mixed" column="subcombo_mixed" />
+            <result property="highAvailable" column="subcombo_high_available" />
+            <association property="arch"
+                resultMap="com.bsg.upm.dao.DefinitionSubServArchDao.definitionSubServArchDetailResultMap" />
+            <association property="scale"
+                resultMap="com.bsg.upm.dao.DefinitionSubServUnitScaleDao.definitionSubServUnitScaleResultMap" />
+        </collection>	
+	</resultMap>
+	
+	<select id="listName" resultMap="comboResultMap" flushCache="true">
+		SELECT combo.id AS combo_id,
+			combo.name AS combo_name
+		FROM tbl_combo combo 
+		WHERE combo.definition_serv_code = #{definitionServCode}
+	</select>
+	
+	<select id="listByDfServCode" resultMap="comboResultMap" flushCache="true">
+        SELECT combo.id AS combo_id,
+            combo.name AS combo_name,
+            combo.description AS combo_description,
+            dfserv.code AS dfserv_code,
+            dfserv.name AS dfserv_name,
+            subcombo.id AS subcombo_id,
+            subcombo.data_dir_size AS subcombo_data_dir_size, 
+            subcombo.data_dir_device_type AS subcombo_data_dir_device_type,
+            subcombo.log_dir_size AS subcombo_log_dir_size,
+            subcombo.log_dir_device_type AS subcombo_log_dir_device_type,
+            subcombo.network_bandwidth AS subcombo_network_bandwidth,
+            subcombo.mixed AS subcombo_mixed,
+            subcombo.high_available AS subcombo_high_available,
+            arch.id AS arch_id,
+            arch.name AS arch_name, 
+            dfsubserv.id AS dfsubserv_id,
+            dfsubserv.name AS dfsubserv_name,
+            scale.id AS scale_id,
+            scale.name AS scale_name
+        FROM tbl_combo combo, 
+          tbl_definition_serv dfserv, 
+          tbl_subcombo subcombo, 
+          tbl_definition_subserv_arch arch,
+          tbl_definition_subserv dfsubserv,
+          tbl_definition_subserv_unit_scale scale
+        WHERE combo.definition_serv_code = dfserv.code 
+            AND subcombo.combo_id = combo.id
+            AND subcombo.definition_subserv_arch_id = arch.id
+            AND arch.definition_subserv_id = dfsubserv.id
+            AND subcombo.definition_subserv_unit_scale_id = scale.id
+            AND dfserv.code  = #{definitionServCode}
+    </select>
+	
+	<select id="get" resultMap="comboResultMap" flushCache="true">
+		SELECT combo.id AS combo_id,
+            combo.name AS combo_name,
+			combo.description AS combo_description,
+			dfserv.code AS dfserv_code,
+			dfserv.name AS dfserv_name,
+			subcombo.id AS subcombo_id,
+			subcombo.data_dir_size AS subcombo_data_dir_size, 
+			subcombo.data_dir_device_type AS subcombo_data_dir_device_type,
+			subcombo.log_dir_size AS subcombo_log_dir_size,
+			subcombo.log_dir_device_type AS subcombo_log_dir_device_type,
+			subcombo.network_bandwidth AS subcombo_network_bandwidth,
+			subcombo.mixed AS subcombo_mixed,
+			subcombo.high_available AS subcombo_high_available,
+			arch.id AS arch_id,
+			arch.name AS arch_name, 
+			dfsubserv.id AS dfsubserv_id,
+			dfsubserv.name AS dfsubserv_name,
+			scale.id AS scale_id,
+			scale.name AS scale_name
+		FROM tbl_combo combo, 
+		  tbl_definition_serv dfserv, 
+		  tbl_subcombo subcombo, 
+		  tbl_definition_subserv_arch arch,
+		  tbl_definition_subserv dfsubserv,
+		  tbl_definition_subserv_unit_scale scale
+		WHERE combo.definition_serv_code = dfserv.code 
+			AND subcombo.combo_id = combo.id
+			AND subcombo.definition_subserv_arch_id = arch.id
+			AND arch.definition_subserv_id = dfsubserv.id
+			AND subcombo.definition_subserv_unit_scale_id = scale.id
+			AND combo.id = #{id}
+	</select>
+		
+</mapper>

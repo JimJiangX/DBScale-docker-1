@@ -1,0 +1,343 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					主机编辑
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>所属区域</label>
+					<section class="col col-4">
+						<label class="select"> <select class=" required" id="area"
+							name="area">
+								<option value="">请选择区域</option>
+
+						</select><i></i>
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>所属集群</label>
+					<section class="col col-4">
+						<label class="select"> <select class=" required"
+							id="cluster" name="cluster">
+								<option value="">请选择集群</option>
+
+						</select><i></i>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>主机名</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="name"
+							name="name" placeholder=" 请输入主机名" class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>主机IP</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="sshIp"
+							name="sshIp" placeholder=" 请输入主机IP" class="required">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>SSH端口号</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="port"
+							name="port" placeholder=" 请输入SSH端口号"
+							class="required digits">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>SSH名</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="sshUser"
+							name="sshUser" placeholder=" 请输入SSH用户名" class="required">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>SSH密码</label>
+					<section class="col col-4">
+						<label class="input"> <input type="password"
+							id="sshPassword" name="sshPassword" placeholder=" 请输入SSH密码 "
+							class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>机房</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="room"
+							name="room" placeholder=" 请输入机房标识" class="required">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>机位</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="seat"
+							name="seat" placeholder=" 请输入机位标识" class="required">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">HDD设备</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="hddDev"
+							name="hddDev" placeholder=" 请输入HDD设备标识" class="">
+						</label>
+					</section>
+					<label class="label col col-2">SSD设备</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="ssdDev"
+							name="ssdDev" placeholder=" 请输入SSD设备标识" class="">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>SAN存储</label>
+					<section class="col col-4">
+						<label class="select"> <select class=" required " id="san"
+							name="san">
+								<option value="">请选择SAN存储</option>
+
+						</select><i></i>
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>容器上限</label>
+					<section class="col col-4">
+						<label class="input"> <label class="input"> <input
+								type="text" id="maxContainer" name="maxContainer"
+								placeholder=" 请输入容器上限" class="required digits">
+						</label>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red"></label>备注信息</label>
+					<section class="col col-10">
+						<label class="input"> <input type="text" id="description"
+							name="description" placeholder=" 在此输入备注信息..."
+							class="">
+						</label>
+					</section>
+				</div>
+				<div style="display: none;">
+					<input type="text" name="site" id="site" value="">
+				</div>
+			</fieldset>
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+    pageSetUp();
+   
+    var area, $area;
+	var cluster, $cluster;
+	var san, $san;
+    var pagefunction = function() {
+    	$('#site').val(getSession("siteId"));
+        var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var hostid = $("#jqgrid").jqGrid('getRowData',s).id;
+        sendGet("/" + getProjectName() + "/v1.0/selections/sans?site="+getSession("siteId"),fillSelect_san,DialogAlert,null);
+        sendGet("/" + getProjectName() + "/v1.0/hosts/"+hostid,fillForm,DialogAlert,null); 
+
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+                name : {
+                    required : '请输入主机名'
+                },
+                port : {
+                    required : '请输入SSH端口号',
+                    digits: '请输入正确的数字'
+                },
+                sshIp : {
+                    required : '请输入主机IP',
+                    ip:'请输入正确的IP地址'
+                },
+                room : {
+                    required : '请输入机房标识'
+                },
+                seat : {
+                    required : '请输入机位标识'
+                },
+                maxContainer : {
+                    required : '请输入容器上限',
+                    digits: '请输入正确的数字'
+                },
+                sshUser:{
+                	required : '请输入SSH名'
+                },
+                sshPassword:{
+                	required : '请输入SSH密码'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToJson(data);
+            	jsonData.port = parseInt(jsonData.port);
+            	jsonData.maxContainer = parseInt(jsonData.maxContainer);
+            	var flg = true;
+            	if(jsonData.area == ""){
+            		DialogAlert("请选择区域");
+            		flg = false;
+            	}
+            	if(jsonData.cluster == ""){
+            		DialogAlert("请选择集群");
+            		flg = false;
+            	}
+            	if(isIp(jsonData.sshIp)){
+            		flg = true;
+            	}else{
+            		DialogAlert("主机IP输入格式有误");
+            		flg = false;
+            	}
+            	//在这里调用ajax方法提交
+            	if(flg){
+            		sendPut("/" + getProjectName() + "/v1.0/hosts/"+hostid, postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+            	}
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/hosts?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    function fillForm(data){
+    	var hostsdata=data['data'];
+        $('#name').val(hostsdata.name);
+        $('#port').val(hostsdata.port);
+        $('#sshIp').val(hostsdata.sshIp);
+        $('#sshUser').val(hostsdata.sshUser);
+        $('#sshPassword').val(hostsdata.sshPassword);
+        $('#room').val(hostsdata.room);
+        $('#seat').val(hostsdata.seat);
+        $('#hddDev').val(hostsdata.hddDev);
+        $('#ssdDev').val(hostsdata.ssdDev);
+        $('#maxContainer').val(hostsdata.maxContainer);
+        $('#description').val(hostsdata.description);
+        san = $san[0].selectize;
+        san.setValue(hostsdata.sanId)
+        
+        sendGet("/" + getProjectName() + "/v1.0/selections/areas?site="+getSession("siteId")+"&enabled=1",fillSelect_area(hostsdata.areaId, hostsdata.Name, hostsdata.clusterId, hostsdata.clusterName),DialogAlert,null);
+    }
+    function fillSelect_area(areaId, areaName, clusterId, clusterName){
+    	return function(data){
+    		var flg = false;
+    		$.each(data, function(k, v){
+    			if(v.id == areaId){
+    				flg = true;
+    			}
+    		});
+    		if(!flg){
+    			data.push({id: areaId, text: areaName});
+    		}
+    		$area = $("#area").selectize({
+        		valueField: 'id',
+    			labelField: 'text',
+    			searchField: 'text',
+        		create: false,
+        		sortField: {field: 'text'},
+        		options: data
+        	});
+    		area = $area[0].selectize;
+    		area.setValue([areaId]);
+        	$cluster = $("#cluster").selectize({
+        		valueField: 'id',
+        		labelField: 'text',
+        		searchField: 'text',
+        		create: true,
+        		sortField: {field: 'text'},
+        		options: []
+        	});
+        	sendGet("/" + getProjectName() + "/v1.0/selections/clusters?area="+areaId+"&enabled=1",fillSelect_cluster_init(clusterId, clusterName),DialogAlert,null);
+        	$("#area").change(function(){
+        		if($(this.selectedOptions).val() == areaId){
+        			sendGet("/" + getProjectName() + "/v1.0/selections/clusters?area="+areaId+"&enabled=1",fillSelect_cluster_init(clusterId, clusterName),DialogAlert,null);
+        		} else {
+        			sendGet("/" + getProjectName() + "/v1.0/selections/clusters?area="+$(this.selectedOptions).val()+"&enabled=1",fillSelect_cluster_change,DialogAlert,null);
+        		}
+        	});
+    	}
+    }
+    function fillSelect_cluster_init(clusterId, clusterName){
+    	return function(data){
+    		var flg = false;
+    		$.each(data, function(k, v){
+    			if(v.id == clusterId){
+    				flg = true;
+    			}
+    		});
+    		if(!flg){
+    			data.push({id: clusterId, text: clusterName});
+    		}
+    		cluster = $cluster[0].selectize;
+        	cluster.clearOptions();
+        	$.each(data, function(k, v){
+        		cluster.addOption(v);
+        	});
+        	cluster.setValue([clusterId]);
+    	}
+    }
+    function fillSelect_cluster_change(data){
+    	cluster = $cluster[0].selectize;
+    	cluster.clearOptions();
+    	$.each(data, function(k, v){
+    		cluster.addOption(v);
+    	});
+    }
+    
+    function fillSelect_san(data){
+    	$san = $("#san").selectize({
+    		valueField: 'id',
+    		labelField: 'text',
+    		searchField: 'text',
+    		create: true,
+    		sortField: {field: 'text'},
+    		options: data
+    	});
+    }
+    $('#submitbtn').click(function() {
+        $('#checkout-form').submit();
+    });
+</script>

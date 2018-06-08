@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.SubServDao">
+	<resultMap id="subServResultMap" type="com.bsg.upm.entity.SubServEntity">
+		<id property="id" column="subserv_id" />
+		<result property="relateId" column="subserv_relate_id" />
+		<association property="subOrder"
+			resultMap="com.bsg.upm.dao.SubOrderDao.subOrderResultMap" />
+		<association property="serv" resultMap="com.bsg.upm.dao.ServDao.servResultMap"/>
+	</resultMap>
+
+	<resultMap id="subServDetailResultMap" type="com.bsg.upm.entity.SubServEntity"
+		extends="subServResultMap">
+		<association property="port"
+			resultMap="com.bsg.upm.dao.PortDao.portResultMap" />
+		<association property="units"
+			resultMap="com.bsg.upm.dao.UnitDao.unitResultMap" />
+	</resultMap>
+	
+	<select id="getRelateId" resultType="string">
+	   SELECT relate_id
+	   FROM tbl_subserv
+	   WHERE id = #{id}
+	</select>
+	
+	<select id="listRelateIdByServIdAndDfSubServName" resultType="string">
+       SELECT relate_id
+       FROM tbl_subserv subserv, 
+        tbl_suborder suborder,
+        tbl_definition_subserv dfsubserv
+       WHERE subserv.suborder_id = suborder.id
+        AND suborder.definition_subserv_id = dfsubserv.id 
+        AND subserv.serv_id = #{servId} 
+        AND dfsubserv.name = #{definitionSubServName}
+    </select>
+    
+     <select id="listIdByServIdAndDfSubServName" resultType="string">
+       SELECT subserv.id
+       FROM tbl_subserv subserv, 
+        tbl_suborder suborder,
+        tbl_definition_subserv dfsubserv
+       WHERE subserv.suborder_id = suborder.id
+        AND suborder.definition_subserv_id = dfsubserv.id 
+        AND subserv.serv_id = #{servId} 
+        AND dfsubserv.name = #{definitionSubServName}
+    </select>
+    
+    
+    <select id="get" resultMap="subServResultMap" flushCache="true">
+        SELECT  subserv.id AS subserv_id,
+	            subserv.relate_id AS subserv_relate_id,
+	            port.id AS port_id,
+	            port.port_value,
+	            suborder.id AS suborder_id,
+	            dfsubserv.id AS dfsubserv_id, 
+	            dfsubserv.name AS dfsubserv_name, 
+	            dfsubserv.canbackup AS dfsubserv_canbackup,
+	            serv.id AS serv_id,
+	            o.id AS order_id,
+	            o.owner AS order_owner,
+	            o.sharding AS order_sharding,
+	            dfserv.code AS definition_serv_code,
+	            area.id AS area_id,
+	            area.name AS area_name,
+	            site.id AS site_id,
+	            site.name AS site_name
+        FROM    tbl_subserv subserv,
+	            tbl_port port,
+	            tbl_suborder suborder,
+	            tbl_definition_subserv dfsubserv,
+	            tbl_serv serv,
+	            tbl_order o,
+	            tbl_definition_serv dfserv,
+	            tbl_area area,
+	            tbl_site site
+        WHERE     port.subserv_id = subserv.id
+	            AND subserv.suborder_id = suborder.id
+	            AND suborder.definition_subserv_id = dfsubserv.id
+	            AND subserv.serv_id = serv.id
+	            AND serv.order_id = o.id
+	            AND o.area_id = area.id
+	            AND o.definition_serv_code = dfserv.code 
+	            AND area.site_id = site.id
+	            AND subserv.id = #{id}     
+    </select>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.SubServEntity">
+		UPDATE tbl_subserv
+		<set>
+			suborder_id = #{subOrder.id}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateRelateId" parameterType="com.bsg.upm.entity.SubServEntity">
+		UPDATE tbl_subserv
+		<set>
+			relate_id = #{relateId}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_subserv
+		WHERE id = #{id}
+	</delete>
+	
+	<delete id="removeRelativeUnit">
+		DELETE FROM tbl_unit
+		WHERE subserv_id = #{subServId}
+	</delete>
+
+</mapper>

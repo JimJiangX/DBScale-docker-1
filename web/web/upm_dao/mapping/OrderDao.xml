@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.OrderDao">
+	<resultMap id="orderResultMap" type="com.bsg.upm.entity.OrderEntity">
+		<id property="id" column="order_id" />
+		<result property="servName" column="order_serv_name" />
+		<result property="no" column="order_no" />
+		<result property="type" column="order_type" />
+		<result property="status" column="order_status" />
+		<result property="msg" column="order_msg" />
+		<result property="owner" column="order_owner" />
+		<result property="sharding" column="order_sharding" />
+		<result property="associateOrderId" column="order_associate_order_id" />
+		<result property="createDateTime" column="order_create_datetime" />
+		<result property="createUserLoginName" column="order_create_user_login_name" />
+		<association property="definitionServ"
+			javaType="com.bsg.upm.entity.DefinitionServEntity">
+			<id property="code" column="definition_serv_code" />
+			<result property="name" column="definition_serv_name" />
+		</association>
+		<association property="area"
+			resultMap="com.bsg.upm.dao.AreaDao.areaResultMap" />
+		<association property="businessSubSystem"
+			resultMap="com.bsg.upm.dao.BusinessSubSystemDao.businessSubSystemDetailResultMap" />
+		<collection property="subOrders"
+			resultMap="com.bsg.upm.dao.SubOrderDao.subOrderResultMap" />
+	</resultMap>
+	
+	<select id="list" resultMap="orderResultMap" flushCache="true">
+		SELECT o.id AS order_id,
+			o.serv_name AS order_serv_name,
+			o.no AS order_no,
+			o.type AS order_type,
+			o.status AS order_status,
+			o.owner AS order_owner,
+			o.sharding AS order_sharding,
+			o.create_user_login_name AS order_create_user_login_name,
+			o.create_datetime AS order_create_datetime,
+			o.associate_order_id AS order_associate_order_id,
+			dfserv.code AS definition_serv_code,
+			dfserv.name AS definition_serv_name,
+			temp.business_system_id, 
+			temp.business_system_name,
+			temp.subsystem_id, 
+			temp.subsystem_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			area.id AS area_id,
+			area.name AS area_name,
+			area.enabled AS area_enabled,
+			so.id AS suborder_id, 
+			so.network_bandwidth AS suborder_network_bandwidth,
+			so.data_dir_device_type AS suborder_data_dir_device_type, 
+			so.data_dir_size AS suborder_data_dir_size, 
+			so.log_dir_device_type AS suborder_log_dir_device_type, 
+			so.log_dir_size AS suborder_log_dir_size,
+			so.mixed AS suborder_mixed,
+			so.high_available AS suborder_high_available,
+			dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.compose AS dfsubserv_compose, 
+			arch.id AS arch_id, 
+			arch.name AS arch_name, 
+			scale.id AS scale_id, 
+			scale.name AS scale_name,
+			sssi.id AS subserv_software_image_id, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version, 
+			sssi.enabled AS subserv_software_image_enabled, 
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version
+		FROM tbl_order o LEFT JOIN (
+			SELECT system.id AS business_system_id,
+				system.name AS business_system_name,
+				subsystem.id AS subsystem_id,
+				subsystem.name AS subsystem_name,
+				subsystem_order.order_id
+			FROM tbl_business_system system,
+				tbl_business_subsystem subsystem,
+				tbl_business_subsystem_order subsystem_order
+			WHERE system.id = subsystem.business_system_id
+				AND subsystem.id = subsystem_order.business_subsystem_id
+		) temp ON temp.order_id = o.id,
+			tbl_definition_serv dfserv,
+			tbl_site site, 
+			tbl_area area,
+			tbl_suborder so,
+			tbl_definition_subserv dfsubserv,
+			tbl_definition_subserv_arch arch,
+			tbl_definition_subserv_unit_scale scale,
+			tbl_subserv_software_image sssi, 
+			tbl_definition_subserv_software dfsss
+		WHERE o.definition_serv_code = dfserv.code
+			AND o.area_id = area.id
+			AND area.site_id = site.id
+			AND so.order_id = o.id
+			AND so.definition_subserv_id = dfsubserv.id
+			AND so.definition_subserv_arch_id = arch.id
+			AND so.definition_subserv_unit_scale_id = scale.id
+			AND so.subserv_software_image_id = sssi.id
+			AND sssi.definition_subserv_software_id = dfsss.id
+		<if test="siteId !=null and site !=''">
+		 	AND site.id = #{siteId}
+		</if>		
+		<if test="owner !=null and owner !=''">
+		 	AND o.create_user_login_name = #{owner}
+		</if>
+		<if test="definitionServCode !=null and definitionServCode !=''">
+		 	AND o.definition_serv_code = #{definitionServCode}
+		</if>
+		ORDER BY o.definition_serv_code, o.owner, o.create_datetime DESC
+	</select>
+	
+	<select id="listAllBySiteID" resultMap="orderResultMap" flushCache="true">
+		SELECT o.id AS order_id,	
+		       o.type AS order_type,
+			  o.status AS order_status
+	    FROM tbl_order o,
+	    	tbl_site site, 
+			tbl_area area
+		WHERE o.area_id = area.id
+			AND area.site_id = site.id
+			AND site.id=#{siteId}
+	</select>
+	
+	<select id="get" resultMap="orderResultMap" flushCache="true">
+		SELECT o.id AS order_id,
+			o.serv_name AS order_serv_name,
+			o.no AS order_no,
+			o.type AS order_type,
+			o.status AS order_status,
+			o.owner AS order_owner,
+			o.sharding AS order_sharding,
+			o.associate_order_id AS order_associate_order_id,
+			o.create_user_login_name AS order_create_user_login_name,
+			o.create_datetime AS order_create_datetime,
+			o.associate_order_id AS order_associate_order_id,
+			dfserv.code AS definition_serv_code,
+			dfserv.name AS definition_serv_name,
+			temp.business_system_id, 
+			temp.business_system_name,
+			temp.subsystem_id, 
+			temp.subsystem_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			area.id AS area_id,
+			area.name AS area_name,
+			area.enabled AS area_enabled,
+			so.id AS suborder_id, 
+			so.network_bandwidth AS suborder_network_bandwidth,
+			so.data_dir_device_type AS suborder_data_dir_device_type, 
+			so.data_dir_size AS suborder_data_dir_size, 
+			so.log_dir_device_type AS suborder_log_dir_device_type, 
+			so.log_dir_size AS suborder_log_dir_size,
+			so.mixed AS suborder_mixed,
+			so.high_available AS suborder_high_available,
+			so.associate_suborder_id AS suorder_associate_suborder_id,
+			dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority, 
+			dfsubserv.compose AS dfsubserv_compose, 
+			arch.id AS arch_id, 
+			arch.name AS arch_name, 
+			arch.code AS arch_code, 
+			arch.type AS arch_type, 
+			arch.unit_num AS arch_unit_num,
+			scale.id AS scale_id, 
+			scale.name AS scale_name,
+			scale.cpu_num AS scale_cpu_num, 
+			scale.mem_size AS scale_mem_size,
+			sssi.id AS subserv_software_image_id, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version, 
+			sssi.enabled AS subserv_software_image_enabled, 
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version
+		FROM tbl_order o LEFT JOIN (
+			SELECT system.id AS business_system_id,
+				system.name AS business_system_name,
+				subsystem.id AS subsystem_id,
+				subsystem.name AS subsystem_name,
+				subsystem_order.order_id
+			FROM tbl_business_system system,
+				tbl_business_subsystem subsystem,
+				tbl_business_subsystem_order subsystem_order
+			WHERE system.id = subsystem.business_system_id
+				AND subsystem.id = subsystem_order.business_subsystem_id
+		) temp ON temp.order_id = o.id,
+			tbl_definition_serv dfserv,
+			tbl_site site, 
+			tbl_area area,
+			tbl_suborder so,
+			tbl_definition_subserv dfsubserv,
+			tbl_definition_subserv_arch arch,
+			tbl_definition_subserv_unit_scale scale,
+			tbl_subserv_software_image sssi, 
+			tbl_definition_subserv_software dfsss
+		WHERE o.definition_serv_code = dfserv.code
+			AND o.area_id = area.id
+			AND area.site_id = site.id
+			AND so.order_id = o.id
+			AND so.definition_subserv_id = dfsubserv.id
+			AND so.definition_subserv_arch_id = arch.id
+			AND so.definition_subserv_unit_scale_id = scale.id
+			AND so.subserv_software_image_id = sssi.id
+			AND sssi.definition_subserv_software_id = dfsss.id
+			AND o.id = #{id}
+	</select>
+	
+	<select id="getBase" resultMap="orderResultMap" flushCache="true">
+        SELECT o.id AS order_id,
+            o.serv_name AS order_serv_name,
+            o.no AS order_no,
+            o.type AS order_type,
+            o.status AS order_status,
+            o.owner AS order_owner,
+            o.sharding AS order_sharding,
+            o.associate_order_id AS order_associate_order_id,
+            o.create_user_login_name AS order_create_user_login_name,
+            o.create_datetime AS order_create_datetime,
+            o.associate_order_id AS order_associate_order_id,
+            temp.business_system_id, 
+            temp.business_system_name,
+            temp.subsystem_id, 
+            temp.subsystem_name,
+            so.id AS suborder_id, 
+            so.network_bandwidth AS suborder_network_bandwidth,
+            so.data_dir_device_type AS suborder_data_dir_device_type, 
+            so.data_dir_size AS suborder_data_dir_size, 
+            so.log_dir_device_type AS suborder_log_dir_device_type, 
+            so.log_dir_size AS suborder_log_dir_size,
+            so.mixed AS suborder_mixed,
+            so.high_available AS suborder_high_available
+        FROM tbl_order o LEFT JOIN (
+            SELECT system.id AS business_system_id,
+                system.name AS business_system_name,
+                subsystem.id AS subsystem_id,
+                subsystem.name AS subsystem_name,
+                subsystem_order.order_id
+            FROM tbl_business_system system,
+                tbl_business_subsystem subsystem,
+                tbl_business_subsystem_order subsystem_order
+            WHERE system.id = subsystem.business_system_id
+                AND subsystem.id = subsystem_order.business_subsystem_id
+        ) temp ON temp.order_id = o.id,
+            tbl_suborder so
+        WHERE so.order_id = o.id
+            AND o.id = #{id}
+    </select>
+	
+	<select id="getByServId" resultMap="orderResultMap" flushCache="true">
+		SELECT o.id AS order_id,
+			o.serv_name AS order_serv_name,
+			o.no AS order_no,
+			o.type AS order_type,
+			o.status AS order_status,
+			o.owner AS order_owner,
+			o.sharding AS order_sharding,
+			o.associate_order_id AS order_associate_order_id,
+			o.create_user_login_name AS order_create_user_login_name,
+			o.create_datetime AS order_create_datetime,
+			o.associate_order_id AS order_associate_order_id,
+			dfserv.code AS definition_serv_code,
+			dfserv.name AS definition_serv_name,
+			temp.business_system_id, 
+			temp.business_system_name,
+			temp.subsystem_id, 
+			temp.subsystem_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			area.id AS area_id,
+			area.name AS area_name,
+			area.enabled AS area_enabled,
+			so.id AS suborder_id, 
+			so.network_bandwidth AS suborder_network_bandwidth,
+			so.data_dir_device_type AS suborder_data_dir_device_type, 
+			so.data_dir_size AS suborder_data_dir_size, 
+			so.log_dir_device_type AS suborder_log_dir_device_type, 
+			so.log_dir_size AS suborder_log_dir_size,
+			so.mixed AS suborder_mixed,
+			so.high_available AS suborder_high_available,
+			so.associate_suborder_id AS suorder_associate_suborder_id,
+			dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority, 
+			dfsubserv.compose AS dfsubserv_compose, 
+			arch.id AS arch_id, 
+			arch.name AS arch_name, 
+			arch.code AS arch_code, 
+			arch.type AS arch_type, 
+			arch.unit_num AS arch_unit_num,
+			scale.id AS scale_id, 
+			scale.name AS scale_name,
+			scale.cpu_num AS scale_cpu_num, 
+			scale.mem_size AS scale_mem_size,
+			sssi.id AS subserv_software_image_id, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version, 
+			sssi.enabled AS subserv_software_image_enabled, 
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version
+		FROM tbl_serv serv,
+			tbl_order o LEFT JOIN (
+				SELECT system.id AS business_system_id,
+					system.name AS business_system_name,
+					subsystem.id AS subsystem_id,
+					subsystem.name AS subsystem_name,
+					subsystem_order.order_id
+				FROM tbl_business_system system,
+					tbl_business_subsystem subsystem,
+					tbl_business_subsystem_order subsystem_order
+				WHERE system.id = subsystem.business_system_id
+					AND subsystem.id = subsystem_order.business_subsystem_id
+			) temp ON temp.order_id = o.id,
+			tbl_definition_serv dfserv,
+			tbl_site site, 
+			tbl_area area,
+			tbl_suborder so,
+			tbl_definition_subserv dfsubserv,
+			tbl_definition_subserv_arch arch,
+			tbl_definition_subserv_unit_scale scale,
+			tbl_subserv_software_image sssi, 
+			tbl_definition_subserv_software dfsss
+		WHERE serv.order_id = o.id 
+			AND o.definition_serv_code = dfserv.code
+			AND o.area_id = area.id
+			AND area.site_id = site.id
+			AND so.order_id = o.id
+			AND so.definition_subserv_id = dfsubserv.id
+			AND so.definition_subserv_arch_id = arch.id
+			AND so.definition_subserv_unit_scale_id = scale.id
+			AND so.subserv_software_image_id = sssi.id
+			AND sssi.definition_subserv_software_id = dfsss.id
+			AND serv.id = #{servId}
+	</select>
+	
+	<select id="getBaseByServId" resultMap="orderResultMap" flushCache="true">
+		SELECT o.id AS order_id,
+			o.serv_name AS order_serv_name,
+			o.no AS order_no,
+			o.type AS order_type,
+			o.status AS order_status,
+			o.owner AS order_owner,
+			o.sharding AS order_sharding,
+			o.associate_order_id AS order_associate_order_id,
+			o.create_user_login_name AS order_create_user_login_name,
+			o.create_datetime AS order_create_datetime,
+			o.associate_order_id AS order_associate_order_id,
+			temp.business_system_id, 
+            temp.business_system_name,
+            temp.subsystem_id, 
+            temp.subsystem_name
+		FROM tbl_serv serv,
+			tbl_order o LEFT JOIN (
+				SELECT system.id AS business_system_id,
+					system.name AS business_system_name,
+					subsystem.id AS subsystem_id,
+					subsystem.name AS subsystem_name,
+					subsystem_order.order_id
+				FROM tbl_business_system system,
+					tbl_business_subsystem subsystem,
+					tbl_business_subsystem_order subsystem_order
+				WHERE system.id = subsystem.business_system_id
+					AND subsystem.id = subsystem_order.business_subsystem_id
+			) temp ON temp.order_id = o.id
+		WHERE serv.order_id = o.id 
+			AND serv.id = #{servId}
+	</select>
+	
+	<select id="getMaxNoBySiteIdAndServName" resultType="int" flushCache="true">
+        SELECT MAX(no) 
+        FROM tbl_order o, tbl_area area
+        WHERE o.area_id = area.id 
+           AND area.site_id = #{siteId}
+           AND o.serv_name = #{servName} 
+	</select>
+	
+	<select id="countBySiteIdAndServName" resultType="int" flushCache="true">
+	   SELECT COUNT(*)
+	   FROM tbl_order o, tbl_area area
+	   WHERE o.area_id = area.id 
+	       AND area.site_id = #{siteId}
+	       AND o.serv_name = #{servName} 
+	</select>
+	
+	<select id="countByServName" resultType="int" flushCache="true">
+	   SELECT COUNT(*)
+	   FROM tbl_order
+	   WHERE serv_name = #{servName} 
+	</select>
+	
+	<select id="countUnexecutedBySiteIdAndServName" resultType="int" flushCache="true">
+	   SELECT COUNT(*)
+	   FROM tbl_order o, tbl_area area
+	   WHERE o.area_id = area.id 
+	   	   AND o.status != 'executed' 
+	   	   AND o.status != 'unapprove'
+	       AND area.site_id = #{siteId}
+	       AND o.serv_name = #{servName} 
+	</select>
+	
+	<select id="countBeAssociate" resultType="int" flushCache="true">
+	   SELECT COUNT(*) 
+	   FROM tbl_order 
+	   WHERE associate_order_id = #{orderId}
+	</select>
+	
+	<select id="countBySubSystemId" resultType="int" flushCache="true">
+       SELECT COUNT(*) 
+       FROM tbl_business_subsystem_order 
+       WHERE business_subsystem_id = #{subSystemId}
+    </select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.OrderEntity">
+		INSERT INTO tbl_order
+		(
+			id,
+			definition_serv_code,
+			serv_name,
+			no,
+			area_id,
+			type,
+			status,
+			msg,
+			owner,
+			sharding,
+			associate_order_id,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUES
+		(
+			#{id},
+			#{definitionServ.code},
+			#{servName},
+			#{no},
+			#{area.id},
+			#{type},
+			#{status},
+			#{msg},
+			#{owner},
+			#{sharding},
+			#{associateOrderId},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<insert id="saveRelativeSubOrder" parameterType="com.bsg.upm.entity.OrderEntity">
+		INSERT INTO tbl_suborder
+		(
+			id,
+			definition_subserv_id,
+			subserv_software_image_id,
+			definition_subserv_arch_id,
+			definition_subserv_unit_scale_id,
+			network_bandwidth,
+			data_dir_size,
+			data_dir_device_type,
+			log_dir_size,
+			log_dir_device_type,
+			mixed,
+			high_available,
+			associate_suborder_id,
+			order_id
+		)
+		VALUES
+		<foreach collection="subOrders" item="subOrder" index="index" separator=",">
+		(
+			#{subOrder.id},
+			#{subOrder.definitionSubServ.id},
+			#{subOrder.subServSoftwareImage.id},
+			#{subOrder.definitionSubServArch.id},
+			#{subOrder.definitionSubServUnitScale.id},
+			#{subOrder.networkBandwidth},
+			#{subOrder.dataDirSize},
+			#{subOrder.dataDirDeviceType},
+			#{subOrder.logDirSize},
+			#{subOrder.logDirDeviceType},
+			#{subOrder.mixed},
+			#{subOrder.highAvailable},
+			#{subOrder.associateSubOrderId},
+			#{id}
+		)	
+		</foreach>
+	</insert>
+	
+	<insert id="saveRelationshipWithBusinessSubSystem" parameterType="com.bsg.upm.entity.OrderEntity">
+		INSERT INTO tbl_business_subsystem_order
+		(
+			business_subsystem_id,
+			order_id
+		)
+		VALUES
+		(
+			#{businessSubSystem.id},
+			#{id}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.OrderEntity">
+		UPDATE tbl_order
+		<set>
+			area_id = #{area.id},
+			sharding = #{sharding}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateStatusAndMsg" parameterType="com.bsg.upm.entity.OrderEntity">
+		UPDATE tbl_order
+		<set>
+			status = #{status},
+			msg = #{msg}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateOwner" parameterType="com.bsg.upm.entity.OrderEntity">
+		UPDATE tbl_order
+		<set>
+			owner = #{owner}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_order 
+		WHERE id = #{id}
+	</delete>
+	
+	<delete id="removeRelativeSubOrder">
+		DELETE FROM tbl_suborder
+		WHERE order_id = #{orderId}
+	</delete>
+	
+	<delete id="removeRelationshipWithBusinessSubSystem">
+		DELETE FROM tbl_business_subsystem_order
+		WHERE order_id = #{orderId}
+	</delete>
+</mapper>

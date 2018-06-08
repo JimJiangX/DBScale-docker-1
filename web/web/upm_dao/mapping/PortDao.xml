@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.PortDao">
+	<resultMap id="portResultMap" type="com.bsg.upm.entity.PortEntity">
+		<id property="id" column="port_id" />
+		<result property="portValue" column="port_value" />
+		<result property="enabled" column="port_enabled" />
+		<result property="used" column="port_used" />
+		<result property="createDateTime" column="port_create_datetime" />
+		<result property="createUserLoginName" column="port_create_user_login_name" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+	</resultMap>
+
+	<resultMap id="portDetailMap" type="com.bsg.upm.entity.PortEntity"
+		extends="portResultMap">
+		<association property="subServ" javaType="com.bsg.upm.entity.SubServEntity">
+			<id property="id" column="subserv_id" />
+			<association property="serv" javaType="com.bsg.upm.entity.ServEntity">
+				<id property="id" column="serv_id" />
+				<result property="servName" column="serv_name" />
+			</association>
+		</association>
+	</resultMap>
+	
+	<select id="list" resultMap="portDetailMap" flushCache="true">
+		SELECT port.id AS port_id, 
+			port.port_value, 
+			port.used AS port_used, 
+			port.enabled AS port_enabled, 
+			port.create_datetime AS port_create_datetime, 
+			port.create_user_login_name AS port_create_user_login_name, 
+			site.id AS site_id, 
+			site.name AS site_name,
+			subserv.id AS subserv_id,
+			serv.id AS serv_id,
+			serv.serv_name
+		FROM tbl_port port 
+			LEFT JOIN tbl_subserv subserv ON port.subserv_id = subserv.id 
+			LEFT JOIN tbl_serv serv ON subserv.serv_id = serv.id,
+			tbl_site site
+		WHERE port.site_id = site.id
+			AND port.site_id = #{siteId}
+		<if test="used !=null">
+		 	AND port.used = #{used}
+		</if>
+		<if test="start !=null">
+            AND port.port_value >= #{start}
+        </if>
+        <if test="end !=null">
+            AND port.port_value <![CDATA[<=]]> #{end}
+        </if>
+		ORDER BY port.port_value ASC 
+		<if test="limit !=null">
+		 	limit 0, #{limit}
+		</if>
+	</select>
+	
+	<select id="listBySiteIdAndPortValues" resultMap="portResultMap" flushCache="true">
+	   SELECT port.id AS port_id, 
+            port.port_value, 
+            port.used AS port_used, 
+            port.enabled AS port_enabled, 
+            port.create_datetime AS port_create_datetime, 
+            port.create_user_login_name AS port_create_user_login_name
+        FROM tbl_port port
+        WHERE port.site_id = #{siteId}
+            AND port_value IN
+        <foreach item="item" collection="portValues" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY port.port_value ASC
+	</select>
+	
+	<select id="listUnused" resultMap="portResultMap" flushCache="true">
+		SELECT port.id AS port_id, 
+			port.port_value, 
+			port.used AS port_used, 
+			port.enabled AS port_enabled, 
+			port.create_datetime AS port_create_datetime, 
+			port.create_user_login_name AS port_create_user_login_name
+		FROM tbl_port port
+		WHERE port.site_id = #{siteId}
+			AND port.used = 0
+		ORDER BY port.port_value ASC
+	</select>
+	
+	<select id="get" resultMap="portResultMap" flushCache="true">
+		SELECT port.id AS port_id, 
+			port.port_value, 
+			port.used AS port_used, 
+			port.enabled AS port_enabled, 
+			port.create_datetime AS port_create_datetime, 
+			port.create_user_login_name AS port_create_user_login_name, 
+			site.id AS site_id, 
+			site.name AS site_name,
+			serv.id AS serv_id,
+			serv.serv_name
+		FROM tbl_port port LEFT JOIN tbl_serv serv ON port.serv_id = serv.id, 
+			tbl_site site
+		WHERE port.site_id = site.id
+			AND port.id = #{id}
+	</select>
+	
+	<select id="countBySiteId" resultType="int" flushCache="true">
+        SELECT COUNT(id)
+        FROM tbl_port
+        WHERE site_id = #{siteId}
+    </select>
+	
+	<select id="countPort" resultType="int" flushCache="true">
+		SELECT COUNT(id)
+		FROM tbl_port
+		WHERE site_id = #{siteId}
+			AND port_value >= #{startPort}
+			AND port_value <![CDATA[<=]]> #{endPort}
+	</select>
+	
+	<insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO tbl_port
+		(
+			id,
+			site_id,
+			port_value,
+			enabled,
+			used,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+        <foreach collection="list" item="item" index="index" separator=",">
+		(
+			#{item.id},
+			#{item.site.id},
+			#{item.portValue},
+			#{item.enabled},
+			#{item.used},
+			#{item.createDateTime},
+			#{item.createUserLoginName}
+		)
+        </foreach>
+    </insert>
+    
+    <update id="updatePortToUsed">
+		UPDATE tbl_port
+		<set>
+			used = 1,
+            subserv_id = #{subServ.id},
+		</set>
+		WHERE id = #{id}
+	</update>
+    
+	<update id="updatePortToUnused">
+		UPDATE tbl_port
+		<set>
+			used = 0,
+            subserv_id = null,
+		</set>
+		WHERE id = #{id}
+	</update>
+    
+    <update id="updateEnabled" parameterType="com.bsg.upm.entity.PortEntity">
+		UPDATE tbl_port
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+        DELETE FROM tbl_port 
+        WHERE id = #{id} 
+    </delete>
+</mapper>

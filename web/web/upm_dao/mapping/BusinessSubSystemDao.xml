@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.BusinessSubSystemDao">
+	<resultMap id="businessSubSystemResultMap"
+		type="com.bsg.upm.entity.BusinessSubSystemEntity">
+		<id property="id" column="subsystem_id" />
+		<result property="name" column="subsystem_name" />
+		<result property="description" column="subsystem_description" />
+		<result property="createDateTime" column="subsystem_create_datetime" />
+	</resultMap>
+
+	<resultMap id="businessSubSystemDetailResultMap"
+		type="com.bsg.upm.entity.BusinessSubSystemEntity" extends="businessSubSystemResultMap">
+		<association property="businessSystem"
+			resultMap="com.bsg.upm.dao.BusinessSystemDao.businessSystemResultMap" />
+	</resultMap>
+
+	<select id="list" parameterType="java.util.Map" resultMap="businessSubSystemDetailResultMap" flushCache="true">
+		SELECT bss.id AS subsystem_id, 
+			bss.name AS subsystem_name, 
+			bss.description AS subsystem_description, 
+			bss.create_datetime AS subsystem_create_datetime,
+			bs.id AS business_system_id, 
+			bs.name AS business_system_name, 
+			bs.description AS business_system_description, 
+			bs.owner AS business_system_owner, 
+			bs.create_datetime AS business_system_create_datetime
+		FROM tbl_business_subsystem bss, 
+			tbl_business_system bs
+		WHERE bss.business_system_id = bs.id 
+			<if test="owner != null">
+				AND bs.owner = #{owner}
+			</if>
+		ORDER BY bs.create_datetime DESC,
+			bss.create_datetime DESC
+	</select>
+	
+	<select id="listNameByBusinessSystemId" resultMap="businessSubSystemResultMap" flushCache="true">
+		SELECT id AS subsystem_id, 
+			name AS subsystem_name
+		FROM tbl_business_subsystem
+		WHERE business_system_id = #{businessSystemId}
+		ORDER BY name
+	</select>
+	
+	<select id="listWithoutAssociation" resultMap="businessSubSystemResultMap" flushCache="true">
+		SELECT id AS subsystem_id, 
+			name AS subsystem_name
+		FROM tbl_business_subsystem
+	</select>
+	
+	<select id="get" resultMap="businessSubSystemDetailResultMap" flushCache="true">
+		SELECT bss.id AS subsystem_id, 
+			bss.name AS subsystem_name, 
+			bss.description AS subsystem_description, 
+			bss.create_datetime AS subsystem_create_datetime,
+			bs.id AS business_system_id, 
+			bs.name AS business_system_name, 
+			bs.description AS business_system_description, 
+			bs.owner AS business_system_owner, 
+			bs.create_datetime AS business_system_create_datetime
+		FROM tbl_business_subsystem bss, 
+			tbl_business_system bs
+		WHERE bss.business_system_id = bs.id 
+			AND bss.id = #{id}
+	</select>
+	
+	<select id="getByNameAndBusinessSystemId" resultMap="businessSubSystemResultMap" flushCache="true">
+		SELECT bss.id AS subsystem_id, 
+			bss.name AS subsystem_name, 
+			bss.description AS subsystem_description, 
+			bss.create_datetime AS subsystem_create_datetime
+		FROM tbl_business_subsystem bss
+		WHERE bss.name = #{name}
+			AND bss.business_system_id = #{businessSystemId}
+	</select>
+	
+	<select id="countByNameAndBusinessSystemId" resultType="int" flushCache="true">
+		SELECT COUNT(*)
+		FROM tbl_business_subsystem
+		WHERE name = #{name}
+			AND business_system_id = #{businessSystemId}
+	</select>
+	
+	<select id="countByBusinessSystemId" resultType="int" flushCache="true">
+		SELECT COUNT(*)
+		FROM tbl_business_subsystem
+		WHERE business_system_id = #{businessSystemId}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.BusinessSubSystemEntity">
+		INSERT INTO tbl_business_subsystem
+		(
+			id,
+			name,
+			description,
+			business_system_id,
+			create_datetime
+		)
+		VALUE
+		(
+			#{id},
+			#{name},
+			#{description},
+			#{businessSystem.id},
+			#{createDateTime}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.BusinessSubSystemEntity">
+		UPDATE tbl_business_subsystem
+		<set>
+			name = #{name},
+			description = #{description},
+			business_system_id = #{businessSystem.id}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_business_subsystem
+		WHERE id = #{id}
+	</delete>
+
+</mapper>

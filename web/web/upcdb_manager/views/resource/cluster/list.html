@@ -1,0 +1,157 @@
+  <!--集群-列表页面 -->
+<section id="widget-grid" class="">
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="widget-body">
+                <!-- Dynamic Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:void(0);" onclick="add_cluster()" id="addcluster" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增</a>
+                <a href="javascript:void(0);" class="btn btn-primary" onclick="start_cluster()">启用</a>
+                <a href="javascript:void(0);" class="btn btn-warning" onclick="stop_cluster()">停用</a>
+                <a href="javascript:void(0);"  class="btn btn-info" onclick="update_cluster()" id="updatecluster">编辑</a>
+                <a href="javascript:void(0);" class="btn btn-danger" onclick="delete_cluster()">删除</a>
+            </div>
+            <p>
+                &nbsp;
+            </p>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <!-- end widget -->
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+
+    </div>
+</section>
+<script>
+	
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+	    		var siteid=getSession("siteId");
+	    		sendGet("/" + getProjectName() + "/v1.0/clusters?site="+siteid,createGrid_cluster,ListAlert,null);
+    		});
+    	});
+    });
+    var gridCluster=$("#jqgrid");
+    function delete_cluster(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var cluster_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('delete', cluster_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    function add_cluster(){
+    	$("#addcluster").attr("href","views/resource/cluster/add.html");
+    }
+    function update_cluster(){
+    	ListAlertClear();
+        s = gridCluster.jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var id=$("#updatecluster");
+        if(s.length==1){
+        	if(rowData.enabledStatus == "yes"){
+	            id.attr("href","views/resource/cluster/update.html");
+	            id.attr("data-toggle","modal");
+	            id.attr("data-target","#addModal");
+        	}else{
+        		ListAlert("请在停用状态下进行编辑!");
+                id.removeAttr("data-toggle");
+                id.removeAttr("data-target");
+                id.removeAttr("href");
+        	}
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    function start_cluster(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var cluster_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('start', cluster_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    function stop_cluster(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		 var cluster_id = $("#jqgrid").jqGrid('getRowData',s).id;
+    		 ListConfirm('stop', cluster_id);
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+    
+    function confirm(type, id){
+    	ListAlertClear();
+    	switch(type){
+    	case 'start':
+    		sendPut("/" + getProjectName() + "/v1.0/clusters/"+id+"/enable",showReturn,ListAlert,null,null);
+    		break;
+    	case 'stop':
+   		    sendPut("/" + getProjectName() + "/v1.0/clusters/"+id+"/disable",showReturn,ListAlert,null,null);
+    		break;
+    	case 'delete':
+    		sendDelete("/" + getProjectName() + "/v1.0/clusters/"+id, showReturn, ListAlert, null);
+    		break;
+    	default:
+    	}
+    }
+    
+    function showReturn(data){
+		 sendGet("/" + getProjectName() + "/v1.0/clusters?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    
+  //模态框刷新启停
+    $(function () { 
+    	//显示监听
+    	$('#addModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#addModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(showReturn, setTime);
+   		 	}
+    	})
+    	
+    }); 
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

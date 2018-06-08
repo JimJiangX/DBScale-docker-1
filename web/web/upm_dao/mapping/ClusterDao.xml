@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.ClusterDao">
+	<resultMap id="clusterResultMap" type="com.bsg.upm.entity.ClusterEntity">
+		<id property="id" column="cluster_id" />
+		<result property="name" column="cluster_name" />
+		<result property="relateId" column="cluster_relate_id" />
+		<result property="mixed" column="cluster_mixed" />
+		<result property="enabled" column="cluster_enabled" />
+		<result property="definitionSubServNames" column="cluster_definition_subserv_names" />
+		<result property="description" column="cluster_description" />
+		<result property="createDateTime" column="cluster_create_datetime" />
+		<result property="createUserLoginName" column="cluster_create_user_login_name" />
+		<association property="area"
+			resultMap="com.bsg.upm.dao.AreaDao.areaResultMap" />
+	</resultMap>
+
+	<resultMap id="clusterDetailResultMap" type="com.bsg.upm.entity.ClusterEntity"
+		extends="clusterResultMap">
+		<collection property="networkings"
+			resultMap="com.bsg.upm.dao.NetworkingDao.networkingResultMap">
+		</collection>
+	</resultMap>
+	
+	<select id="list" parameterType="java.util.Map" resultMap="clusterDetailResultMap" flushCache="true">
+		SELECT c.id AS cluster_id, 
+			c.name AS cluster_name, 
+			c.relate_id AS cluster_relate_id, 
+			c.mixed AS cluster_mixed,
+			c.enabled AS cluster_enabled,
+			c.definition_subserv_names AS cluster_definition_subserv_names, 
+			c.description AS cluster_description, 
+			c.create_datetime AS cluster_create_datetime, 
+			c.create_user_login_name AS cluster_create_user_login_name, 
+			area.id AS area_id,
+			area.name AS area_name,
+			area.enabled AS area_enabled,
+			site.id AS site_id,
+			site.name AS site_name, 
+			n.id AS networking_id, 
+			n.name AS networking_name,
+			n.enabled AS networking_enabled
+		FROM tbl_cluster c, 
+			tbl_area area,
+			tbl_site site,
+			tbl_cluster_networking cn, 
+			tbl_networking n
+		WHERE c.area_id = area.id
+			AND area.site_id = site.id
+			AND c.id = cn.cluster_id
+			AND cn.networking_id = n.id
+		 	AND site.id = #{siteId}
+		ORDER BY site.create_datetime DESC, area.create_datetime DESC, c.create_datetime DESC
+	</select>
+	
+	
+	<select id="listWithoutAssociation" parameterType="java.util.Map" resultMap="clusterDetailResultMap" flushCache="true">
+		 SELECT  c.id AS cluster_id, 
+            c.name AS cluster_name
+		 FROM tbl_cluster   c
+	</select>
+	
+	<select id="listName" resultMap="clusterResultMap" flushCache="true">
+		SELECT c.id AS cluster_id, 
+			c.name AS cluster_name,
+			c.description AS cluster_description
+		FROM tbl_cluster c
+		WHERE c.area_id = #{areaId}
+		<if test="enabled!=null">
+			AND c.enabled = #{enabled}
+		</if>
+		ORDER BY c.name
+	</select>
+	
+	<select id="listByAreaIdAndMixedAndEnabled" resultMap="clusterDetailResultMap" flushCache="true">
+		SELECT c.id AS cluster_id, 
+			c.name AS cluster_name, 
+			c.relate_id AS cluster_relate_id, 
+			c.mixed AS cluster_mixed,
+			c.enabled AS cluster_enabled,
+			c.definition_subserv_names AS cluster_definition_subserv_names,
+			n.id AS networking_id, 
+			n.name AS networking_name,
+			n.enabled AS networking_enabled
+		FROM tbl_cluster c, 
+			tbl_cluster_networking cn, 
+			tbl_networking n
+		WHERE c.id = cn.cluster_id
+			AND cn.networking_id = n.id
+			AND c.area_id = #{areaId}
+			AND c.mixed = #{mixed}
+			AND c.enabled = #{enabled}
+			AND n.enabled = true
+	</select>
+	
+	<select id="get" resultMap="clusterDetailResultMap" flushCache="true">
+		SELECT c.id AS cluster_id, 
+			c.name AS cluster_name, 
+			c.relate_id AS cluster_relate_id, 
+			c.mixed AS cluster_mixed,
+			c.enabled AS cluster_enabled,
+			c.definition_subserv_names AS cluster_definition_subserv_names, 
+			c.description AS cluster_description, 
+			c.create_datetime AS cluster_create_datetime, 
+			c.create_user_login_name AS cluster_create_user_login_name, 
+			area.id AS area_id,
+			area.name AS area_name,
+			area.enabled AS area_enabled,
+			site.id AS site_id,
+			site.name AS site_name, 
+			n.id AS networking_id, 
+			n.name AS networking_name,
+			n.enabled AS networking_enabled
+		FROM tbl_cluster c, 
+			tbl_area area,
+			tbl_site site,
+			tbl_cluster_networking cn, 
+			tbl_networking n
+		WHERE c.area_id = area.id
+			AND area.site_id = site.id
+			AND c.id = cn.cluster_id
+			AND cn.networking_id = n.id	
+			AND c.id = #{id}
+	</select>
+	
+	<select id="countByAreaId" resultType="int" flushCache="true">
+		SELECT COUNT(c.id)
+		FROM tbl_cluster c
+		WHERE c.area_id = #{areaId}
+	</select>
+	
+	<select id="countByAreaIdAndName" resultType="int" flushCache="true">
+        SELECT COUNT(c.id)
+        FROM tbl_cluster c
+        WHERE c.name = #{name} 
+            AND c.area_id = #{areaId}
+    </select>
+
+	<insert id="save" parameterType="com.bsg.upm.entity.ClusterEntity">
+		INSERT INTO tbl_cluster 
+		(
+			id,
+			area_id, 
+			name,
+			relate_id,
+			mixed,
+			enabled,
+			definition_subserv_names,
+			description, 
+			create_datetime,
+			create_user_login_name
+		)
+		VALUES 
+		(
+			#{id},
+			#{area.id},
+			#{name},
+			#{relateId},
+			#{mixed},	
+			#{enabled},	
+			#{definitionSubServNames},		
+			#{description}, 	
+			#{createDateTime},
+			#{createUserLoginName}
+		)							
+	</insert>
+	
+	<insert id="saveRelativeNetworking" parameterType="com.bsg.upm.entity.ClusterEntity">
+		INSERT INTO tbl_cluster_networking
+		(
+			cluster_id,
+			networking_id
+		)
+		VALUES 
+		<foreach collection="networkings" item="item" index="index" separator=",">
+		(
+			#{id},
+			#{item.id}
+		)		
+		</foreach>				
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.ClusterEntity">
+		UPDATE tbl_cluster 
+		<set>
+			area_id = #{area.id},
+			name = #{name},
+			mixed = #{mixed},
+			definition_subserv_names = #{definitionSubServNames},
+			description = #{description}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateRelateId" parameterType="com.bsg.upm.entity.ClusterEntity">
+		UPDATE tbl_cluster 
+		<set>
+			relate_id = #{relateId}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateEnabled" parameterType="com.bsg.upm.entity.ClusterEntity">
+		UPDATE tbl_cluster 
+		<set>
+			enabled = #{enabled}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_cluster
+		WHERE id = #{id}
+	</delete>
+	
+	<delete id="removeRelativeNetworking">
+		DELETE FROM tbl_cluster_networking
+		WHERE cluster_id = #{clusterId}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.SystemConfigDao">
+	<resultMap id="ResultMap" type="com.bsg.upm.entity.SystemConfigEntity">
+		<result property="alertUdpIp" column="alert_udp_ip" />
+		<result property="alertUdpPort" column="alert_udp_port" />
+	</resultMap>
+
+	<select id="getSysConfig" resultMap="ResultMap">
+		SELECT *
+		FROM tbl_sys_config 
+		LIMIT 1 
+	</select>
+</mapper>

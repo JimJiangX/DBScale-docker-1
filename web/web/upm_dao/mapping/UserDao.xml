@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.UserDao">
+	<resultMap id="userResultMap" type="com.bsg.upm.entity.UserEntity">
+		<id property="username" column="user_username" />
+		<result property="password" column="user_password" />
+		<result property="name" column="user_name" />
+		<result property="telephone" column="user_telephone" />
+		<result property="email" column="user_email" />
+		<result property="company" column="user_company" />
+		<result property="enabled" column="user_enabled" />
+		<result property="authType" column="user_auth_type" />
+		<result property="autoApprove" column="user_auto_approve" />
+		<result property="alternateContact" column="user_alternate_contact" />
+		<result property="alternateContactTel" column="user_alternate_contact_telephone" />
+		<result property="tag" column="user_tag" />
+		<result property="createDatetime" column="user_create_datetime" />
+		<association property="userRole" resultMap="com.bsg.upm.dao.UserRoleDao.userRoleResultMap" />
+	</resultMap>
+
+	<resultMap id="userDetailResultMap" type="com.bsg.upm.entity.UserEntity" extends="userResultMap">
+		<association property="userGroup" resultMap="com.bsg.upm.dao.UserGroupDao.userGroupResultMap" />
+	</resultMap>
+	
+	<select id="list" resultMap="userDetailResultMap">
+	   SELECT u.username AS user_username, 
+			u.name AS user_name,
+			u.telephone AS user_telephone,
+			u.email AS user_email,
+			u.company AS user_company,
+			u.enabled AS user_enabled,
+			u.auth_type AS user_auth_type,
+			u.auto_approve AS user_auto_approve,
+			u.alternate_contact AS user_alternate_contact,
+			u.alternate_contact_telephone AS user_alternate_contact_telephone,
+          	u.create_datetime AS user_create_datetime,
+          	g.id AS group_id,
+			g.name AS group_name,
+			g.description AS group_description,
+          	r.code AS user_role_code,
+		  	r.name AS user_role_name,
+		  	r.level AS user_role_level,
+		 	r.data_scope AS user_role_data_scope,
+		  	r.description AS user_role_description,
+		  	area.id AS area_id,
+		  	area.name AS area_name,
+		  	area.enabled AS area_enabled,
+		  	site.id AS site_id,
+		  	site.name AS site_name
+        FROM tbl_user u 
+        LEFT JOIN tbl_user_group g ON u.user_group_id = g.id 
+        LEFT JOIN tbl_user_role r ON u.user_role_code = r.code 
+        LEFT JOIN tbl_area area ON g.area_id = area.id
+        LEFT JOIN tbl_site site ON area.site_id = site.id
+	</select>
+	
+	<!-- 根据指定条件查询用户信息 -->
+	<select id="getUser" resultMap="userDetailResultMap">
+		SELECT u.username AS user_username, 
+			u.name AS user_name,
+			u.telephone AS user_telephone,
+			u.email AS user_email,
+			u.company AS user_company,
+			u.enabled AS user_enabled,
+			u.auth_type AS user_auth_type,
+			u.auto_approve AS user_auto_approve,
+			u.alternate_contact AS user_alternate_contact,
+			u.alternate_contact_telephone AS user_alternate_contact_telephone,
+          	u.create_datetime AS user_create_datetime,
+          	g.id AS group_id,
+			g.name AS group_name,
+			g.description AS group_description,
+          	r.code AS user_role_code,
+		  	r.name AS user_role_name,
+		  	r.level AS user_role_level,
+		 	r.data_scope AS user_role_data_scope,
+		  	r.description AS user_role_description,
+		  	area.id AS area_id,
+		  	area.name AS area_name,
+		  	area.enabled AS area_enabled,
+		  	site.id AS site_id,
+		  	site.name AS site_name
+        FROM tbl_user u 
+        LEFT JOIN tbl_user_group g ON u.user_group_id = g.id 
+        LEFT JOIN tbl_user_role r ON u.user_role_code = r.code
+        LEFT JOIN tbl_area area ON g.area_id = area.id
+        LEFT JOIN tbl_site site ON area.site_id = site.id
+		WHERE (u.username = #{loginName} 
+		  	OR u.email = #{loginName} 
+		  	OR u.telephone = #{loginName})
+		<if test="password!=null and password!=''">
+			AND u.password = #{password}
+		</if>  
+	</select>
+	
+	<select id="countByUsername" resultType="int">
+	   SELECT COUNT(*)
+	   FROM tbl_user
+	   WHERE username = #{username}
+	</select>
+	
+	<select id="countByTelephone" resultType="int">
+       SELECT COUNT(*)
+       FROM tbl_user
+       WHERE telephone = #{telephone}
+    </select>
+    
+    <select id="countByEmail" resultType="int">
+       SELECT COUNT(*)
+       FROM tbl_user
+       WHERE email = #{email}
+    </select>
+    
+    <insert id="save" parameterType="com.bsg.upm.entity.UserEntity">
+        INSERT INTO tbl_user
+        (
+            username,
+            password,
+            name,
+            telephone,
+            email,
+            company,
+            user_group_id,
+            user_role_code,
+            enabled,
+            auth_type,
+            auto_approve,
+            alternate_contact,
+            alternate_contact_telephone,
+            tag,
+            create_datetime
+        ) VALUES
+        (
+            #{username},
+            #{password},
+            #{name},
+            #{telephone},
+            #{email},
+            #{company},
+            <choose>
+                <when test="userGroup!=null">
+                    #{userGroup.id},
+                </when>
+                <otherwise>
+                    null,
+                </otherwise>
+            </choose>
+            #{userRole.code},
+            #{enabled},
+            #{authType},
+            #{autoApprove},
+            #{alternateContact},
+            #{alternateContactTel},
+            #{tag},
+            #{createDatetime}
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.bsg.upm.entity.UserEntity">
+        UPDATE tbl_user
+        <set>
+            name = #{name},
+            telephone = #{telephone},
+            email = #{email},
+            company = #{company},
+		<if test="userGroup!=null">
+			user_group_id = #{userGroup.id},
+		</if>
+            user_role_code = #{userRole.code},
+            auto_approve = #{autoApprove},
+            alternate_contact = #{alternateContact},
+            alternate_contact_telephone = #{alternateContactTel}
+        </set>
+        WHERE username = #{username}
+    </update>
+    
+    <update id="updatePwd" parameterType="com.bsg.upm.entity.UserEntity">
+        UPDATE tbl_user
+        <set>
+            password = #{password}
+        </set>
+        WHERE username = #{username}
+    </update>
+    
+    <update id="updateEnabled" parameterType="com.bsg.upm.entity.UserEntity">
+        UPDATE tbl_user
+        <set>
+            enabled = #{enabled}
+        </set>
+        WHERE username = #{username}
+    </update>
+</mapper>

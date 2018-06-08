@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.ServDao">
+	<resultMap id="servResultMap" type="com.bsg.upm.entity.ServEntity">
+		<id property="id" column="serv_id" />
+		<result property="servName" column="serv_name" />
+		<result property="createSuccessFlg" column="serv_create_success_flg" />
+		<result property="createDateTime" column="serv_create_datetime" />
+		<result property="createUserLoginName" column="serv_create_user_login_name" />
+		<association property="order" resultMap="com.bsg.upm.dao.OrderDao.orderResultMap"/>
+		<collection property="tasks"
+            resultMap="com.bsg.upm.dao.TaskDao.taskResultMap" columnPrefix="task_">
+        </collection>
+	</resultMap>
+
+	<resultMap id="servDetailResultMap" type="com.bsg.upm.entity.ServEntity" extends="servResultMap">
+		<collection property="subServs"
+			resultMap="com.bsg.upm.dao.SubServDao.subServDetailResultMap" />
+	</resultMap>
+	
+	<select id="list" parameterType="java.util.Map" resultMap="servDetailResultMap" flushCache="true">
+		SELECT serv.id AS serv_id,
+			serv.serv_name,
+			serv.create_success_flg AS serv_create_success_flg,
+			serv.create_datetime AS serv_create_datetime,
+			o.id AS order_id,
+			o.owner AS order_owner,
+			o.sharding AS order_sharding,
+			temp.business_system_id, 
+			temp.business_system_name,
+			temp.subsystem_id, 
+			temp.subsystem_name,
+			dfserv.code AS definition_serv_code,
+			dfserv.name AS definition_serv_name,
+			area.id AS area_id,
+			area.name AS area_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			subserv.id AS subserv_id,
+			subserv.relate_id AS subserv_relate_id,
+			suborder.id AS suborder_id,
+			suborder.network_bandwidth AS suborder_network_bandwidth,
+			suborder.data_dir_device_type AS suborder_data_dir_device_type, 
+			suborder.data_dir_size AS suborder_data_dir_size, 
+			suborder.log_dir_device_type AS suborder_log_dir_device_type, 
+			suborder.log_dir_size AS suborder_log_dir_size,
+			suborder.mixed AS suborder_mixed,
+			suborder.high_available AS suborder_high_available,
+			dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority, 
+			dfsubserv.canbackup AS dfsubserv_canbackup,
+			dfsubserv.compose AS dfsubserv_compose, 
+			arch.id AS arch_id, 
+			arch.name AS arch_name, 
+			arch.unit_num AS arch_unit_num,
+			scale.id AS scale_id, 
+			scale.name AS scale_name,
+			sssi.id AS subserv_software_image_id, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version,  
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version,
+			port.id AS port_id,
+			port.port_value,
+			unit.id AS unit_id,
+            unit.relate_id AS unit_relate_id,
+            unit.relate_name AS unit_relate_name,
+            task.id AS task_id, 
+            task.obj_type AS task_obj_type, 
+            task.obj_id AS task_obj_id, 
+            task.obj_name AS task_obj_name, 
+            task.action_type AS task_action_type, 
+            task.start_datetime AS task_start_datetime, 
+            task.end_datetime AS task_end_datetime, 
+            task.status AS task_status, 
+            task.msg AS task_msg, 
+            task.owner AS task_owner, 
+            task.create_user_login_name AS task_create_user_login_name,
+            unit_task.id AS unit_task_id, 
+            unit_task.obj_type AS unit_task_obj_type, 
+            unit_task.obj_id AS unit_task_obj_id, 
+            unit_task.obj_name AS unit_task_obj_name, 
+            unit_task.action_type AS unit_task_action_type, 
+            unit_task.start_datetime AS unit_task_start_datetime, 
+            unit_task.end_datetime AS unit_task_end_datetime, 
+            unit_task.status AS unit_task_status, 
+            unit_task.msg AS unit_task_msg, 
+            unit_task.owner AS unit_task_owner, 
+            unit_task.create_user_login_name AS unit_task_create_user_login_name
+		FROM tbl_serv serv LEFT JOIN tbl_task task ON task.obj_id = serv.id,
+			tbl_order o LEFT JOIN (
+				SELECT system.id AS business_system_id,
+					system.name AS business_system_name,
+					subsystem.id AS subsystem_id,
+					subsystem.name AS subsystem_name,
+					subsystem_order.order_id
+				FROM tbl_business_system system,
+					tbl_business_subsystem subsystem,
+					tbl_business_subsystem_order subsystem_order
+				WHERE system.id = subsystem.business_system_id
+					AND subsystem.id = subsystem_order.business_subsystem_id
+			) temp ON temp.order_id = o.id,
+			tbl_definition_serv dfserv,
+			tbl_area area,
+			tbl_site site, 
+			tbl_subserv subserv,
+			tbl_suborder suborder,
+			tbl_definition_subserv dfsubserv,
+			tbl_definition_subserv_arch arch,
+			tbl_definition_subserv_unit_scale scale,
+			tbl_subserv_software_image sssi, 
+			tbl_definition_subserv_software dfsss,
+			tbl_port port,
+			tbl_unit unit LEFT JOIN tbl_task unit_task ON unit_task.obj_id = unit.id
+		WHERE serv.order_id = o.id
+			AND o.definition_serv_code = dfserv.code
+			AND o.area_id = area.id
+			AND area.site_id = site.id
+			AND subserv.serv_id = serv.id
+			AND subserv.suborder_id = suborder.id
+			AND suborder.order_id = o.id
+			AND suborder.definition_subserv_id = dfsubserv.id
+			AND suborder.definition_subserv_arch_id = arch.id
+			AND suborder.definition_subserv_unit_scale_id = scale.id
+			AND suborder.subserv_software_image_id = sssi.id
+			AND sssi.definition_subserv_software_id = dfsss.id
+			AND port.subserv_id = subserv.id 
+			AND unit.subserv_id = subserv.id
+		<if test="siteId !=null and siteId !=''">
+		 	AND site.id = #{siteId}
+		</if>
+		<if test="owner !=null and owner !=''">
+		 	AND o.owner = #{owner}
+		</if>
+		<if test="definitionServCode !=null and definitionServCode !=''">
+		 	AND dfserv.code = #{definitionServCode}
+		</if>
+		ORDER BY serv.create_datetime DESC, 
+		  dfsubserv.priority ASC,
+		  unit.relate_name,
+		  task.start_datetime DESC,
+		  unit_task.start_datetime DESC
+	</select>
+	
+	
+	
+	<select id="listWithoutAssociation" parameterType="java.util.Map" resultMap="servDetailResultMap" flushCache="true">
+		
+		SELECT serv.id AS serv_id,
+               serv.serv_name
+		FROM  tbl_serv serv
+	 
+	</select>
+	
+	
+	
+	
+	<select id="listName" resultMap="servResultMap" flushCache="true">
+		SELECT serv.id, serv.serv_name
+		FROM tbl_serv serv, 
+			tbl_order o,
+			tbl_area a
+		WHERE serv.order_id = o.id
+			AND o.area_id = a.id
+			AND a.site_id = #{siteId} 
+			AND o.definition_serv_code = #{definitionServCode}
+		<if test="owner!=null and owner !=''">
+		 	AND o.owner = #{owner}
+		</if>
+	</select>
+	
+	<select id="getBase" resultMap="servDetailResultMap" flushCache="true">
+		SELECT serv.id AS serv_id,
+			serv.serv_name,
+			serv.create_success_flg AS serv_create_success_flg,
+			o.id AS order_id,
+			o.serv_name AS order_serv_name,
+			o.owner AS order_owner,
+			o.sharding AS order_sharding,
+			o.associate_order_id AS order_associate_order_id,
+			area.id AS area_id,
+			area.name AS area_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			subserv.id AS subserv_id,
+			subserv.relate_id AS subserv_relate_id,
+			port.id AS port_id,
+            port.port_value,
+			suborder.id AS suborder_id,
+			suborder.mixed AS suborder_mixed,
+			suborder.high_available AS suborder_high_available,
+			dfsubserv.id AS dfsubserv_id,
+            dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.name AS dfsubserv_name,
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority,
+			dfsubserv.canbackup AS dfsubserv_canbackup,
+			dfsubserv.compose AS dfsubserv_compose, 
+			unit.id AS unit_id,
+			unit.relate_id AS unit_relate_id,
+			unit.relate_name AS unit_relate_name,
+			dfserv.code AS definition_serv_code,
+			dfserv.name AS definition_serv_name
+		FROM tbl_serv serv,
+			tbl_order o,
+			tbl_area area,
+			tbl_site site,
+			tbl_subserv subserv,
+			tbl_port port,
+			tbl_suborder suborder,
+			tbl_definition_subserv dfsubserv,
+			tbl_unit unit,
+			tbl_definition_serv dfserv
+		WHERE serv.order_id = o.id
+			AND o.area_id = area.id
+			AND area.site_id = site.id
+			AND subserv.serv_id = serv.id
+			AND port.subserv_id = subserv.id
+			AND subserv.suborder_id = suborder.id
+			AND suborder.order_id = o.id
+			AND suborder.definition_subserv_id = dfsubserv.id
+			AND unit.subserv_id = subserv.id
+			AND o.definition_serv_code = dfserv.code
+			AND serv.id = #{id}
+	</select>
+	
+	<select id="get" resultMap="servDetailResultMap" flushCache="true">
+		SELECT serv.id AS serv_id,
+			serv.serv_name,
+			serv.create_success_flg AS serv_create_success_flg,
+			serv.create_datetime AS serv_create_datetime,
+			o.id AS order_id,
+			o.serv_name AS order_serv_name,
+			o.owner AS order_owner,
+			o.type AS order_type,
+			o.status AS order_status,
+			o.sharding AS order_sharding,
+			o.associate_order_id AS order_associate_order_id,
+			temp.business_system_id, 
+			temp.business_system_name,
+			temp.subsystem_id, 
+			temp.subsystem_name,
+			dfserv.code AS definition_serv_code,
+			dfserv.name AS definition_serv_name,
+			area.id AS area_id,
+			area.name AS area_name,
+			site.id AS site_id,
+			site.name AS site_name,
+			subserv.id AS subserv_id,
+			subserv.relate_id AS subserv_relate_id,
+			suborder.id AS suborder_id,
+			suborder.network_bandwidth AS suborder_network_bandwidth,
+			suborder.data_dir_device_type AS suborder_data_dir_device_type, 
+			suborder.data_dir_size AS suborder_data_dir_size, 
+			suborder.log_dir_device_type AS suborder_log_dir_device_type, 
+			suborder.log_dir_size AS suborder_log_dir_size,
+			suborder.mixed AS suborder_mixed,
+			suborder.high_available AS suborder_high_available,
+			dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name, 
+			dfsubserv.type AS dfsubserv_type, 
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.priority AS dfsubserv_priority, 
+			dfsubserv.canbackup AS dfsubserv_canbackup,
+			dfsubserv.compose AS dfsubserv_compose, 
+			arch.id AS arch_id, 
+			arch.name AS arch_name, 
+			arch.code AS arch_code, 
+			arch.type AS arch_type, 
+			arch.unit_num AS arch_unit_num,
+			scale.id AS scale_id, 
+			scale.name AS scale_name,
+			scale.cpu_num AS scale_cpu_num, 
+			scale.mem_size AS scale_mem_size,
+			sssi.id AS subserv_software_image_id, 
+			sssi.relate_id AS subserv_software_image_relate_id, 
+			sssi.patch_version AS subserv_software_image_patch_version, 
+			sssi.build_version AS subserv_software_image_build_version, 
+			sssi.enabled AS subserv_software_image_enabled, 
+			dfsss.id AS df_subserv_software_id, 
+			dfsss.definition_subserv_name,
+			dfsss.major_version AS df_subserv_software_major_version, 
+			dfsss.minor_version AS df_subserv_software_minor_version,
+			unit.id AS unit_id,
+			unit.relate_id AS unit_relate_id,
+			unit.relate_name AS unit_relate_name,
+			port.id AS port_id,
+			port.port_value,
+			task.id AS task_id, 
+            task.obj_type AS task_obj_type, 
+            task.obj_id AS task_obj_id, 
+            task.obj_name AS task_obj_name, 
+            task.action_type AS task_action_type, 
+            task.start_datetime AS task_start_datetime, 
+            task.end_datetime AS task_end_datetime, 
+            task.status AS task_status, 
+            task.msg AS task_msg, 
+            task.owner AS task_owner, 
+            task.create_user_login_name AS task_create_user_login_name,
+            unit_task.id AS unit_task_id, 
+            unit_task.obj_type AS unit_task_obj_type, 
+            unit_task.obj_id AS unit_task_obj_id, 
+            unit_task.obj_name AS unit_task_obj_name, 
+            unit_task.action_type AS unit_task_action_type, 
+            unit_task.start_datetime AS unit_task_start_datetime, 
+            unit_task.end_datetime AS unit_task_end_datetime, 
+            unit_task.status AS unit_task_status, 
+            unit_task.msg AS unit_task_msg, 
+            unit_task.owner AS unit_task_owner, 
+            unit_task.create_user_login_name AS unit_task_create_user_login_name
+		FROM tbl_serv serv LEFT JOIN tbl_task task ON task.obj_id = serv.id,
+			tbl_order o LEFT JOIN (
+				SELECT system.id AS business_system_id,
+					system.name AS business_system_name,
+					subsystem.id AS subsystem_id,
+					subsystem.name AS subsystem_name,
+					subsystem_order.order_id
+				FROM tbl_business_system system,
+					tbl_business_subsystem subsystem,
+					tbl_business_subsystem_order subsystem_order
+				WHERE system.id = subsystem.business_system_id
+					AND subsystem.id = subsystem_order.business_subsystem_id
+			) temp ON temp.order_id = o.id,
+			tbl_definition_serv dfserv,
+			tbl_area area,
+			tbl_site site, 
+			tbl_subserv subserv,
+			tbl_suborder suborder,
+			tbl_definition_subserv dfsubserv,
+			tbl_definition_subserv_arch arch,
+			tbl_definition_subserv_unit_scale scale,
+			tbl_subserv_software_image sssi, 
+			tbl_definition_subserv_software dfsss,
+			tbl_port port,
+			tbl_unit unit LEFT JOIN tbl_task unit_task ON unit_task.obj_id = unit.id
+		WHERE serv.order_id = o.id
+			AND o.definition_serv_code = dfserv.code
+			AND o.area_id = area.id
+			AND area.site_id = site.id
+			AND subserv.serv_id = serv.id
+			AND subserv.suborder_id = suborder.id
+			AND suborder.order_id = o.id
+			AND suborder.definition_subserv_id = dfsubserv.id
+			AND suborder.definition_subserv_arch_id = arch.id
+			AND suborder.definition_subserv_unit_scale_id = scale.id
+			AND suborder.subserv_software_image_id = sssi.id
+			AND sssi.definition_subserv_software_id = dfsss.id
+			AND port.subserv_id = subserv.id 	
+			AND unit.subserv_id = subserv.id
+			AND serv.id = #{id}
+		ORDER BY dfsubserv.priority ASC, 
+		  unit.relate_name, 
+		  task.start_datetime DESC,
+          unit_task.start_datetime DESC
+	</select>
+	
+	<select id="getByOrderId" resultMap="servDetailResultMap" flushCache="true">
+		SELECT serv.id AS serv_id,
+			serv.serv_name,
+			o.id AS order_id,
+			o.owner AS order_owner,
+			o.type AS order_type,
+			o.sharding AS order_sharding,
+			subserv.id AS subserv_id,
+			subserv.relate_id AS subserv_relate_id,
+			suborder.id AS suborder_id,
+			suborder.mixed AS suborder_mixed,
+			suborder.high_available AS suborder_high_available,
+			dfsubserv.id AS dfsubserv_id, 
+			dfsubserv.name AS dfsubserv_name,
+			dfsubserv.port_key AS dfsubserv_port_key, 
+			dfsubserv.compose AS dfsubserv_compose
+		FROM tbl_serv serv,
+			tbl_order o,
+			tbl_subserv subserv,
+			tbl_suborder suborder,
+			tbl_definition_subserv dfsubserv
+		WHERE serv.order_id = o.id
+			AND subserv.serv_id = serv.id
+			AND subserv.suborder_id = suborder.id
+			AND suborder.order_id = o.id
+			AND suborder.definition_subserv_id = dfsubserv.id
+			AND o.id = #{orderId}
+	</select>
+	
+	<select id="countBySiteId" resultType="int" flushCache="true">
+		SELECT COUNT(serv.id)
+		FROM tbl_serv serv, 
+			tbl_order o,
+			tbl_area area
+		WHERE serv.order_id = o.id
+			AND o.area_id = area.id
+			AND area.site_id = #{siteId}
+	</select>
+	
+	<select id="countByOrderId" resultType="int" flushCache="true">
+	   SELECT COUNT(id) 
+	   FROM tbl_serv 
+	   WHERE order_id = #{orderId}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.ServEntity">
+		INSERT INTO tbl_serv
+		(
+			id,
+			order_id,
+			serv_name,
+			create_success_flg,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUES
+		(
+			#{id},
+			#{order.id},
+			#{servName},
+			#{createSuccessFlg},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<insert id="saveRelativeSubServ" parameterType="com.bsg.upm.entity.ServEntity">
+		INSERT INTO tbl_subserv
+		(
+			id,
+			serv_id,
+			relate_id,
+			suborder_id
+		)
+		VALUE
+		<foreach collection="subServs" item="subServ" index="index" separator=",">
+		(
+			#{subServ.id},
+			#{id},
+			#{subServ.relateId},
+			#{subServ.subOrder.id}
+		)		
+		</foreach>	
+	</insert>
+	
+	<insert id="saveRelativeSubServUnit" parameterType="com.bsg.upm.entity.ServEntity">
+		INSERT INTO tbl_unit
+		(
+			id,
+			relate_id,
+			relate_name,
+			subserv_id
+		)
+		VALUE
+		<foreach collection="subServs" item="subServ" separator=",">
+			<foreach collection="subServ.units" item="unit" separator=",">
+				(
+					#{unit.id},
+					#{unit.relateId},
+					#{unit.relateName},
+					#{subServ.id}
+				)	
+			</foreach>
+		</foreach>	
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.ServEntity">
+		UPDATE tbl_serv
+		<set>
+			order_id = #{order.id}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateCreateSuccessFlg" parameterType="com.bsg.upm.entity.ServEntity">
+		UPDATE tbl_serv 
+		<set>
+			create_success_flg = #{createSuccessFlg}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_serv 
+		WHERE id = #{id}
+	</delete>
+	
+	<delete id="removeRelativeConfig">
+		DELETE FROM tbl_subserv_config
+		WHERE serv_id = #{servId}
+	</delete>
+</mapper>

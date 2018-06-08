@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionServDao">
+	<resultMap id="dfServResultMap" type="com.bsg.upm.entity.DefinitionServEntity">
+		<id property="code" column="dfserv_code" />
+		<result property="name" column="dfserv_name" />
+		<result property="description" column="dfserv_description" />
+	</resultMap>
+	
+	<select id="listName" parameterType="java.util.Map" resultMap="dfServResultMap" flushCache="true">
+		SELECT code AS dfserv_code, 
+		  name AS dfserv_name, 
+		  description AS dfserv_description
+		FROM tbl_definition_serv
+		WHERE enabled = 1
+	</select>	
+</mapper>

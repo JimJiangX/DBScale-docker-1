@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.bsg.upm.dao.SanVendorDao">
+	<resultMap id="sanVendorResultMap" type="com.bsg.upm.entity.SanVendorEntity">
+		<id property="id" column="san_vendor_id" />
+		<result property="code" column="san_vendor_code" />
+		<result property="name" column="san_vendor_name" />
+		<result property="version" column="san_vendor_version" />
+	</resultMap>
+	
+	 <select id="list" resultMap="sanVendorResultMap" flushCache="true">
+		SELECT id AS san_vendor_id,
+			code AS san_vendor_code,
+			name AS san_vendor_name,
+			version AS san_vendor_version
+		FROM tbl_san_vendor
+	</select>
+	
+	 <select id="get" resultMap="sanVendorResultMap" flushCache="true">
+		SELECT id AS san_vendor_id,
+			code AS san_vendor_code,
+			name AS san_vendor_name,
+			version AS san_vendor_version
+		FROM tbl_san_vendor
+		WHERE id = #{id}
+	</select>
+	
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.bsg.upm.dao.SanDao">
+	<resultMap id="sanResultMap" type="com.bsg.upm.entity.SanEntity">
+		<id property="id" column="san_id" />
+		<result property="name" column="san_name" />
+		<result property="relateId" column="san_relate_id" />
+		<result property="description" column="san_description" />
+		<result property="createDateTime" column="san_create_datetime" />
+		<result property="createUserLoginName" column="san_create_user_login_name" />
+		<result property="storage" column="san_relate_id" />
+		<association property="sanVendor"
+			resultMap="com.bsg.upm.dao.SanVendorDao.sanVendorResultMap" />
+		<association property="site"
+			resultMap="com.bsg.upm.dao.SiteDao.siteResultMap" />
+	</resultMap>
+	
+	<select id="list" resultMap="sanResultMap" flushCache="true">
+		SELECT san.id AS san_id,
+			san.name AS san_name,
+			san.relate_id AS san_relate_id,
+			san.description AS san_description,
+			san.create_datetime AS san_create_datetime,
+			san.create_user_login_name AS san_create_user_login_name,
+			vendor.id AS san_vendor_id,
+			vendor.code AS san_vendor_code,
+			vendor.name AS san_vendor_name,
+			vendor.version AS san_vendor_version,
+			site.id AS site_id,
+			site.name AS site_name
+		FROM tbl_san san,
+			tbl_san_vendor vendor,
+			tbl_site site
+		WHERE san.san_vendor_id = vendor.id
+			AND san.site_id = site.id
+			AND site.id = #{siteId}
+	</select>
+	
+	<select id="listName" resultMap="sanResultMap" flushCache="true">
+       SELECT san.id AS san_id,
+            san.name AS san_name,
+            san.description AS san_description
+        FROM tbl_san san
+        WHERE san.site_id = #{siteId}
+        ORDER BY san.name
+    </select>
+	
+	<select id="get" resultMap="sanResultMap" flushCache="true">
+		SELECT san.id AS san_id,
+			san.name AS san_name,
+			san.relate_id AS san_relate_id,
+			san.description AS san_description,
+			san.create_datetime AS san_create_datetime,
+			san.create_user_login_name AS san_create_user_login_name,
+			vendor.id AS san_vendor_id,
+			vendor.code AS san_vendor_code,
+			vendor.name AS san_vendor_name,
+			vendor.version AS san_vendor_version,
+			site.id AS site_id,
+			site.name AS site_name
+		FROM tbl_san san,
+			tbl_san_vendor vendor,
+			tbl_site site
+		WHERE san.san_vendor_id = vendor.id
+			AND san.site_id = site.id
+			AND san.id = #{id}		
+	</select>
+	
+	<select id="countBySiteId" resultType="int" flushCache="true">
+        SELECT COUNT(id)
+        FROM tbl_san
+        WHERE site_id = #{siteId}
+    </select>
+
+	<select id="countBySiteIdAndName" resultType="int" flushCache="true">
+		SELECT COUNT(id)
+		FROM tbl_san
+		WHERE site_id = #{siteId}
+			AND name = #{name}
+	</select>
+
+	<insert id="save" parameterType="com.bsg.upm.entity.SanEntity">
+		INSERT INTO tbl_san
+		(
+			id,
+			site_id,
+			name,
+			relate_id,
+			description,
+			san_vendor_id,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+		(
+			#{id},
+			#{site.id},
+			#{name},
+			#{relateId},
+			#{description},
+			#{sanVendor.id},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+
+	<update id="updateRelateId" parameterType="com.bsg.upm.entity.SanEntity">
+		UPDATE tbl_san
+		<set>
+			relate_id = #{relateId}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM tbl_san
+		WHERE id = #{id}
+	</delete>
+</mapper>

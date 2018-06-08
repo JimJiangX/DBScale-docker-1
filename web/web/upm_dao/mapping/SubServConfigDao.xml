@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.SubServConfigDao">
+	<resultMap id="subServConfigResultMap" type="com.bsg.upm.entity.SubServConfigEntity">
+		<id property="id" column="id" />
+		<result property="servId" column="serv_id" />
+		<result property="subServType" column="subserv_type" />
+		<result property="content" column="content" />
+	</resultMap>
+	
+	<select id="getByServIdAndSubServType" resultMap="subServConfigResultMap" flushCache="true">
+		SELECT id,
+			serv_id,
+			subserv_type,
+			content
+		FROM tbl_subserv_config 
+		WHERE serv_id = #{servId}
+	   	AND subserv_type = #{subServType}
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.SubServConfigEntity">
+		INSERT INTO tbl_subserv_config
+		(
+			id,
+			serv_id,
+			subserv_type,
+			content
+		)
+		VALUE
+		(
+			#{id},
+			#{servId},
+			#{subServType},
+			#{content}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.SubServConfigEntity">
+		UPDATE tbl_subserv_config
+		<set>
+			content = #{content}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+</mapper>

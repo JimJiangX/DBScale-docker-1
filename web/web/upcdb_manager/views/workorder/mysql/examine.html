@@ -1,0 +1,327 @@
+<div>
+    <!-- widget content -->
+    <div class="widget-body">
+
+        <form  id="checkout-form" class="smart-form">
+            <header style="padding:10px 0;">
+                <h2>
+                    工单审批
+                    <button class="close"  data-dismiss="modal">
+                        x
+                    </button>
+                </h2>
+
+            </header>
+            <fieldset style="padding: 8px 14px 0px;">
+            	<div id="dialog-alert">
+            	</div>
+                <div class="row">
+                    <label class="label col" style="width: 120px;">站点</label>
+                    <section class="col" style="width: 180px;margin-bottom: 5px;">
+                        <label class="input">
+                            <input type="text" id="siteName" disabled class="required"/>
+                        </label>
+                    </section>
+                    <label class="label col" style="width: 120px;">区域</label>
+                    <section class="col" style="width: 180px;margin-bottom: 5px;">
+                    	<label class="input">
+                            <input type="text" id="areaName" disabled class="required"/>
+                        </label>
+                    </section>
+                    <label class="label col" style="width: 120px;">用户</label>
+                    <section class="col" style="width: 180px;margin-bottom: 5px;">
+                        <label class="input">
+                            <input type="text" id="owner" disabled class="required"/>
+                        </label>
+                    </section>
+                </div>
+                <div class="row">
+                    <label class="label col" style="width: 120px;">系统</label>
+                    <section class="col" style="width: 180px;margin-bottom: 5px;">
+                        <label class="input">
+                            <input type="text"  id="businessSystemName"  disabled class="required"/>
+                        </label>
+                    </section>
+                    <label class="label col" style="width: 120px;">子系统</label>
+                    <section class="col" style="width: 180px;margin-bottom: 5px;">
+                        <label class="input">
+                            <input type="text"  id="businessSubSystemName" disabled class="required"/>
+                        </label>
+                    </section>
+                    <label class="label col" style="width: 120px;">服务名称</label>
+                    <section class="col" style="width: 180px;margin-bottom: 5px;">
+                        <label class="input">
+                            <input type="text"  id="servName" disabled class="required">
+                        </label>
+                    </section>
+                </div>
+            </fieldset>
+            <header style="padding:0px 0;">
+                <h6 id="upsqlTitle"></h6>
+            </header>
+            <fieldset style="padding: 8px 14px 0px;">
+            	<div class="row">
+	            	<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+			      	<label class="input">
+					  	<input type="text" id="upsqlArchName" disabled class="required"/>
+					  </label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+						<label class="input">
+					    	<input type="text"  id="upsqlSoftwareImageName" disabled class="required"/>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="upsqlMixed" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">数据磁盘大小</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+					    <label class="input">
+							<input type="text" id="upsqlDataSize" disabled class="required"/>
+					  	</label>
+					</section>
+					<label class="label col" style="width: 120px;">数据磁盘类型</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+					    <label class="input">
+							<input type="text" id="upsqlDataType" disabled class="required"/>
+					  	</label>
+					</section>
+					<label class="label col" style="width: 120px;">规模</label>
+							<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="upsqlScaleName" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">日志磁盘大小</label>
+							<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="upsqlLogSize" disabled class="required"/>
+					  </label>
+					</section>
+					<label class="label col" style="width: 120px;">日志磁盘类型</label>
+							<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="upsqlLogType" disabled class="required"/>
+					  </label>
+					</section>
+					<label class="label col" style="width: 120px;">分片数量</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="shardingCount"
+							disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">带宽</label>
+				    <section class="col" style="width: 180px;margin-bottom: 5px;">
+					  <label class="input">
+					  	<input type="text" id="upsqlNetworkBandwidth" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+            </fieldset>
+            <!-- <header style="padding:0px 0;">
+                <h6 id="upproxyTitle"></h6>
+            </header>
+            <fieldset style="padding: 8px 14px 0px;">
+            	<div class="row">
+	            	<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+			      	<label class="input">
+					  	<input type="text" id="upproxyArchName" disabled class="required"/>
+					  </label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+						<label class="input">
+					    	<input type="text"  id="upproxySoftwareImageName" disabled class="required"/>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="upproxyMixed" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+						<label class="input">
+						  	<input type="text" id="upproxyScaleName" disabled class="required"/>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">带宽</label>
+							<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="upproxyNetworkBandwidth" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+            </fieldset>
+            <header style="padding:0px 0;">
+                <h6 id="smTitle"></h6>
+            </header>
+            <fieldset style="padding: 8px 14px 0px;">
+            	<div class="row">
+	            	<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+			      	<label class="input">
+					  	<input type="text" id="smArchName" disabled class="required"/>
+					  </label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+						<label class="input">
+					    	<input type="text"  id="smSoftwareImageName" disabled class="required"/>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+					      	<label class="input">
+					  	<input type="text" id="smMixed" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+						<label class="input">
+					  		<input type="text" id="smScaleName" disabled class="required"/>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px;margin-bottom: 5px;">
+					  <label class="input">
+					  	<input type="text" id="smNetworkBandwidth" disabled class="required"/>
+					  </label>
+					</section>
+				</div>
+				
+            </fieldset> -->
+            <header style="padding:0px 0;">
+                <h6>审批拒绝理由</h6>
+            </header>
+            <fieldset style="padding: 8px 14px 0px;">
+            	<label class="textarea textarea-resizeable">
+            		<textarea rows="3" id="refuseTextarea" class="custom-scroll"></textarea>
+            	</label>
+            </fieldset>
+        </form>
+
+
+    </div>
+    <!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+        取消
+    </button>
+    <button type="button" class="btn btn-warning btn-sm" id="refusebtn">
+        拒绝
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="submitbtn">
+        通过
+    </button>
+</div>
+
+<script>
+	var orderID;
+    pageSetUp();
+    
+    var area, $area;
+
+    var pagefunction = function() {
+        s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        orderID = rowData.id;
+        sendGet("/" + getProjectName() + "/v1.0/orders/"+rowData.id,fillForm,DialogAlert,null);
+    };
+
+    var shardingCounts = 0;
+    
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function fillForm(data){
+    	var orderData=data['data'];
+        $('#siteName').val(orderData.siteName);
+        $('#areaName').val(orderData.areaName);
+        $('#businessSystemName').val(orderData.businessSystemName);
+        $('#businessSubSystemName').val(orderData.businessSubSystemName);
+        $('#owner').val(orderData.owner);
+        $('#servName').val(orderData.servName);
+        
+        $.each(orderData.subOrders, function(index, order){
+        	if(order.type == "upproxy"){
+        		$('#upproxyTitle').text("UPSQL代理");
+        		$('#upproxyArchName').val(order.archName);
+        		$('#upproxySoftwareImageName').val(order.softwareImageName);
+        		$('#upproxyScaleName').val(order.scaleName);
+        		$('#upproxyNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+
+        		$('#upproxyMixed').val(order.mixed?"混合":"非混合");
+        	} else if(order.type == "mysql"){
+        		shardingCounts++;
+        		$('#upsqlTitle').text("MYSQL数据库");
+        		$('#upsqlArchName').val(order.archName);
+        		$('#upsqlSoftwareImageName').val(order.softwareImageName);
+        		$('#upsqlScaleName').val(order.scaleName);
+        		$('#upsqlNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#upsqlDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#upsqlDataType').val(order.dataDirTypeText);
+        		$('#upsqlLogSize').val(BytesToSize(order.logDirSize));
+        		$('#upsqlLogType').val(order.logDirTypeText);
+        		$('#upsqlMixed').val(order.mixed?"混合":"非混合");
+        	} else if(order.type == "switch_manager"){
+        		$('#smTitle').text("UPSQL高可用");
+        		$('#smArchName').val(order.archName);
+        		$('#smSoftwareImageName').val(order.softwareImageName);
+        		$('#smScaleName').val(order.scaleName);
+        		$('#smNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+
+        		$('#smMixed').val(order.mixed?"混合":"非混合");
+        	}
+        });
+        
+        if(orderData.sharding){
+        	$("#shardingCount").val(shardingCounts);
+        }else{
+        	shardingCounts = "无";
+        	$("#shardingCount").val(shardingCounts);
+        }
+    }
+    
+    $('#refusebtn').click(function() {
+    	DialogAlertClear();
+    	if($('#refuseTextarea').val() == ""){
+     	   DialogAlert('请输入拒绝工单申请理由');
+     	   return;
+        }
+        var jsonData={};
+   		jsonData.status = "unapprove";
+   		jsonData.msg = $('#refuseTextarea').val();
+       sendPut("/" + getProjectName() + "/v1.0/orders/"+orderID+"/approve", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+    });
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	var jsonData={};
+    	jsonData.status = "approved";
+    	jsonData.msg = "";
+    	sendPut("/" + getProjectName() + "/v1.0/orders/"+orderID+"/approve", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+    });
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/orders?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+</script>

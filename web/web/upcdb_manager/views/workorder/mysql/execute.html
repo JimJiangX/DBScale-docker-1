@@ -1,0 +1,476 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form id="checkout-form" class="smart-form">
+			<header style="padding: 10px 0;">
+				<h2>
+					工单执行
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">站点</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="siteName"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">区域</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="areaName" name="areaName">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">用户</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="owner"
+							disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">系统</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="businessSystemName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">子系统</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="businessSubSystemName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">服务名称</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="servName"
+							disabled class="required">
+						</label>
+					</section>
+				</div>
+			</fieldset>
+			<header style="padding: 0px 0;">
+				<h6 id="upsqlTitle"></h6>
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div class="row">
+					<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upsqlArchName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="upsqlSoftwareImageName" name="upsqlSoftwareImageName">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="upsqlMixed" name="upsqlMixed">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">数据磁盘大小</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upsqlDataSize" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">数据磁盘类型</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select disabled class="required "
+							id="upsqlDataType" name="upsqlDataType">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upsqlScaleName" disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">日志磁盘大小</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="upsqlLogSize"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">日志磁盘类型</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select disabled class="required "
+							id="upsqlLogType" name="upsqlLogType">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分片数量</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="shardingCount"
+							disabled class="required" />
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upsqlNetworkBandwidth" disabled class="required" />
+						</label>
+					</section>
+				</div>
+			</fieldset>
+			<!-- <header style="padding: 0px 0;">
+				<h6 id="upproxyTitle"></h6>
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div class="row">
+					<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upproxyArchName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="upproxySoftwareImageName" name="upproxySoftwareImageName">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="upproxyMixed" name="upproxyMixed">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upproxyScaleName" disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="upproxyNetworkBandwidth" disabled class="required" />
+						</label>
+					</section>
+				</div>
+			</fieldset>
+			<header style="padding: 0px 0;">
+				<h6 id="smTitle"></h6>
+			</header>
+			<fieldset style="padding: 8px 14px 0px;">
+				<div class="row">
+					<label class="label col" style="width: 120px;">架构</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="smArchName"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">版本</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="smSoftwareImageName" name="smSoftwareImageName">
+								<option value="">请选择版本</option>
+						</select>
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">分配策略</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="select"> <select class="required "
+							id="smMixed" name="smMixed">
+								<option value="">请选择区域</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col" style="width: 120px;">规模</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text" id="smScaleName"
+							disabled class="required" />
+						</label>
+					</section>
+					<label class="label col" style="width: 120px;">带宽</label>
+					<section class="col" style="width: 180px; margin-bottom: 5px;">
+						<label class="input"> <input type="text"
+							id="smNetworkBandwidth" disabled class="required" />
+						</label>
+					</section>
+				</div>
+			</fieldset> -->
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="button" class="btn btn-primary btn-sm" id="submitbtn">
+		执行</button>
+</div>
+
+<script>
+    pageSetUp();
+    
+    var areaName, $areaName;
+    var upproxySoftwareImageName, $upproxySoftwareImageName;
+    var upsqlSoftwareImageName, $upsqlSoftwareImageName;
+    var smSoftwareImageName, $smSoftwareImageName;
+    var upsqlDataType, $upsqlDataType;
+    var upsqlLogType, $upsqlLogType;
+    var upproxyMixed, $upproxyMixed;
+    var upsqlMixed, $upsqlMixed;
+    var smMixed, $smMixed;
+    var pagefunction = function() {
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        sendGet("/" + getProjectName() + "/v1.0/orders/"+rowData.id,fillForm,DialogAlert,null);  
+    };
+
+    var shardingCounts = 0;
+    
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    function fillForm(data){
+    	var orderData=data['data'];
+        $('#siteName').val(orderData.siteName);
+        $('#businessSystemName').val(orderData.businessSystemName);
+        $('#businessSubSystemName').val(orderData.businessSubSystemName);
+        $('#owner').val(orderData.owner);
+        $('#servName').val(orderData.servName);
+        
+        sendGet("/" + getProjectName() + "/v1.0/selections/areas?site="+getSession("siteId")+"&enabled=1",fillSelect(orderData.areaId, orderData.areaName, 'areaName'),DialogAlert,null);
+        sendGet("/" + getProjectName() + "/v1.0/selections/storage_types",fillSelectType(orderData.subOrders),DialogAlert,null);
+        
+        var mixData = [
+        	{
+                "id": false,
+                "text": "非混合"
+            },
+            {
+            	"id": true,
+                "text": "混合"
+            }
+        ];        
+        
+        $.each(orderData.subOrders, function(index, order){
+        	if(order.type == "upproxy"){
+        		$('#upproxyTitle').text("UPSQL代理");
+        		$('#upproxyArchName').val(order.archName);
+        		$('#upproxyScaleName').val(order.scaleName);
+        		$('#upproxyNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#upproxyDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#upproxyLogSize').val(BytesToSize(order.logDirSize));
+        		fillSelect(order.mixed, order.mixed, 'upproxyMixed')(mixData);
+        		
+        		sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=upproxy&enabled=1",fillSelect(order.softwareImageId, order.softwareImageName, 'upproxySoftwareImageName'),DialogAlert,null);
+        	} else if(order.type == "mysql"){
+        		shardingCounts++;
+        		$('#upsqlTitle').text("MYSQL数据库");
+        		$('#upsqlArchName').val(order.archName);
+        		$('#upsqlScaleName').val(order.scaleName);
+        		$('#upsqlNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#upsqlDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#upsqlLogSize').val(BytesToSize(order.logDirSize));
+        		fillSelect(order.mixed, order.mixed, 'upsqlMixed')(mixData);
+        		
+        		sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=mysql&enabled=1",fillSelect(order.softwareImageId, order.softwareImageName, 'upsqlSoftwareImageName'),DialogAlert,null);
+        	} else if(order.type == "switch_manager"){
+        		$('#smTitle').text("UPSQL高可用");
+        		$('#smArchName').val(order.archName);
+        		$('#smScaleName').val(order.scaleName);
+        		$('#smNetworkBandwidth').val(order.networkBandwidth == 0 ? '无限制' : order.networkBandwidth);
+        		$('#smDataSize').val(BytesToSize(order.dataDirSize));
+        		$('#smLogSize').val(BytesToSize(order.logDirSize));
+        		fillSelect(order.mixed, order.mixed, 'smMixed')(mixData);
+        		
+        		sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=switch_manager&enabled=1",fillSelect(order.softwareImageId, order.softwareImageName, 'smSoftwareImageName'),DialogAlert,null);
+        	}
+        });
+        if(orderData.sharding){
+        	$("#shardingCount").val(shardingCounts);
+        }else{
+        	shardingCounts = "无";
+        	$("#shardingCount").val(shardingCounts);
+        }
+    }
+    
+    function fillSelectType(subOrders){
+    	return function(data){
+    		$.each(subOrders, function(index, order){
+        		fillSelect(order.dataDirType, order.dataDirTypeText, order.type+'DataType')(data);
+        		fillSelect(order.logDirType, order.logDirTypeText, order.type+'LogType')(data);
+        	});
+    	}
+    }
+    function fillSelect(id, name, switchType){
+    	return function(data){
+    		var flg = false;
+    		$.each(data, function(k, v){
+    			if(v.id == id){
+    				flg = true;
+    			}
+    		});
+    		if(!flg){
+    			data.push({id: id, text: name});
+    		}
+    		switch(switchType){
+    		case 'areaName':
+    			$areaName = $("#areaName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			areaName = $areaName[0].selectize;
+    			areaName.setValue([id]);
+    			break;
+    		case 'upproxySoftwareImageName':
+    			$upproxySoftwareImageName = $("#upproxySoftwareImageName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upproxySoftwareImageName = $upproxySoftwareImageName[0].selectize;
+    			upproxySoftwareImageName.setValue([id]);
+    			break;
+    		case 'upsqlSoftwareImageName':
+    			$upsqlSoftwareImageName = $("#upsqlSoftwareImageName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upsqlSoftwareImageName = $upsqlSoftwareImageName[0].selectize;
+    			upsqlSoftwareImageName.setValue([id]);
+    			break;
+    		case 'smSoftwareImageName':
+    			$smSoftwareImageName = $("#smSoftwareImageName").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			smSoftwareImageName = $smSoftwareImageName[0].selectize;
+    			smSoftwareImageName.setValue([id]);
+    			break;
+    		case 'upsqlDataType':
+    			$upsqlDataType = $("#upsqlDataType").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upsqlDataType = $upsqlDataType[0].selectize;
+    			upsqlDataType.setValue([id]);
+    			break;
+    		case 'upsqlLogType':
+    			$upsqlLogType = $("#upsqlLogType").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upsqlLogType = $upsqlLogType[0].selectize;
+    			upsqlLogType.setValue([id]);
+    			break;
+    		case 'upproxyMixed':
+    			$upproxyMixed = $("#upproxyMixed").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upproxyMixed = $upproxyMixed[0].selectize;
+    			upproxyMixed.setValue([id]);
+    			break;
+    		case 'upsqlMixed':
+    			$upsqlMixed = $("#upsqlMixed").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			upsqlMixed = $upsqlMixed[0].selectize;
+    			upsqlMixed.setValue([id]);
+    			break;
+    		case 'smMixed':
+    			$smMixed = $("#smMixed").selectize({
+            		valueField: 'id',
+        			labelField: 'text',
+        			searchField: 'text',
+            		create: false,
+            		sortField: {field: 'text'},
+            		options: data
+            	});
+    			smMixed = $smMixed[0].selectize;
+    			smMixed.setValue([id]);
+    			break;
+    		default:
+    		}
+    	}
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	var jsonData={};
+    	jsonData.area = $('#areaName').val();
+    	jsonData.definitionSubServs = [
+    		{
+    		      "name": "mysql",
+    		      "mixed": $('#upproxyMixed').text() == '混合' ? true : false
+    		    }
+    	];
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var rowData = $("#jqgrid").jqGrid('getRowData',s);
+        var orderID = rowData.id;
+    	sendPut("/" + getProjectName() + "/v1.0/orders/"+orderID+"/execution", postSuccess, DialogAlert,JSON.stringify(jsonData),null);
+    });
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/orders?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+</script>

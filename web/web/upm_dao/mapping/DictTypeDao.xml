@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DictTypeDao">
+	<resultMap id="ResultMap" type="com.bsg.upm.entity.DictTypeEntity">
+		<id property="code" column="code" />
+		<result property="name" column="name" />
+		<collection property="dicts" ofType="com.bsg.upm.entity.DictEntity">
+			<id property="code" column="dict_code" />
+			<result property="name" column="dict_name" />
+			<result property="sequence" column="sequence" />
+		</collection>
+	</resultMap>
+
+	<select id="list" resultMap="ResultMap" parameterType="java.util.Map" flushCache="true">
+		SELECT dt.code, dt.name, d.code AS dict_code, d.name AS dict_name, d.sequence
+		FROM tbl_dict_type dt 
+		LEFT JOIN tbl_dict d ON dt.code = d.dict_type_code 
+		ORDER BY d.sequence ASC
+	</select>
+	
+	<select id="get" resultMap="ResultMap" flushCache="true">
+		SELECT dt.code, dt.name
+		FROM tbl_dict_type dt
+		WHERE dt.code = #{code}
+	</select>
+
+</mapper>

@@ -1,0 +1,160 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					移交
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-3">选择用户</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择用户..." id="username"
+							name="username">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">用户姓名</label>
+					<section class="col col-8">
+						 <input
+							class="required" placeholder="选择用户..." id="name"
+							name="name" disabled="disabled">
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">所属部门</label>
+					<section class="col col-8">
+						<input
+							class="required" placeholder="选择用户..." id="company"
+							name="company" disabled="disabled">
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+
+<script>
+	var user,$user;
+	var userData;
+	var softwareVersion;
+    pageSetUp();
+    var pagefunction = function() {
+    	
+    	s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        serviceId = $("#jqgrid").jqGrid('getRowData',s).id;
+        
+    	sendGet("/" + getProjectName() + "/v1.0/users",fillForm,DialogAlert,null);
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option={ 
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+            	user: {
+                     required : true
+                }
+            },
+            // Messages for form validation
+            messages:{
+            	user : {
+                    required : '请选择软件版本'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var flg = false;
+            	if($("#username").val() == "" || $("#username").val() == null){
+            		DialogAlert("请选择用户");
+            		flg = false;
+            	}else{
+            		flg = true;
+            	}
+            	var jsondata = {
+            		"username":$("#username").val()
+            	};
+            	if(flg){
+	            	//在这里调用ajax方法提交
+	            	sendPut("/" + getProjectName() + "/v1.0/servs/"+serviceId+"/transfer", postSuccess,DialogAlert, JSON.stringify(jsondata), null);
+            	}
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+    function postSuccess(data){
+    	//提交成功的方法
+    	$("#changeTransferModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/servs?site="+getSession("siteId")+'&serv_type=redis',reloadGrid,ListAlert,null);
+    }
+    
+    function fillForm(data){
+    		userData = data;
+	    	$user = $("#username").selectize({
+				valueField : 'username',
+				labelField : 'username',
+				searchField : 'username',
+				create : false,
+				sortField : {
+					field : 'username'
+				},
+				options : []
+			});
+    		user = $user[0].selectize;
+	        $.each(data['data'], function(k, v) {
+	        	user.addOption(v);
+	        	user.setValue(v.username);
+	        });
+	        user.setValue(data['data'][0]['username']);
+	        $("#name").val(data['data'][0]['name']);
+			$("#company").val(data['data'][0]['company']);
+    }
+    
+    $("#username").change(function (){
+		var value = $(this).children('option:selected').val();
+		$.each(userData['data'], function(k, v) {
+			if(value == v.username){
+				$("#name").val(v.name);
+				$("#company").val(v.company);
+			}
+        });
+	});
+</script>

@@ -1,0 +1,203 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					版本变更
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-3">服务类型</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择服务类型..." id="servType"
+							name="servType">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-3">版本选择</label>
+					<section class="col col-8">
+						<label class="select select-multiple"> <select
+							class="required" placeholder="选择版本..." id="version"
+							name="version">
+						</select>
+						</label>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+
+<script>
+	var servType,$servType;
+	var version,$version;
+	var softwareVersion;
+	var dateSizeSmall;
+	var flgScales = true;
+    pageSetUp();
+    var pagefunction = function() {
+    	$servType = $("#servType").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: [
+    		          {
+    		        	  id:'mysql',
+    		        	  text:'MYSQL'
+    		          }
+    		]
+    	});
+    	servType = $servType[0].selectize;
+    	servType.setValue('mysql');
+    	
+    	$version = $("#version").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: []
+    	});
+    	
+    	s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        serviceId = $("#jqgrid").jqGrid('getRowData',s).id;
+        
+    	sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type=mysql&enabled=1",fillForm,DialogAlert,null);
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option={ 
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+            	version: {
+                     required : true
+                }
+            },
+            // Messages for form validation
+            messages:{
+            	version : {
+                    required : '请选择软件版本'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var flg = true;
+            	if(softwareVersion == $("#version").val()){
+            		DialogAlert("与当前版本一致请变更版本");
+            		flg = false;
+            	}
+            	if($("#version").val() == "" || $("#version").val() == null){
+            		DialogAlert("请选择版本号");
+            		flg = false;
+            	}
+            	var jsondata = {
+            			  		"definitionSubServs": [
+            				    {
+            				      "name": $("#servType").val(),
+            				      "softwareImage": $("#version").val()
+            				    }
+            				  ]
+            				};
+            	if(flg){
+	            	//在这里调用ajax方法提交
+	            	sendPut("/" + getProjectName() + "/v1.0/servs/"+serviceId+"?type=image_update", postSuccess,DialogAlert, JSON.stringify(jsondata), null);
+            	}
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+    function postSuccess(data){
+    	//提交成功的方法
+    	$("#changeModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/servs?site="+getSession("siteId")+'&serv_type=mysql',reloadGrid,ListAlert,null);
+    	swal({ 
+			  title: "提交成功", 
+			  text: "请前往工单管理页面查看", 
+			  type: "success",
+			  showCancelButton: true, 
+			  confirmButtonColor: "#DD6B55",
+			  confirmButtonText: "前往", 
+			  cancelButtonText: "继续",
+			  closeOnConfirm: true,
+			  closeOnCancel	:true
+			}).then((result) => {
+				if (result.value) { 
+					window.location.href = "index.html#views/workorder/upsql/list.html";
+				} 
+		});
+    }
+    
+    $("#servType").change(function (){
+    	var serv = $("#servType").val();
+    	sendGet("/" + getProjectName() + "/v1.0/selections/software/versions?site="+getSession("siteId")+"&software_type="+serv+"&enabled=1",fillForm,DialogAlert,null);
+    });
+    
+    function fillForm(data){
+    		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    		if($("#servType").val() == 'mysql'){
+	            softwareVersion = $("#jqgrid").jqGrid('getRowData',s).softwareImageId;
+    		}else if($("#servType").val() == 'upproxy'){
+    			softwareVersion = $("#jqgrid").jqGrid('getRowData',s).softwareImageIdUpproxy;
+    		}else{
+    			softwareVersion = $("#jqgrid").jqGrid('getRowData',s).softwareImageIdSwm;
+    		}
+            
+    		if(data.length == 0){
+        		flgScales = false;
+        		DialogAlert("无可用软件版本");
+        		return;
+        	}
+    		else{
+    			version = $version[0].selectize;
+	        	version.clearOptions();
+	        	$.each(data, function(k, v){
+	        		version.addOption(v);
+	        		if(softwareVersion == v.id){
+	        			version.setValue([v.id]);
+	        		}
+	        	});
+    		}
+        	
+    }
+</script>

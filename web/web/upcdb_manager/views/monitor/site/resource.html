@@ -1,0 +1,177 @@
+<section id="widget-grid">
+	<div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+		<article class="col-sm-12 col-md-12 col-lg-6" style="padding-left:13px;padding-right:5px">
+			<div class="jarviswidget" id="wid-id-0"
+				data-widget-colorbutton="false" data-widget-editbutton="false"
+				data-widget-togglebutton="false" data-widget-deletebutton="false"
+				data-widget-fullscreenbutton="false" data-widget-custombutton="false"
+				data-widget-sortable="false" style="height: 600px;">
+				<header>
+					<span class="widget-icon"> <i class="glyphicon glyphicon-stats txt-color-darken"></i></span>
+					<h2>CPU使用率</h2>
+				</header>
+				<!-- widget div-->
+				<!-- widget edit box -->
+				<div class="jarviswidget-editbox"></div>
+				<!-- end widget edit box -->
+				<!-- content -->
+				<div id="cpuChart" class="chart txt-color-blue" style="height: 600px;"></div>
+				<!-- end widget div -->
+			</div>
+		</article>
+		<article class="col-sm-12 col-md-12 col-lg-6" style="padding-left:13px;padding-right:5px">
+			<div class="jarviswidget" id="wid-id-0"
+				data-widget-colorbutton="false" data-widget-editbutton="false"
+				data-widget-togglebutton="false" data-widget-deletebutton="false"
+				data-widget-fullscreenbutton="false" data-widget-custombutton="false"
+				data-widget-sortable="false" style="height: 600px;">
+				<header>
+					<span class="widget-icon"> <i class="glyphicon glyphicon-stats txt-color-darken"></i></span>
+					<h2>内存使用率</h2>
+				</header>
+				<!-- widget div-->
+				<!-- widget edit box -->
+				<div class="jarviswidget-editbox"></div>
+				<!-- end widget edit box -->
+				<!-- content -->
+				<div id="memChart" class="chart txt-color-blue" style="height: 600px;"></div>
+				<!-- end widget div -->
+			</div>
+		</article>
+	</div>
+</section>
+<script>
+    pageSetUp();
+    
+    var cpuChart = echarts.init(document.getElementById('cpuChart'));
+    var memChart = echarts.init(document.getElementById('memChart'));
+    cpuChart.showLoading();
+    memChart.showLoading();
+    
+    sendGetWithoutLayer("/" + getProjectName() + "/v1.0/monitor/site/"+getSession("siteId")+"/clusterinfos",initChart,ListAlert,null);
+    
+    function initChart(data){
+    	var legendData = [];
+    	var seriesCpuOuterData = [],
+    		seriesCpuInnerData = [],
+    		seriesMemOuterData = [],
+    		seriesMemInnerData = [];
+    	var option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'left',
+                    data: legendData
+                },
+                series: [
+                    {
+                        name:'',
+                        type:'pie',
+                        selectedMode: 'single',
+                        radius: [0, '30%'],
+
+                        label: {
+                            normal: {
+                                position: 'inner'
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data:[]
+                    },
+                    {
+                        name:'',
+                        type:'pie',
+                        radius: ['40%', '55%'],
+                        data:[]
+                    }
+                ]
+            };
+    	
+    	$.each(data.data, function(k ,v){
+    		legendData.push(v.name);
+    		legendData.push(v.name + ' 已分配');
+    		legendData.push(v.name + ' 未分配');
+    		seriesCpuInnerData.push({
+    			clusterId: v.id,
+    			name: v.name,
+    			value: v.cpu_all
+    		});
+    		seriesMemInnerData.push({
+    			clusterId: v.id,
+    			name: v.name,
+    			value: BytesToGB(v.memory_all)
+    		});
+    		if(v.cpu_all - v.cpu_free > 0){
+    			seriesCpuOuterData.push({
+        			clusterId: v.id,
+        			name: v.name + ' 已分配',
+        			value: v.cpu_all - v.cpu_free
+        		});
+    		}
+    		if(v.cpu_free > 0){
+    			seriesCpuOuterData.push({
+        			clusterId: v.id,
+        			name: v.name + ' 未分配',
+        			value: v.cpu_free
+        		});
+    		}
+    		if(v.memory_all - v.memory_free > 0){
+    			seriesMemOuterData.push({
+        			clusterId: v.id,
+        			name: v.name + ' 已分配',
+        			value: BytesToGB(v.memory_all - v.memory_free)
+        		});
+    		}
+    		if(v.memory_free > 0){
+    			seriesMemOuterData.push({
+        			clusterId: v.id,
+        			name: v.name + ' 未分配',
+        			value: BytesToGB(v.memory_free)
+        		});
+    		}
+    	});
+    	
+    	option.legend.data = legendData;
+    	
+    	var cpuOption = {},
+    		memOption = {};
+    	$.extend(true, cpuOption, option);
+    	$.extend(true, memOption, option);
+    	
+    	cpuOption.series[0].data = seriesCpuInnerData;
+    	cpuOption.series[1].data = seriesCpuOuterData;
+    	memOption.series[0].data = seriesMemInnerData;
+    	memOption.series[1].data = seriesMemOuterData;
+    	
+    	memOption.tooltip.formatter = "{a} <br/>{b}: {c}G ({d}%)";
+    	
+    	cpuChart.setOption(cpuOption);
+    	memChart.setOption(memOption);
+    	
+    	cpuChart.on('click', function (params) {
+    	    setSession('clusterId', params.data.clusterId);
+        	
+    		window.location.href='index.html#views/monitor/site/clusterResource.html';
+    	});
+    	
+    	memChart.on('click', function (params) {
+			setSession('clusterId', params.data.clusterId);
+        	
+    		window.location.href='index.html#views/monitor/site/clusterResource.html';
+    	});
+    	
+    	cpuChart.hideLoading();
+        memChart.hideLoading();
+    }
+</script>

@@ -1,0 +1,217 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					存储登记
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+
+			</header>
+			<fieldset>
+				<div id="dialog-alert"></div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>存储名称</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="name"
+							name="name" placeholder="" class="required ">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>品牌</label>
+					<section class="col col-4">
+						<label class="select"> <select class="required "
+							id="vendor" name="vendor">
+								<option value="">请选择品牌</option>
+						</select><i></i>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>所属站点</label>
+					<section class="col col-4">
+						<label class="select"> <select class="required " id="site" disabled="disabled"
+							name="site">
+								<option value="">请选择站点</option>
+						</select><i></i>
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>管理域名</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="domain"
+							name="domain" placeholder="" class="required ">
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2"><label style="color: red">*</label>起始LUNID</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="lunStart"
+							name="lunStart" placeholder=" 范围0到10240" class="required ">
+						</label>
+					</section>
+					<label class="label col col-2"><label style="color: red">*</label>结束LUNID</label>
+					<section class="col col-4">
+						<label class="input"> <input type="text" id="lunEnd"
+							name="lunEnd" placeholder=" 范围0到10240" class="required ">
+						</label>
+					</section>
+				</div>
+				<input type="hidden" id="hostLunStart" name="hostLunStart">
+				<input type="hidden" id="hostLunEnd" name="hostLunEnd">
+			</fieldset>
+		</form>
+
+
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+	var vendor, $vendor;
+	var site, $site;
+	$('#hostLunStart').val(100);
+	$('#hostLunEnd').val(150);
+    pageSetUp();
+    var pagefunction = function() {
+    	var siteid=getSession("siteId");
+    	$('#site').val(siteid);
+		//请求表单中的内容-如select并填充到页面
+    	sendGet("/" + getProjectName() + "/v1.0/selections/sites",fillSelect_siteName,DialogAlert,null);
+    	sendGet("/" + getProjectName() + "/v1.0/selections/san_vendors",fillSelect_brand,DialogAlert,null);
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option = {
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+
+            },
+            // Rules for form validation
+            rules: {
+            	 name: {
+                     required : true
+                 },
+                 domain : {
+                     required : true
+                 },
+                 lunStart:{
+                	digits:true,
+                 	required : true,
+                 	max:10240,
+                 	min:0
+                 },
+                 lunEnd:{
+                	digits:true,
+                	required : true,
+                  	max:10240,
+                  	min:0
+                 }
+		    },
+            // Messages for form validation
+            messages:{
+            	name : {
+                    required : '请输入存储名称'
+                },
+                domain : {
+                    required : '请输入管理域名'
+                },
+                lunStart:{
+                	digits:'必须为整数',
+                	required : '请输入起始LUN',
+                	max:$.validator.format( "开始LUN不能大于10240." ),
+                	min:$.validator.format( "开始LUN不能小于0." )
+                },
+                lunEnd:{
+                	digits:'必须为整数',
+                	required : '请输入结束LUN',
+                	max:$.validator.format( "结束LUN不能大于10240." ),
+                	min:$.validator.format( "结束LUN不能小于0." )
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	//在这里生成需要提交的json数据
+            	var data=$('#checkout-form').serializeArray();
+            	var jsonData=arrayToJson(data);
+            	jsonData['lunStart'] = parseInt(jsonData['lunStart']);
+            	jsonData['lunEnd'] = parseInt(jsonData['lunEnd']);
+            	jsonData['hostLunStart'] = parseInt(jsonData['hostLunStart']);
+            	jsonData['hostLunEnd'] = parseInt(jsonData['hostLunEnd']);
+            	jsonData['site'] = $("#site").val();
+            	var flg = true;
+            	if(jsonData.vendor == ""){
+            		DialogAlert("请选择品牌");
+            		flg = false;
+            	}
+            	if(jsonData.site == ""){
+            		DialogAlert("请选择站点");
+            		flg = false;
+            	}
+            	//在这里调用ajax方法提交
+            	if(flg){
+            		sendPost("/" + getProjectName() + "/v1.0/sans", postSuccess, DialogAlert,JSON.stringify(jsonData),null);debugger;
+            	}
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+    function postSuccess(data){
+    	$("#addModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/sans?site="+getSession("siteId"),reloadGrid,ListAlert,null);
+    }
+    function fillSelect_brand(data){
+    	$vendor = $("#vendor").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: data
+    	});
+    }
+    function fillSelect_siteName(data){
+    	$site = $("#site").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'text'},
+    		options: data
+    	});
+    	site = $site[0].selectize;
+    	$.each(data, function(k, v) {
+    		site.addOption(v);
+			if (getSession("siteId") == v.id) {
+				site.setValue([ v.id ]);
+			}
+		});
+    }
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+</script>

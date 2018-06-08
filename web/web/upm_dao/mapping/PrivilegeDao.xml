@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.PrivilegeDao">
+	<resultMap id="privilegeResultMap" type="com.bsg.upm.entity.PrivilegeEntity">
+		<id property="code" column="code" />
+		<result property="description" column="description" />
+		<result property="enabled" column="enabled" />
+	</resultMap>
+	
+	<select id="list" parameterType="java.util.Map" resultMap="privilegeResultMap" flushCache="true">
+		SELECT code, description, enabled
+		FROM tbl_privilege
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+		  <if test="enabled!=null">
+            AND enabled = #{enabled}
+        </if>
+		</trim>
+		ORDER BY sequence ASC
+	</select>
+	
+</mapper>

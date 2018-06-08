@@ -1,0 +1,502 @@
+<div>
+	<!-- widget content -->
+	<div class="widget-body">
+
+		<form action="" method="post" id="checkout-form" class="smart-form">
+			<header>
+				<h2>
+					编辑策略
+					<button class="close" data-dismiss="modal">x</button>
+				</h2>
+			</header>
+			<fieldset style="padding: 25px 14px 5px 20%;">
+				<div id="dialog-alert"></div>
+				<div id="crontabLabel"></div>
+				<div class="row">
+					<label class="label col col-2">备份类型</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required " id="type"
+							name="type" disabled="disabled">
+								<option value="">请选择备份类型</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">保留天数</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required "
+							id="retention" name="retention">
+								<option value="">请选择保留天数</option>
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">备份周期</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required "
+							id="retention_type" name="retention_type">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row" id="sel_day">
+					<label class="label col col-2">日期</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required " id="dom"
+							name="dom">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row" style="display: none;">
+					<label class="label col col-2">月</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required "
+							id="month" name="month">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row" id="sel_week">
+					<label class="label col col-2">周</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required " id="dow"
+							name="dow">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row">
+					<label class="label col col-2">时</label>
+					<section class="col col-2">
+						<label class="select"> <select class="required " id="hour"
+							name="hour">
+						</select>
+						</label>
+					</section>
+					<label class="label col col-2">分</label>
+					<section class="col col-2">
+						<label class="select"> <select class="required "
+							id="minute" name="minute">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row" id="dbNameSelect">
+					<label class="label col col-2">数据库</label>
+					<section class="col col-6">
+						<label class="select"> <select class="required " id="dbName"
+							name="dbName">
+						</select>
+						</label>
+					</section>
+				</div>
+				<div class="row" id="dbTable">
+					<section class="col col-8">
+						<div class="table-responsive">
+		                    <table class="table table-bordered">
+		                        <thead>
+		                        <tr>
+		                            <th>选择</th>
+		                            <th>数据库表名称</th>
+		                        </tr>
+		                        </thead>
+		                        <tbody id="databaseTable">
+		                        </tbody>
+		                    </table>
+		                </div>
+					</section>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- end widget content -->
+
+</div>
+<div class="modal-footer">
+
+	<button type="button" class="btn btn-default btn-sm"
+		data-dismiss="modal">取消</button>
+	<button type="submit" class="btn btn-primary btn-sm" id="submitbtn">
+		保存</button>
+</div>
+<script>
+    pageSetUp();
+    
+    $("#sel_day").hide();
+	$("#sel_week").hide();
+    
+	var databaseName;
+	var tableNames;
+    var type, $type;
+    var retention, $retention;
+    var retention_type, $retention_type;
+    var minute, $minute;
+    var hour, $hour;
+    var dom, $dom;
+    var month, $month;
+    var dow, $dow;
+    var s = $("#jqgridBackupStrategy").jqGrid('getGridParam', 'selarrrow');
+    var backup_storage_id = $("#jqgridBackupStrategy").jqGrid('getRowData',s).id;
+    var date = new Date();
+    
+	function getTableNames(){
+	    var obj = document.getElementsByName("databaseTableName");
+	    var table_names = new Array();
+	    for(k in obj){
+	        if(obj[k].checked)
+	        	table_names.push(obj[k].value);
+	    }
+	    return table_names;
+	}
+    
+    var pagefunction = function() {
+    	
+        var errorClass = 'invalid';
+        var errorElement = 'em';
+        var option ={
+            errorClass: errorClass,
+            errorElement:errorElement,
+            highlight: function(element) {
+                $(element).parent().removeClass('state-success').addClass("state-error");
+                $(element).removeClass('valid');
+            },
+            unhighlight: function(element) {
+                $(element).parent().removeClass("state-error").addClass('state-success');
+                $(element).addClass('valid');
+            },
+            // Rules for form validation
+            // Messages for form validation
+            messages:{
+            	type : {
+                    required : '请选择备份类型'
+                },
+                retention : {
+                    required : '请选择保留天数'
+                }
+            },
+            errorPlacement : function(error, element) {
+                if($(element).next("div").hasClass("tooltip")) {
+                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+                } else {
+                    $(element).attr("title",
+                            $(error).text()).tooltip("show");
+                }
+            },
+            submitHandler:function(form){
+            	var typeValue = $("#type").val();
+				//在这里生成需要提交的json数据
+				var data = $('#checkout-form').serializeArray();
+				var jsonData = {
+					type : $("#type").val(),
+					retention : parseInt($("#retention").val()),
+					cronExpression : $("#minute").val() + ' '
+							+ $("#hour").val() + ' ' + $("#dom").val() + ' '
+							+ $("#month").val() + ' ' + $("#dow").val()
+				};
+				if(typeValue == "tables"){		//导表备份
+					var table_names = getTableNames();
+					jsonData = {
+							type : $("#type").val(),
+							dbName:$("#dbName").val(),
+							tableNames:table_names,
+							retention : parseInt($("#retention").val()),
+							cronExpression : $("#minute").val() + ' '
+									+ $("#hour").val() + ' ' + $("#dom").val() + ' '
+									+ $("#month").val() + ' ' + $("#dow").val(),
+							mark:""
+					};
+				}else{							//全 备
+					jsonData = {
+							type : $("#type").val(),
+							retention : parseInt($("#retention").val()),
+							cronExpression : $("#minute").val() + ' '
+									+ $("#hour").val() + ' ' + $("#dom").val() + ' '
+									+ $("#month").val() + ' ' + $("#dow").val(),
+							mark:""
+					};
+				}
+            	//在这里调用ajax方法提交
+            	sendPut("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/backup_strategys/"+backup_storage_id, postSuccess,DialogAlert,JSON.stringify(jsonData), null);
+            }
+        };
+        $('#checkout-form').validate(option);
+    };
+    loadScript("js/plugin/jquery-form/jquery-form.min.js", pagefunction);
+
+    $('#submitbtn').click(function() {
+    	DialogAlertClear();
+    	$('#checkout-form').submit();
+    });
+    function postSuccess(data){
+    	//提交成功的方法
+    	$("#s4remoteModal").modal('toggle');
+    	sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+'/backup_strategys',reloadBackupStrategyGrid,ListAlert,null);
+    }
+    
+    $("#dbName").change(function(){
+		databaseName = $("#dbName").val();
+		sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/databases/"+databaseName, fillFormDatabaseTable,
+				DialogAlert, null);
+	});
+    
+    function fillFormDatabase(data) {
+		dbName = $dbName[0].selectize;
+		dbName.clearOptions();
+		$.each(data.data, function(k, v) {
+			dbName.addOption(v);
+		});
+		if(null != databaseName && '' != databaseName){
+			dbName.setValue(databaseName);
+			sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/databases/"+databaseName, fillFormDatabaseTable,
+					DialogAlert, null);
+		}
+	}
+    
+    function fillTablesChcekbox(){
+        var val = tableNames.split(",");
+        var boxes = document.getElementsByName("databaseTableName");
+        for(i=0;i<boxes.length;i++){
+            for(j=0;j<val.length;j++){
+                if(boxes[i].value == val[j]){
+                    boxes[i].checked = true;
+                    break
+                }
+            }
+        }
+    }
+    
+    function fillFormDatabaseTable(data){
+		$("#databaseTable").empty();
+		$.each(data.data.tables,function(index,obj){
+	    	$("#databaseTable").append(
+	                "<tr><td><input type='checkbox' id='databaseTableName' name='databaseTableName' value="+obj['name']+"></td><td>"+obj['name']+"</td></tr>"
+	        );
+	    });
+		fillTablesChcekbox();
+	}
+    
+    $("#retention_type").change(function() {
+		var date = new Date();
+		var week = date.getDay()>0?date.getDay():'7';
+		var day = date.getDate();
+		if ($(this).val() == "1") {
+			$("#sel_day").hide();
+			$("#sel_week").hide();
+			dow.setValue("*");
+			month.setValue("*");
+			dom.setValue("*");
+		} else if ($(this).val() == "2") {
+			$("#sel_day").hide();
+			$("#sel_week").show();
+			dow.setValue(week);
+			month.setValue("*");
+			dom.setValue("*");
+		} else if ($(this).val() == "3") {
+			$("#sel_day").show();
+			$("#sel_week").hide();
+			dow.setValue("*");
+			month.setValue("*");
+			dom.setValue(day);
+		}
+	});
+    
+    sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/backup_strategys/"+backup_storage_id,fillForm_data,DialogAlert,null);
+    
+    function fillForm_data(data){
+    	databaseName = data['data']['dbName'];
+    	tableNames = data['data']['tableNames'];
+    	
+		$dbName = $("#dbName").selectize({
+			valueField : 'name',
+			labelField : 'name',
+			searchField : 'name',
+			create : false,
+			sortField : {
+				field : 'name'
+			},
+			options : []
+		});
+
+    	//备份周期类型
+    	$retention_type = $("#retention_type").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: [{
+        		id: "1",
+        		text: "按天"
+        	},{
+        		id: "2",
+        		text: "按周"
+        	},{
+        		id: "3",
+        		text: "按月"
+        	}]
+    	});
+    	retention_type = $retention_type[0].selectize;
+    	
+    	//保留天数
+    	$retention = $("#retention").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: []
+    	});
+    	retention = $retention[0].selectize;
+    	retention.clearOptions();
+    	for(var i = 1; i <= 3; i++){
+    		retention.addOption({
+    			id: i,
+    			text: i.toString()
+    		});
+    	}
+    	
+    	//分钟
+    	$minute = $("#minute").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: []
+    	});
+    	minute = $minute[0].selectize;
+    	minute.clearOptions();
+    	for(var i = 0; i < 60; i++){
+    		minute.addOption({
+    			id: i,
+    			text: i.toString()
+    		});
+    	}
+    	
+    	//小时
+    	$hour = $("#hour").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: []
+    	});
+    	hour = $hour[0].selectize;
+    	hour.clearOptions();
+    	for(var i = 0; i < 24; i++){
+    		hour.addOption({
+    			id: i,
+    			text: i.toString()
+    		});
+    	}
+    	
+    	//按月-------天数
+    	$dom = $("#dom").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: []
+    	});
+    	dom = $dom[0].selectize;
+    	dom.clearOptions();
+    	dom.addOption({
+			id: "*",
+			text: "*"
+		});
+    	for(var i = 1; i <= 31; i++){
+    		dom.addOption({
+    			id: i,
+    			text: i.toString()
+    		});
+    	}
+    	
+    	//月----------*
+    	$month = $("#month").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: []
+    	});
+    	month = $month[0].selectize;
+    	month.clearOptions();
+    	month.addOption({
+			id: "*",
+			text: "*"
+		});
+    	for(var i = 1; i <= 12; i++){
+    		month.addOption({
+    			id: i,
+    			text: i.toString()
+    		});
+    	}
+    	month.setValue("*");
+    	
+    	//按周---------------星期
+    	$dow = $("#dow").selectize({
+    		valueField: 'id',
+			labelField: 'text',
+			searchField: 'text',
+    		create: false,
+    		sortField: {field: 'id'},
+    		options: []
+    	});
+    	dow = $dow[0].selectize;
+    	dow.clearOptions();
+    	dow.addOption({
+			id: "*",
+			text: "*"
+		});
+    	for(var i = 1; i <= 7; i++){
+    		dow.addOption({
+    			id: i,
+    			text: i.toString()
+    		});
+    	}
+    	
+    	$("#type").append("<option value='"+data['data']['type']+"'>"+data['data']['typeText']+"</option>");
+    	$("#type").val(data['data']['type']);
+    	if(data['data']['type'] == "tables"){
+    		sendGet("/" + getProjectName() + "/v1.0/servs/"+getSession("serviceUpsqlId")+"/databases", fillFormDatabase,
+    				DialogAlert, null);
+    		$("#dbNameSelect").show();
+			$("#dbTable").show();
+    	}else{
+    		$("#dbNameSelect").hide();
+			$("#dbTable").hide();
+    	}
+    	
+    	retention.setValue(data.data.retention);
+    	
+    	var strs= new Array();
+    	var data_str = data.data.cronExpression;
+    	strs=data_str.split(" ");
+    	hour.setValue(strs[1]);
+    	minute.setValue(strs[0]);
+    	
+    	if(strs[2] != '*' && strs[4] == '*'){
+    		$("#sel_day").show();
+    		$("#sel_week").hide();
+    		retention_type.setValue("3");
+    		dom.setValue(strs[2]);
+    	}else 
+    	if(strs[4] != '*' && strs[2] == '*'){
+    		$("#sel_day").hide();
+    		$("#sel_week").show();
+    		retention_type.setValue("2");
+    		dow.setValue(strs[4]);
+    	}else 
+    	if(strs[4] == '*' && strs[2] == '*'){
+    		$("#sel_day").hide();
+    		$("#sel_week").hide();
+    		retention_type.setValue("1");
+    	}
+    }
+</script>

@@ -1,0 +1,401 @@
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<!-- Dynamic Modal -->
+				<div class="modal fade" id="changeModal" tabindex="-1" role="dialog"
+					aria-labelledby="changeModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<div class="modal fade" id="changeTransferModal" tabindex="-1" role="dialog"
+					aria-labelledby="changeTransferModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<a href="javascript:void(0);" id="start" class="btn btn-success"
+					onclick="startUpsql()">启动</a> <a href="javascript:void(0);"
+					id="stop" class="btn btn-danger" onclick="stopUpsql()">停止</a> 
+					<a href="javascript:void(0);" id="backup" class="btn btn-primary" onclick="backupUpsql()">备份</a> 
+					<a href="javascript:void(0);" id="taskCancel" class="btn btn-warning" onclick="taskCancelUpsql()">取消</a>
+					<a href="javascript:void(0);" id="delete" class="btn btn-danger" onclick="deleteUpsql()">删除</a> 
+					<a href="javascript:void(0);" id="change" class="btn btn-success" onclick="changeUpsql()">扩容</a> 
+					<a href="javascript:void(0);" id="changeversion" class="btn btn-info" onclick="changeUpsqlVersion()">升级</a> 
+					<a href="javascript:void(0);" id="rebuild" class="btn btn-danger" onclick="rebuildUpsql()">重做</a>
+					<a href="javascript:void(0);" id="transfer" class="btn btn-info" onclick="changeTransfer()">移交</a>
+					<a href="javascript:void(0);" id="export" class="btn btn-primary" onclick="exportUpsql()">导出</a>
+					<a href="javascript:void(0);" id="manage" class="btn btn-primary" onclick="manageUpsql()">管理</a>
+					<a href="javascript:void(0);" id="refresh" class="btn btn-primary" style="float: right; margin-right: 10px;" onclick="showReturn()">刷新</a>
+			</div>
+			<p>&nbsp;</p>
+		</article>
+	</div>
+	<div class="row">
+		<div id="list-alert"></div>
+	</div>
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+
+			<!-- end widget -->
+			<table id="jqgrid"></table>
+			<div id="pjqgrid"></div>
+		</article>
+
+	</div>
+</section>
+<div class="modal fade" id="serviceModal" tabindex="-1" role="dialog"
+	aria-labelledby="serviceModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 1024px; padding: 0 0 0 5px;">
+		<div class="modal-content">
+			<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+			<div class="row">
+				<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="widget-body">
+						<header style="padding: 0 20px;">
+							<h2>
+								任务详情列表
+								<button class="close" data-dismiss="modal">x</button>
+							</h2>
+							<div id="dialog-alert"></div>
+						</header>
+					</div>
+				</article>
+			</div>
+			<div class="row" style="padding-left: 20px; padding-bottom: 10px;">
+				<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<table id="jqgridTask"></table>
+					<div id="pjqgridTask"></div>
+				</article>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+
+	function taskCancelUpsql(){
+		ListAlertClear();
+		var id=$("#taskCancel");
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		if(s.length==1){
+	        var taskCancelId = $("#jqgrid").jqGrid('getRowData',s).taskId;
+			 	ListConfirm('taskCancel', taskCancelId);
+	    }
+	    else{
+	    	ListAlert("请勾选一行数据");
+	    }
+	}
+
+    function startUpsql(){
+    	ListAlertClear();
+    	var id=$("#start");
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(null != ids && ids.length != 0){
+   		 	ListConfirm('start', ids);
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+        }
+    }
+    
+    function stopUpsql(){
+    	ListAlertClear();
+    	var id=$("#stop");
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(null != ids && ids.length != 0){
+   		 	ListConfirm('stop', ids);
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+        }
+    }
+    
+    function deleteUpsql(){
+    	ListAlertClear();
+    	var id=$("#delete");
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(null != ids && ids.length != 0){
+    		if(ids.length > 1){
+    			swal({type: 'info', title: '服务删除时，请逐一确认删除！'})
+    		}else{
+	   		 	ListConfirm('delete', ids);
+    		}
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+        }
+    }
+    
+    function backupUpsql(){
+    	ListAlertClear();
+    	var id=$("#backup");
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(s.length==1){
+            var obj_id = $("#jqgrid").jqGrid('getRowData',s).id;
+   		 	ListConfirm('backup', obj_id);
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+        }
+    }
+    
+    function rebuildUpsql(){
+    	ListAlertClear();
+    	var id=$("#rebuild");
+    	var ids = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	if(null != ids && ids.length != 0){
+   		 	ListConfirm('rebuild', ids);
+        }
+        else{
+        	ListAlert("请勾选一行数据");
+        }
+    }
+    
+    function changeUpsql(){
+    	ListAlertClear();
+    	var id=$("#change");
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        if(s.length==1){
+            id.attr("href","views/service/upsql/change.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#changeModal");
+        } else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function changeUpsqlVersion(){
+    	ListAlertClear();
+    	var id=$("#changeversion");
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        if(s.length==1){
+            id.attr("href","views/service/upsql/changeVersion.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#changeModal");
+        } else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function changeTransfer(){
+    	ListAlertClear();
+    	var id=$("#transfer");
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        if(s.length==1){
+            id.attr("href","views/service/upsql/transfer.html");
+            id.attr("data-toggle","modal");
+            id.attr("data-target","#changeTransferModal");
+        } else{
+        	ListAlert("请勾选一行数据");
+            id.removeAttr("data-toggle");
+            id.removeAttr("data-target");
+            id.removeAttr("href");
+        }
+    }
+    
+    function manageUpsql(){
+        var id=$("#manage");
+        var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+        var createSuccessFlg = $("#jqgrid").jqGrid('getRowData',s).createSuccessFlg;
+	    if(s.length==1){
+	        	var obj_id = $("#jqgrid").jqGrid('getRowData',s).id;
+	        	setSession('serviceUpsqlId', obj_id);
+	            id.attr("href","index.html#views/service/upsql/manage.html");
+	    } else{
+	        	ListAlert("请勾选一行数据");
+	            id.removeAttr("href");
+	    }
+    }
+    
+    function manageUpsqlOnRow(rowId,createSuccessFlg){
+        	
+	       setSession('serviceUpsqlId', rowId);
+	       window.location.href = "index.html#views/service/upsql/manage.html";
+        	
+    }
+    
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){
+    			sendGet("/" + getProjectName() + "/v1.0/servs?site="+getSession("siteId")+'&serv_type=upsql_upproxy_swm',createGrid_mysql_1,ListAlert,null);
+    		});
+    	});
+    });
+    
+    $('#serviceModal').on("show.bs.modal", function(e){
+    	ListAlertClear();
+    	$("#mainframestate").empty();
+    	$("#jqgridTask").jqGrid('GridUnload');
+    	sendGet("/" + getProjectName() + "/v1.0/tasks?obj_id="+$(e.relatedTarget).data('serviceId'),createGrid_taskDetailModal,ListAlert,null);
+    });
+    
+    function confirm(type, id){
+    	ListAlertClear();
+    	var ids = id.split(",");
+    	var rowNum = ids.length - 1;
+		var row;
+    	switch(type){
+    	case 'start':
+    		for(var i = 0;i<ids.length;i++){
+		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+		    	sendPutAll("/" + getProjectName() + "/v1.0/servs/" + row.id + "/start", function(data,rowIndex,rowNum){
+			        if(rowIndex == rowNum){
+			       		showReturn();
+			   	   	}
+				}, function(msg){
+					ListAlert(msg);
+				}, null,null,i,rowNum);
+		    }
+    		break;
+    	case 'stop':
+    		swal({ 
+				  title: "提示", 
+				  text: "您确认要继续停止么？", 
+				  type: "info",
+				  showCancelButton: true, 
+				  confirmButtonColor: "#DD6B55",
+				  confirmButtonText: "确认", 
+				  cancelButtonText: "取消",
+				  closeOnConfirm: true,
+				  closeOnCancel	:true
+				}).then((result) => {
+					if (result.value) { 
+						for(var i = 0;i<ids.length;i++){
+			    			row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+			    			sendPutAll("/" + getProjectName() + "/v1.0/servs/" + row.id + "/stop", function(data,rowIndex,rowNum){
+				    		    if(rowIndex == rowNum){
+				    		   		showReturn();
+				    		   	}
+							}, function(msg){
+								ListAlert(msg);
+							}, null,null,i,rowNum);
+			    		}
+					}
+			});
+    		break;
+    	case 'delete':
+    		swal({
+    			  title: '删除服务验证：',
+	  			  input: 'text',
+	  			  inputPlaceholder: '请输入该服务的服务名称',
+	  			  confirmButtonText: '确认删除',
+	              cancelButtonText: '取消',
+	  			  showCancelButton: true,
+	  			  inputValidator: (value) => {
+	  			    row = $("#jqgrid").jqGrid('getRowData', ids[0]);
+	  			    if(row.servName != value){
+	  			    	return '填写的服务名称与选中的不一致！';
+	  			    }
+	  			    return !value && '请输入服务名称！';
+	  			  }
+    		 }).then((result) => {
+    			  if (result.value) {
+    				    row = $("#jqgrid").jqGrid('getRowData', ids[0]);
+		    			sendDeleteAll("/" + getProjectName() + "/v1.0/servs/"+row.id+"?force=true", function(data,rowIndex,rowNum){ 
+		    		    	if(rowIndex == rowNum){
+		    		    		showReturn();
+		    		    	}
+						}, function(msg){
+							ListAlert(msg);
+						}, null,null,0,rowNum);
+    			  }
+    		 })
+            /* swal({
+                  title: "你确定要继续删除么？",
+                  input: "checkbox",
+		          inputValue:0,
+		          inputPlaceholder:
+		        	    '强制删除',
+				  confirmButtonColor: "#DD6B55",
+                  confirmButtonText: '确认',
+                  cancelButtonText: '取消',
+                  showCancelButton: true
+            }).then((result) => {
+				if (result.value == 1) {
+					for(var i = 0;i<ids.length;i++){
+		    			row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+			    			sendDeleteAll("/" + getProjectName() + "/v1.0/servs/"+row.id+"?force=true", function(data,rowIndex,rowNum){ 
+			    		    	if(rowIndex == rowNum){
+			    		    		showReturn();
+			    		    	}
+							}, function(msg){
+								ListAlert(msg);
+							}, null,null,i,rowNum);
+		    		}
+				}
+				if(result.value == 0){
+					for(var i = 0;i<ids.length;i++){
+		    			row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+			    			sendDeleteAll("/" + getProjectName() + "/v1.0/servs/"+row.id+"?force=false", function(data,rowIndex,rowNum){ 
+			    		    	if(rowIndex == rowNum){
+			    		    		showReturn();
+			    		    	}
+							}, function(msg){
+								ListAlert(msg);
+							}, null,null,i,rowNum);
+		    		}
+				}
+		    }); */
+    		break;
+    	case 'rebuild':
+    		for(var i = 0;i<ids.length;i++){
+		    	row = $("#jqgrid").jqGrid('getRowData', ids[i]);
+		    	sendPutAll("/" + getProjectName() + "/v1.0/servs/" + row.id + "/redo", function(data,rowIndex,rowNum){
+			        if(rowIndex == rowNum){
+			       		showReturn();
+			   	   	}
+				}, function(msg){
+					ListAlert(msg);
+				}, null,null,i,rowNum);
+		    }
+    		break;
+    	case 'backup':
+    		sendPut("/" + getProjectName() + "/v1.0/servs/"+id+"/backup",showReturn,ListAlert,null, null);
+    		break;
+    	case 'taskCancel':
+    		sendPut("/" + getProjectName() + "/v1.0/tasks/"+id+"/cancel",showReturn,ListAlert,null, null);
+    		break;
+    	default:
+    	}
+    }
+    
+    //下载
+    function exportUpsql(){
+    	var $eleForm = $("<form method='post'></form>");
+        $eleForm.attr("action","/" + getProjectName() + "/v1.0/servs/download?site="+getSession("siteId")+'&serv_type=upsql_upproxy_swm');
+        $(document.body).append($eleForm);
+        $eleForm.submit();
+    }    
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/servs?site="+getSession("siteId")+'&serv_type=upsql_upproxy_swm',reloadGrid,ListAlert,null);
+	}
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    //模态框刷新启停
+    $(function () { 
+    	//隐藏监听
+		$('#serviceModal').on('hide.bs.modal', function() {
+			showReturn();
+		})
+    	
+    });
+    
+    function noRe(){
+	}
+	clearInterval(flag);
+	var flag = setInterval(noRe, setTime);
+</script>

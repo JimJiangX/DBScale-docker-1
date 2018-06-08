@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.HostDao">
+	<resultMap id="hostResultMap" type="com.bsg.upm.entity.HostEntity">
+		<id property="id" column="host_id" />
+		<result property="name" column="host_name" />
+		<result property="sshIp" column="host_ssh_ip" />
+		<result property="sshUser" column="host_ssh_user" />
+		<result property="sshPassword" column="host_ssh_password" />
+		<result property="port" column="host_port" />
+		<result property="room" column="host_room" />
+		<result property="seat" column="host_seat" />
+		<result property="maxContainer" column="host_max_container" />
+		<result property="hddDev" column="host_hdd_dev" />
+		<result property="ssdDev" column="host_ssd_dev" />
+		<result property="relateId" column="host_relate_id" />
+		<result property="status" column="host_status" />
+		<result property="description" column="host_description" />
+		<result property="createDateTime" column="host_create_datetime" />
+		<result property="createUserLoginName" column="host_create_user_login_name" />
+		<association property="san"
+			resultMap="com.bsg.upm.dao.SanDao.sanResultMap" />
+		<association property="cluster"
+			resultMap="com.bsg.upm.dao.ClusterDao.clusterResultMap" />
+		<collection property="tasks"
+            resultMap="com.bsg.upm.dao.TaskDao.taskResultMap" columnPrefix="task_">
+        </collection>
+	</resultMap>
+
+	<select id="list" parameterType="java.util.Map" resultMap="hostResultMap" flushCache="true">
+		SELECT host.id AS host_id, 
+			host.name AS host_name, 
+			host.ssh_ip AS host_ssh_ip, 
+			host.ssh_user AS host_ssh_user, 
+			host.ssh_password AS host_ssh_password,
+			host.port AS host_port, 
+			host.room AS host_room, 
+			host.seat AS host_seat, 
+			host.hdd_dev AS host_hdd_dev, 
+			host.ssd_dev AS host_ssd_dev,
+			host.max_container AS host_max_container, 
+			host.relate_id AS host_relate_id,
+			host.status AS host_status,
+			host.description AS host_description,
+			host.create_datetime AS host_create_datetime, 
+			host.create_user_login_name AS host_create_user_login_name, 
+			c.id AS cluster_id,
+			c.name AS cluster_name, 
+			c.enabled AS cluster_enabled,
+			area.id AS area_id, 
+			area.name AS area_name, 
+			area.enabled AS area_enabled,
+			site.id AS site_id,
+			site.name AS site_name,
+			task.id AS task_id, 
+            task.obj_type AS task_obj_type, 
+            task.obj_id AS task_obj_id, 
+            task.obj_name AS task_obj_name, 
+            task.action_type AS task_action_type, 
+            task.start_datetime AS task_start_datetime, 
+            task.end_datetime AS task_end_datetime, 
+            task.status AS task_status, 
+            task.msg AS task_msg, 
+            task.owner AS task_owner, 
+            task.create_user_login_name AS task_create_user_login_name,
+            san.id AS san_id,
+			san.name AS san_name,
+			san.relate_id AS san_relate_id,
+			san.description AS san_description 
+		FROM tbl_host host 
+		  LEFT JOIN tbl_task task 
+		  	ON task.obj_id = host.id
+		  LEFT JOIN tbl_san san 
+				ON san.id = host.san_id,
+		  tbl_cluster c, 
+		  tbl_area area, 
+		  tbl_site site 
+		WHERE host.cluster_id = c.id
+			AND c.area_id = area.id
+			AND area.site_id = site.id
+		<if test="siteId!=null and siteId!=''">
+		 	AND site.id = #{siteId}
+		</if>
+		<if test="clusterId!=null and clusterId!=''">
+		 	AND c.id = #{clusterId}
+		</if>
+		ORDER BY substring_index(ssh_ip,".",1),
+			substring_index(substring_index(ssh_ip,".",-3),".",1),
+			substring_index(substring_index(ssh_ip,".",-2),".",1),
+			substring_index(ssh_ip,".",-1),
+			task.start_datetime DESC
+	</select>
+	
+	<select id="listWithoutAssociation" parameterType="java.util.Map" resultMap="hostResultMap" flushCache="true">
+	 SELECT host.id AS host_id, 
+	        host.relate_id AS host_relate_id,
+            host.name AS host_name,
+            host.ssh_ip AS host_ssh_ip
+      FROM tbl_host host
+	</select>
+	
+	<select id="listName" parameterType="java.util.Map" resultMap="hostResultMap" flushCache="true">
+		SELECT host.id AS host_id, 
+			host.name AS host_name, 
+			host.description AS host_description,
+			c.id AS cluster_id,
+			c.name AS cluster_name, 
+			area.id AS area_id, 
+			area.name AS area_name, 
+			site.id AS site_id,
+			site.name AS site_name
+		FROM tbl_host host, tbl_cluster c, tbl_area area, tbl_site site 
+		WHERE host.cluster_id = c.id
+		  AND c.area_id = area.id
+		  AND area.site_id = site.id
+		<if test="siteId!=null and siteId!=''">
+		 	AND site.id = #{siteId}
+		</if>
+		<if test="clusterId!=null and clusterId!=''">
+		 	AND c.id = #{clusterId}
+		</if>
+		  AND host.status = 'enable'
+		ORDER BY host.name
+	</select>
+	
+	<select id="get" resultMap="hostResultMap" flushCache="true">
+		SELECT host.id AS host_id, 
+			host.name AS host_name, 
+			host.ssh_ip AS host_ssh_ip, 
+			host.ssh_user AS host_ssh_user, 
+			host.ssh_password AS host_ssh_password,
+			host.port AS host_port, 
+			host.room AS host_room, 
+			host.seat AS host_seat, 
+			host.hdd_dev AS host_hdd_dev, 
+			host.ssd_dev AS host_ssd_dev,
+			host.max_container AS host_max_container, 
+			host.relate_id AS host_relate_id,
+			host.status AS host_status,
+			host.description AS host_description,
+			host.create_datetime AS host_create_datetime, 
+			host.create_user_login_name AS host_create_user_login_name, 
+			c.id AS cluster_id,
+			c.name AS cluster_name, 
+			c.enabled AS cluster_enabled,
+			c.relate_id AS cluster_relate_id,
+			area.id AS area_id, 
+			area.name AS area_name, 
+			area.enabled AS area_enabled,
+			site.id AS site_id,
+			site.name AS site_name,
+			task.id AS task_id, 
+            task.obj_type AS task_obj_type, 
+            task.obj_id AS task_obj_id, 
+            task.obj_name AS task_obj_name, 
+            task.action_type AS task_action_type, 
+            task.start_datetime AS task_start_datetime, 
+            task.end_datetime AS task_end_datetime, 
+            task.status AS task_status, 
+            task.msg AS task_msg, 
+            task.owner AS task_owner, 
+            task.create_user_login_name AS task_create_user_login_name,
+            san.id AS san_id,
+			san.name AS san_name,
+			san.relate_id AS san_relate_id,
+			san.description AS san_description
+		FROM tbl_host host 
+			LEFT JOIN tbl_task task 
+				ON task.obj_id = host.id
+			LEFT JOIN tbl_san san 
+				ON san.id = host.san_id, 
+			tbl_cluster c, 
+			tbl_area area, 
+		  	tbl_site site 
+		WHERE host.cluster_id = c.id
+			AND c.area_id = area.id
+			AND area.site_id = site.id
+			AND host.id = #{id} 
+		ORDER BY task.start_datetime DESC
+	</select>
+	
+	<select id="getByRelateId" resultMap="hostResultMap" flushCache="true">
+		SELECT host.id AS host_id, 
+			host.name AS host_name, 
+			host.ssh_ip AS host_ssh_ip, 
+			host.ssh_user AS host_ssh_user, 
+			host.ssh_password AS host_ssh_password,
+			host.port AS host_port, 
+			host.room AS host_room, 
+			host.seat AS host_seat, 
+			host.hdd_dev AS host_hdd_dev, 
+			host.ssd_dev AS host_ssd_dev,
+			host.max_container AS host_max_container, 
+			host.relate_id AS host_relate_id,
+			host.create_datetime AS host_create_datetime, 
+			host.create_user_login_name AS host_create_user_login_name, 
+			c.id AS cluster_id,
+			c.name AS cluster_name, 
+			c.enabled AS cluster_enabled,
+			c.relate_id AS cluster_relate_id,
+			area.id AS area_id, 
+			area.name AS area_name, 
+			area.enabled AS area_enabled,
+			site.id AS site_id,
+			site.name AS site_name,
+			san.id AS san_id,
+			san.name AS san_name,
+			san.relate_id AS san_relate_id,
+			san.description AS san_description
+		FROM tbl_host host 
+			LEFT JOIN tbl_san san 
+				ON san.id = host.san_id, 
+			tbl_cluster c, 
+			tbl_area area,
+			tbl_site site 
+		WHERE host.cluster_id = c.id
+			AND c.area_id = area.id
+			AND area.site_id = site.id
+			AND host.relate_id = #{relateId}
+	</select>
+	
+	<select id="countByAreaIdAndName" resultType="int" flushCache="true">
+		SELECT COUNT(h.id)
+		FROM tbl_host h, tbl_cluster c
+		WHERE h.cluster_id = c.id
+			AND c.area_id = #{areaId}
+			AND h.name = #{name}
+	</select>
+	
+	<select id="countByAreaIdAndIp" resultType="int" flushCache="true">
+		SELECT COUNT(h.id)
+		FROM tbl_host h, tbl_cluster c
+		WHERE h.cluster_id = c.id
+			AND h.ssh_ip = #{ip}
+			AND c.area_id = #{areaId}
+	</select>
+	
+	<select id="countInputByAreaId" resultType="int" flushCache="true">
+		SELECT COUNT(h.id)
+		FROM tbl_host h, tbl_cluster c
+		WHERE h.cluster_id = c.id
+			AND c.area_id = #{areaId}
+			AND h.relate_id != null
+	</select>
+	
+	<select id="countByClusterId" resultType="int" flushCache="true">
+		SELECT COUNT(id)
+		FROM tbl_host h
+		WHERE h.cluster_id = #{clusterId}
+	</select>
+	
+	<select id="countInputByClusterId" resultType="int" flushCache="true">
+		SELECT COUNT(id)
+		FROM tbl_host h
+		WHERE h.cluster_id = #{clusterId}
+			AND h.relate_id != null
+	</select>
+	
+	<insert id="save" parameterType="com.bsg.upm.entity.HostEntity">
+		INSERT INTO tbl_host
+		(
+			id,
+			cluster_id,
+			name,
+			ssh_ip,
+			ssh_user,
+			ssh_password,
+			port,
+			room,
+			seat,
+			max_container,
+			hdd_dev,
+			ssd_dev,
+			san_id,
+			relate_id,
+			status,
+			description,
+			create_datetime,
+			create_user_login_name
+		)
+		VALUE
+		(
+			#{id},
+			#{cluster.id},
+			#{name},
+			#{sshIp},
+			#{sshUser},
+			#{sshPassword},
+			#{port},
+			#{room},
+			#{seat},
+			#{maxContainer},
+			#{hddDev},
+			#{ssdDev},
+			<choose>
+		        <when test="san!=null">
+					#{san.id},
+				</when>
+		        <otherwise>
+		            null,
+		        </otherwise>
+		    </choose>
+			#{relateId},
+			#{status},
+			#{description},
+			#{createDateTime},
+			#{createUserLoginName}
+		)
+	</insert>
+	
+	<update id="updateRelateId" parameterType="com.bsg.upm.entity.HostEntity">
+		UPDATE tbl_host
+		<set>
+			relate_id = #{relateId}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateStatus" parameterType="com.bsg.upm.entity.HostEntity">
+		UPDATE tbl_host
+		<set>
+			status = #{status}
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="update" parameterType="com.bsg.upm.entity.HostEntity">
+		UPDATE tbl_host
+		<set>
+			cluster_id = #{cluster.id},
+			name = #{name},
+			ssh_ip = #{sshIp},
+			ssh_user = #{sshUser},
+			ssh_password = #{sshPassword},
+			port = #{port},
+			room = #{room},
+			seat = #{seat},
+			max_container = #{maxContainer},
+			hdd_dev = #{hddDev},
+			ssd_dev = #{ssdDev},
+			<choose>
+		        <when test="san!=null">
+					san_id = #{san.id},
+				</when>
+		        <otherwise>
+		           san_id = null,
+		        </otherwise>
+		    </choose>
+		    description = #{description}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<delete id="remove">
+		DELETE FROM tbl_host
+		WHERE id = #{id}
+	</delete>
+
+</mapper>

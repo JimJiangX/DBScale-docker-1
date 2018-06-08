@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="description"
+	content="Sign in to iCloud to access your photos, videos, documents, notes, contacts, and more. Use your Apple ID or create a new account to start using Apple services." />
+<meta name="keywords" content="icloud, free, apple" />
+<meta property="og:title" content="iCloud.com" />
+<meta property="og:image" content="images/icloud_logo.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="viewport"
+	content="initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="google" value="notranslate" content="notranslate" />
+<!-- #FAVICONS -->
+<link rel="shortcut icon" href="img/favicon/favicon.ico"
+	type="image/x-icon">
+<link rel="icon" href="img/favicon/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" sizes="152x152"
+	href="images/touch-icon-pad-retina.png" />
+<link rel="mask-icon" sizes="any" href="images/icloud_icon_for_tabs.svg"
+	color="#5AC8FA" />
+<link rel="mask-icon" sizes="any" href="css/logincss/stylesheet.css" />
+<link href="css/sweetalert-v2.css" rel="stylesheet" />
+<title>Sign in</title>
+<style type="text/css">
+body {
+	background: url(images/bg01.jpg) no-repeat;
+	width: 100%;
+	height: 100%;
+	background-size: 100% 100%;
+	position: absolute;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/blueprint.jpg',
+		sizingMethod='scale');
+	min-height: 100%;
+	/* background: top 130% right 100% no-repeat, linear-gradient(hsla(215, 75%, 19%, 1), #1561a4 33.19%, #195691 81.51%, hsla(212, 74%, 30%, 1)); */
+	/* background-attachment: fixed;
+            background-size: contain;
+            height: 100%;
+            min-height: 100%; */
+}
+
+.login_button {
+	margin-top: 5px;
+	width: 301px;
+	height: 30px;
+	display: inline-block;
+	padding: 4px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	background-image: linear-gradient(to bottom, #fff, #e6e6e6);
+	background-repeat: repeat-x;
+	border: 1px solid #bbb;
+	border-radius: 6px;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 1px 2px
+		rgba(0, 0, 0, .05);
+	border-color: rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.15)
+		rgba(0, 0, 0, 0.25);
+	background-color: #e6e6e6;
+	color: black;
+}
+
+.login_button:hover {
+	outline: 0;
+	color: #333;
+	text-decoration: none;
+	background-position: 0 -15px;
+	transition: background-position .1s linear;
+	background-color: #e6e6e6;
+	color: #333333;
+}
+
+.login_font_upcdb {
+	font-size: 20px;
+}
+
+.login_font_upcdb_title {
+	font-size: 22px;
+	font-weight: normal;
+	font-family: microsoft yahei;
+}
+
+.top_unionpay_logo {
+	position: absolute;
+	left: 3%;
+	top: 5%;
+	width: 10%;
+}
+
+.top_wenhao_logo {
+	position: absolute;
+	right: 3%;
+	top: 6%;
+	width: 15%;
+}
+
+.left_font_undbc {
+	align-content: left;
+	font-size: 30px;
+	position: absolute;
+	left: 3%;
+	bottom: 4%;
+	color: #fff;
+}
+</style>
+<link rel="stylesheet" href="css/logincss/perf.css">
+<link rel="stylesheet" href="css/logincss/app.css">
+<link rel="stylesheet" href="css/logincss/stylesheet@2x.css">
+<link rel="stylesheet" href="css/logincss/login.css">
+</head>
+<body class="sc-theme sc-focus" style="overflow: hidden;">
+	<img alt="中国银联" src="images/logo.png" class="top_unionpay_logo">
+	<a href="" class="top_wenhao_logo"><img alt="帮助"
+		src="images/wenhao.png" class="top_wenhao_logo"></a>
+	<div class="center-login">
+		<div class="si-body si-container container-fluid" id="content"
+			data-theme="lite">
+			<div class="widget-container fade-in  restrict-max-wh  fade-in "
+				data-mode="embed" data-isiebutnotedge="false">
+				<div id="step" class="si-step ">
+					<div class="logo   signin-label ">
+						<img class="cnsmr-app-image" src="images/new_Logo.png"
+							style="width: 330px; margin-bottom: 25px; margin-right: 10px;">
+					</div>
+					<div id="stepEl">
+						<div id="signin" class="signin fade-in  ">
+							<!-- <h1 tabindex="-1" class="login_font_upcdb_title">中国银联云数据库</h1> -->
+							<form action="#" id="login-form" class="smart-form client-form">
+								<div class="container si-field-container  ">
+									<div class="no-gutter si-field apple-id">
+										<div class="col-xs-12">
+											<span class="sr-only" id="appleIdFieldLabel"
+												aria-hidden="true"> 登录 iCloud Apple ID </span>
+											<div class="ax-border apple-id ">
+												<input type="text" id="username" name="username"
+													class="si-text-field form-textbox " placeholder="账号">
+											</div>
+										</div>
+									</div>
+									<div class="field-separator "></div>
+									<div class="no-gutter si-field pwd">
+										<div class="col-xs-12">
+											<label for="pwd" class="sr-only" aria-hidden="true">
+												密码 </label>
+											<div class="ax-border pwd ">
+												<input type="password" id="password" name="password"
+													class="si-password si-text-field   form-textbox"
+													placeholder="密码">
+											</div>
+											<p class="sr-only" id="invalidUserNamePwdErrMsg"
+												role="tooltip"></p>
+										</div>
+									</div>
+									<button id="sign-in" aria-label="登录" type="submit" tabindex="0"
+										class="login_button">登&nbsp录</button>
+									<div class="si-remember-password">
+										<a id="iforgot-link"
+											class="si-link ax-outline lite-theme-override"
+											style="cursor: pointer" target="_blank"> SSO认证登录 </a>
+									</div>
+									<!-- <div class="si-remember-password">
+                                    <label id="remember-me-label" class="form-label" for="remember-me">
+                                        		信息通知消息
+                                    </label>
+                                </div>
+                                <div class="spinner-container auth  hide"></div> -->
+								</div>
+							</form>
+							<!-- <div class="si-container-footer">
+                                <div class="separator "></div>
+                                <div class="links tk-subbody">
+                                    <div class="si-forgot-password">
+                                        <a id="iforgot-link" class="si-link ax-outline lite-theme-override" style="padding
+                                        "
+                                            target="_blank">
+                                            	更经济、更专业、更高效、更可靠、简单易
+                                        </a>
+                                    </div>
+                                    <div class="si-forgot-password">
+                                        <a id="iforgot-link" class="si-link ax-outline lite-theme-override"
+                                            target="_blank">
+                                          	           信息化是指培养、发展以计算机为主的智能化工具为代表的新生产力
+                                        </a>
+                                    </div>
+                                    <div class="si-forgot-password">
+                                        <a id="iforgot-link" class="si-link ax-outline lite-theme-override"
+                                            target="_blank">
+                                            	
+                                        </a>
+                                    </div>
+                                </div>
+                            </div> -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="auth-footer">
+		<!-- <div class="left_font_undbc">UNDBC</div> -->
+		<div class="footer-contents">
+			<div class="links">
+				<div class="line">
+					<!-- <a  target="_blank">系统状态</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="footer-link-separator"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a  target="_blank">隐私政策</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="footer-link-separator"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a  target="_blank">条款与条件</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="footer-link-separator"></span>&nbsp;&nbsp;&nbsp;&nbsp; -->
+					<span class="copyright" style="margin-right: 44%;"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<!--================================================== -->
+<!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+<script src="js/plugin/pace/pace.min.js"></script>
+<!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+<script src="js/libs/jquery-2.1.1.min.js"></script>
+<script src="js/libs/jquery-ui-1.10.3.min.js"></script>
+<!-- IMPORTANT: APP CONFIG -->
+<script src="js/app.config.js"></script>
+<!-- JS TOUCH : include this plugin for mobile drag / drop touch events 		
+		<script src="js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script> -->
+<!-- BOOTSTRAP JS -->
+<script src="js/bootstrap/bootstrap.min.js"></script>
+<!-- JQUERY VALIDATE -->
+<script src="js/plugin/jquery-validate/jquery.validate.min.js"></script>
+<!-- JQUERY MASKED INPUT -->
+<script src="js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+<!--[if IE 8]>
+			<h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
+		<![endif]-->
+<!-- MAIN APP JS FILE -->
+<script src="js/app.min.js"></script>
+<script src="layer/layui.js"></script>
+<script src="layer/ajax.js"></script>
+<script src="js/sweetalert-dev-v2.js"></script>
+<script src="js/util.js"></script>
+<script type="text/javascript">
+		var myDate = new Date();	
+		var new_year = myDate.getFullYear();
+		$(".copyright").text("版权  © "+new_year+" 中国银联保留所有权利");
+		
+		runAllForms();
+		$(function() {
+			// Validation
+			var errorClass = 'invalid';
+        	var errorElement = 'em';
+			$("#login-form").validate({
+				errorClass	: errorClass,
+	            errorElement:errorElement,
+	            debug:false, //设置为true时表单只验证不提交
+	            highlight: function(element) {
+	                $(element).parent().removeClass('state-success').addClass("state-error");
+	                $(element).removeClass('valid');
+	            },
+	            unhighlight: function(element) {
+
+	                $(element).parent().removeClass("state-error").addClass('state-success');
+	                $(element).addClass('valid');
+	            },
+				// Rules for form validation
+				rules : {
+					email : {
+						required : true
+						//email : true
+					},
+					password : {
+						required : true
+						//minlength : 3,
+						//maxlength : 20
+					}
+				},
+				// Messages for form validation
+				messages : {
+					username : {
+						required : '请输入用户名'
+					},
+					password : {
+						required : '请输入密码'
+					}
+				},
+				// Do not change code below
+				errorPlacement : function(error, element) {
+					if($(element).next("div").hasClass("tooltip")) {
+	                    $(element).attr("data-original-title", $(error).text()).tooltip("show");
+	                }
+	                    else{
+	                    $(element).attr("title", $(error).text()).tooltip("show");
+	                    }
+				},
+				 submitHandler:function(form){
+					 var params = JSON.stringify({
+					    	loginName:$("#username").val(),
+					    	password:$("#password").val()
+					    });
+					 sendPost("v1.0/login",loginReturn,procError,params,null);
+			    }    
+			});
+		});
+		function loginReturn(data){
+			setSession("user", JSON.stringify(data.data));
+			if (data.data.role.code == "admin") {
+				location.href ="views/site/list.html";
+			}else{
+				swal("提示","您的账号无法登陆管理员系统!","info");
+			}
+		}
+	</script>
+</html>

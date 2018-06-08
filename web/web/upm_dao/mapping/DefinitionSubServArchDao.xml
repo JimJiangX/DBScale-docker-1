@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsg.upm.dao.DefinitionSubServArchDao">
+	<resultMap id="definitionSubServArchResultMap"
+		type="com.bsg.upm.entity.DefinitionSubServArchEntity">
+		<id property="id" column="arch_id" />
+		<result property="name" column="arch_name" />
+		<result property="code" column="arch_code" />
+		<result property="type" column="arch_type" />
+		<result property="unitNum" column="arch_unit_num" />
+		<result property="sequence" column="arch_sequence" />
+		<result property="highAvailability" column="arch_high_availability" />
+		<result property="consistency" column="arch_consistency" />
+		<result property="capability" column="arch_capability" />
+		<result property="defaults" column="arch_default" />
+		<result property="hasStandBy" column="arch_has_standby" />
+	</resultMap>
+
+	<resultMap id="definitionSubServArchDetailResultMap"
+		type="com.bsg.upm.entity.DefinitionSubServArchEntity" extends="definitionSubServArchResultMap">
+		<association property="definitionSubServ"
+			resultMap="com.bsg.upm.dao.DefinitionSubServDao.definitionSubServResultMap">
+		</association>
+	</resultMap>
+	
+	<select id="list" resultMap="definitionSubServArchDetailResultMap" flushCache="true">
+		SELECT arch.id AS arch_id, 
+			arch.name AS arch_name,
+			arch.code AS arch_code,
+			arch.type AS arch_type,
+			arch.unit_num AS arch_unit_num,
+			arch.sequence AS arch_sequence,
+			arch.high_availability AS arch_high_availability,
+			arch.consistency AS arch_consistency,
+			arch.capability AS arch_capability,
+			arch.default AS arch_default,
+			arch.has_standby AS arch_has_standby,
+			dfsubserv.id AS dfsubserv_id,
+            dfsubserv.name AS dfsubserv_name
+		FROM tbl_definition_subserv_arch arch, 
+            tbl_definition_subserv dfsubserv
+         WHERE arch.definition_subserv_id = dfsubserv.id
+        <if test="definitionServCode!=null">
+            AND dfsubserv.definition_serv_code = #{definitionServCode}   
+        </if>
+        <if test="definitionSubServName!=null">
+            AND dfsubserv.name = #{definitionSubServName}   
+        </if>
+        <if test="hasStandBy!=null">
+            AND arch.has_standby = #{hasStandBy}   
+        </if>
+        ORDER BY dfsubserv.id, arch.sequence ASC
+	</select>	
+	
+	<select id="listArchName" resultMap="definitionSubServArchResultMap" flushCache="true">
+		SELECT arch.id AS arch_id, 
+			arch.name AS arch_name
+		FROM tbl_definition_subserv_arch arch, 
+			tbl_definition_subserv dfsubserv
+		WHERE arch.definition_subserv_id = dfsubserv.id
+			AND dfsubserv.definition_serv_code = #{definitionServCode}
+			AND dfsubserv.name = #{definitionSubServName}
+			ORDER BY arch.sequence ASC
+	</select>
+	
+	<select id="listUnitNum" resultMap="definitionSubServArchResultMap" flushCache="true">
+		SELECT arch.id AS arch_id, 
+			arch.unit_num AS arch_unit_num
+		FROM tbl_definition_subserv_arch arch, 
+			tbl_definition_subserv dfsubserv
+		WHERE arch.definition_subserv_id = dfsubserv.id
+			AND dfsubserv.definition_serv_code = #{definitionServCode}
+			AND dfsubserv.name = #{definitionSubServName}
+			ORDER BY arch.unit_num ASC
+	</select>
+	
+	<select id="get" resultMap="definitionSubServArchDetailResultMap" flushCache="true">
+		SELECT arch.id AS arch_id, 
+			arch.name AS arch_name,
+			arch.code AS arch_code,
+			arch.type AS arch_type,
+			arch.unit_num AS arch_unit_num,
+			arch.high_availability AS arch_high_availability,
+			arch.consistency AS arch_consistency,
+			arch.capability AS arch_capability,
+			dfsubserv.id AS dfsubserv_id,
+			dfsubserv.name AS dfsubserv_name
+		FROM tbl_definition_subserv_arch arch, 
+		  tbl_definition_subserv dfsubserv
+		WHERE arch.definition_subserv_id = dfsubserv.id 
+		  AND arch.id = #{id} 
+	</select>
+	
+</mapper>

@@ -1,0 +1,115 @@
+<section id="widget-grid" class="">
+			<div class="row">
+		    	<div id="list-alert">
+		        </div>
+	    	</div>
+			<div class="modal fade" id="sMetricclassModal" tabindex="-1"
+				role="dialog" aria-labelledby="sMetricclassModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" style="width: 300px; margin-top: 10%;">
+					<div class="modal-content">
+						<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+					</div>
+				</div>
+			</div>
+			<a href="javascript:void(0);" class="btn btn-info"
+				onclick="metricclassClick('update')" id="metricclassUpdate">监控频率</a>
+			<a href="javascript:void(0);" class="btn btn-success"
+				onclick="metricclassClick('start')" id="metricclassEnable">启用</a>
+			<a href="javascript:void(0);" class="btn btn-danger"
+				onclick="metricclassClick('stop')" id="metricclassDisable">停用</a>
+			<a href="javascript:void(0);" class="btn btn btn-primary" style="float: right;"
+				onclick="backClick()" id="metricclassBack">返回</a>
+			<p style="height: 0px;">&nbsp;</p>
+			<table id="jqgridMetricclass"></table>
+			<div id="pjqgridMetricclass"></div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    	    	sendGet("/" + getProjectName() + "/v1.0/monitor/hosts/config/"+getSession("eventHostId")+"/metricclass-infos",metricclassInfosGrid,ListAlert,null);
+    		});
+    	});
+    });
+    
+    function backClick(){
+    	window.location.href = "index.html#views/monitor/host/resource.html";
+    }
+    
+    function metricclassClick(type){
+    	ListAlertClear();
+    	var s = $("#jqgridMetricclass").jqGrid('getGridParam', 'selarrrow');
+    	var metric_class = $("#jqgridMetricclass").jqGrid('getRowData',s).metric_class;
+    	var jsonData = {};
+    	if(s.length == 1){
+    		switch(type){
+   		 	case "update":
+	   		 	var id = $("#metricclassUpdate");
+	   		 	id.attr("data-toggle","modal");
+	            id.attr("data-target","#sMetricclassModal");
+	            id.attr("href","views/monitor/host/metricclassUpdate.html");
+   		 		break;
+   		 	case "start":
+   		 		jsonData = {
+   		 			metric_class:metric_class,
+   		 			hosts:[getSession("eventHostId")]
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要启用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/metricclass/enable",showReturn,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+		 		break;
+   		 	case "stop":
+   		 		jsonData = {
+   		 			metric_class:metric_class,
+   		 			hosts:[getSession("eventHostId")]
+   		 		}
+	   		 	swal({ 
+					  title: "提示", 
+					  text: "确定要停用么？", 
+					  type: "info",
+					  showCancelButton: true, 
+					  confirmButtonColor: "#DD6B55",
+					  confirmButtonText: "确定", 
+					  cancelButtonText: "取消",
+					  closeOnConfirm: true,
+					  closeOnCancel	:true
+					}).then((result) => {
+						if (result.value) { 
+			   		 		sendPut("/" + getProjectName() + "/v1.0/monitor/hosts/config/metricclass/disable",showReturn,ListAlert,JSON.stringify(jsonData),null);
+						}
+				});
+	 			break;
+   		 	default:
+    		}
+    	}else{
+	   		 ListAlert("请勾选一行数据");
+	 	}
+    }
+    
+    function showReturn(){
+    	sendGet("/" + getProjectName() + "/v1.0/monitor/hosts/config/"+getSession("eventHostId")+"/metricclass-infos",reloadGrid,ListAlert,null);
+	}
+    
+    function reloadGrid(data){
+    	ListAlertClear();
+    	var jq_data=data['data'];  	
+    	$("#jqgridMetricclass").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

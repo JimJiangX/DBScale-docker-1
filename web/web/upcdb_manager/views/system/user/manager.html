@@ -1,0 +1,117 @@
+<section id="widget-grid" class="">
+    <div class="row" id="dictButton" style="margin-bottom:5px;">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="widget-body">
+                <!-- Dynamic Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" style="width: 605px;">
+                        <div class="modal-content">
+                            <!-- content will be filled here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- content will be filled here -->
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:void(0);" onclick="editDict()" id="editUserInfo"  class="btn btn-info">编辑</a>
+                <a href="javascript:void(0);" class="btn btn-success" onclick="userManagerClick('start')" id="deleteDict">启用</a>
+                <a href="javascript:void(0);" class="btn btn-danger" onclick="userManagerClick('stop')" id="deleteDict">停用</a>
+                <input type="hidden" id="dictCode" value="">
+            </div>
+        </article>
+    </div>
+    <div class="row">
+    	<div id="list-alert">
+        </div>
+    </div>
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <table id="jqgrid"></table>
+            <div id="pjqgrid"></div>
+        </article>
+    </div>
+</section>
+<script>
+    pageSetUp();
+    loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function(){
+    	loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function(){
+    		loadScript("js/create-jqgrid.js", function(){ 
+    			sendGet("/" + getProjectName() + "/v1.0/users",createGrid_user,ListAlert,null);
+    		});
+    	});
+    });
+	var jq_data;
+
+    function editDict(){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow'); 
+    	if(s.length==1){
+    		var id = $("#editUserInfo");
+    		id.attr("data-toggle","modal");
+            id.attr("data-target","#addModal");
+    		$("#editUserInfo").attr("href","views/system/user/edit.html");
+    	 }
+    	 else{
+    		 ListAlert("请勾选一行数据");
+    	 }
+    }
+	
+    function userManagerClick(type){
+    	ListAlertClear();
+    	var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+    	var username = $("#jqgrid").jqGrid('getRowData',s).username;
+    	if(s.length == 1){
+    		switch(type){
+   		 	case "start":
+   		 		sendPut("/" + getProjectName() + "/v1.0/users/"+username+"/enable",showReturn,ListAlert,null,null);
+		 		break;
+   		 	case "stop":
+   		 		sendPut("/" + getProjectName() + "/v1.0/users/"+username+"/disable",showReturn,ListAlert,null,null);
+	 			break;
+   		 	default:
+    		}
+    	}else{
+	   		 ListAlert("请勾选一行数据");
+	         id.removeAttr("data-toggle");
+	         id.removeAttr("data-target");
+	         id.removeAttr("href");
+	 	}
+    }
+    
+    function showReturn(data){
+    	//启用、停用执行成功后的操作方法，刷新表格
+		sendGet("/" + getProjectName() + "/v1.0/users",reloadGrid,ListAlert,null);
+	}
+    
+    function reloadGrid(data){
+    	ListAlertClear();
+    	jq_data=data['data'];   	
+    	$("#jqgrid").clearGridData().setGridParam({data:jq_data}).trigger("reloadGrid");
+    }
+    
+    
+  //模态框刷新启停
+    $(function () { 
+    	//显示监听
+    	$('#addModal').on('show.bs.modal', function () {
+    		 if(typeof(flag) != "undefined"){
+    			 clearInterval(flag); 
+    		 }
+    	})
+    	//隐藏监听
+    	$('#addModal').on('hide.bs.modal', function () {
+    		if(typeof(flag) != "undefined"){ 
+    			 flag = setInterval(showReturn, setTime);
+   		 	}
+    	})
+    	
+    }); 
+    
+    
+    clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>

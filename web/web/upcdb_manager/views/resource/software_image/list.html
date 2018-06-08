@@ -1,0 +1,253 @@
+<section id="widget-grid" class="">
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="widget-body">
+				<!-- Dynamic Modal -->
+				<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+					aria-labelledby="addModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+						</div>
+					</div>
+				</div>
+				<a href="javascript:void(0);" onclick="add_software()"
+					id="addsoftware" class="btn btn-success" data-toggle="modal"
+					data-target="#addModal">新增</a> <a href="javascript:void(0);"
+					class="btn btn-primary" onclick="start_software()">启用</a> <a
+					href="javascript:void(0);" class="btn btn-warning"
+					onclick="stop_software()">停用</a> <a href="javascript:void(0);"
+					class="btn btn-danger" onclick="delete_software()">删除</a> 
+					<a href="javascript:void(0);" class="btn btn-primary" onclick="sends_software()">发布</a>
+					<a
+					href="javascript:void(0);" class="btn btn-success"
+					id="servSoftware" onclick="serv_software()">服务</a> <br> <br>
+			</div>
+		</article>
+	</div>
+	<div class="row">
+		<div id="list-alert"></div>
+	</div>
+	<div class="row">
+		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<!-- Widget ID (each widget will need unique ID)-->
+			<!-- end widget -->
+			<table id="jqgrid"></table>
+			<div id="pjqgrid"></div>
+		</article>
+	</div>
+</section>
+
+<div class="modal fade" id="taskModal" tabindex="-1" role="dialog"
+	aria-labelledby="taskModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 1024px; padding:0 0 0 5px;">
+		<div class="modal-content">
+			<!-- content will be filled here from "ajax/modal-content/model-content-1.html" -->
+			<div class="row">
+				<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="widget-body">
+						<header style="padding: 0 20px;">
+							<h2>
+								任务详情列表
+								<button class="close" data-dismiss="modal">x</button>
+							</h2>
+							<div id="dialog-alert"></div>
+						</header>
+					</div>
+				</article>
+			</div>
+			<div class="row" style="padding-left: 20px; padding-bottom: 10px;">
+				<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<table id="jqgridTask"></table>
+					<div id="pjqgridTask"></div>
+				</article>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="servModal" tabindex="-1" role="dialog"
+	aria-labelledby="servModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 80%;" id="dialogmodal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="taskModalLabel">任务状态提示</h4>
+			</div>
+			<div class="modal-body">
+				<div class="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>所属租户</th>
+								<th>主机名称</th>
+								<th>所属系统</th>
+								<th>所属子系统</th>
+								<th>实例名称</th>
+								<th>实例单元</th>
+							</tr>
+						</thead>
+						<tbody id="servSoftwareTable">
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+<script>
+	pageSetUp();
+	loadScript("js/plugin/jqgrid/grid.locale-en.min.js", function() {
+		loadScript("js/plugin/jqgrid/jquery.jqGrid.min.js", function() {
+			var siteid = getSession("siteId");
+			sendGet("/" + getProjectName() + "/v1.0/softwares/images?site="
+					+ siteid, createGrid_si_1, ListAlert, null);
+		});
+	});
+	// load related plugins
+	var siteid = getSession("siteId");
+	function add_software() {
+		$("#addsoftware")
+				.attr("href", "views/resource/software_image/add.html");
+	}
+	function delete_software() {
+		ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		if (s.length == 1) {
+			var image_id = $("#jqgrid").jqGrid('getRowData', s).id;
+			ListConfirm('delete', image_id);
+		} else {
+			ListAlert("请勾选一行数据");
+		}
+	}
+	function start_software() {
+		ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		if (s.length == 1) {
+			var image_id = $("#jqgrid").jqGrid('getRowData', s).id;
+			ListConfirm('start', image_id);
+		} else {
+			ListAlert("请勾选一行数据");
+		}
+	}
+	function stop_software() {
+		ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		if (s.length == 1) {
+			var image_id = $("#jqgrid").jqGrid('getRowData', s).id;
+			ListConfirm('stop', image_id);
+		} else {
+			ListAlert("请勾选一行数据");
+		}
+	}
+	function sends_software() {
+		ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		if (s.length == 1) {
+			var image_id = $("#jqgrid").jqGrid('getRowData', s).id;
+			ListConfirm('sends', image_id);
+		} else {
+			ListAlert("请勾选一行数据");
+		}
+	}
+
+
+	function serv_software() {
+		ListAlertClear();
+		var s = $("#jqgrid").jqGrid('getGridParam', 'selarrrow');
+		var image_id = $("#jqgrid").jqGrid('getRowData', s).id;
+		
+		var id = $("#servSoftware");
+		if (s.length == 1) {
+			$("#servSoftwareTable").empty();
+			id.attr("data-toggle", "modal");
+			id.attr("data-target", "#servModal");
+			sendGet("/" + getProjectName() + "/v1.0/servs?software_image="
+					+ image_id, createGrid_softwareServiceDetail, ListAlert,
+					null);
+		} else {
+			ListAlert("请勾选一行数据");
+			id.removeAttr("data-toggle");
+			id.removeAttr("data-target");
+			id.removeAttr("href");
+		}
+	}
+
+	function sendsSuccess(){
+		swal("提示","已下发！","info");
+	}
+	
+	function confirm(type, id) {
+		ListAlertClear();
+		switch (type) {
+		case 'start':
+			sendPut("/" + getProjectName() + "/v1.0/softwares/images/" + id
+					+ "/enable", showReturn, ListAlert, null, null);
+			break;
+		case 'stop':
+			sendPut("/" + getProjectName() + "/v1.0/softwares/images/" + id
+					+ "/disable", showReturn, ListAlert, null, null);
+			break;
+		case 'delete':
+			sendDelete("/" + getProjectName() + "/v1.0/softwares/images/" + id,
+					deleteReturn, ListAlert, null);
+			break;
+		case 'sends':
+			sendPut("/" + getProjectName() + "/v1.0/softwares/images/"+id+"/send",
+					sendsSuccess, ListAlert, null);
+			break;
+		default:
+		}
+	}
+
+	function showReturn(data) {
+		sendGet("/" + getProjectName() + "/v1.0/softwares/images?site="
+				+ siteid, reloadGrid, ListAlert, null);
+	}
+	function reloadGrid(data) {
+		ListAlertClear();
+		var jq_data = data['data'];
+		$("#jqgrid").clearGridData().setGridParam({
+			data : jq_data
+		}).trigger("reloadGrid");
+	}
+	function deleteReturn(data) {
+		sendGet("/" + getProjectName() + "/v1.0/softwares/images?site="
+				+ getSession("siteId"), reloadGrid, ListAlert, null);
+	}
+
+	$('#taskModal').on("show.bs.modal",function(e) {
+				ListAlertClear();
+				$("#mainframestate").empty();
+				$("#jqgridTask").jqGrid('GridUnload');
+				sendGet("/" + getProjectName() + "/v1.0/tasks?obj_id="+ $(e.relatedTarget).data('taskId'),createGrid_taskDetailModal, ListAlert, null);
+	});
+
+	//模态框刷新启停
+	$(function() {
+		//显示监听
+		$('#addModal').on('show.bs.modal', function() {
+			if (typeof (flag) != "undefined") {
+				clearInterval(flag);
+			}
+		})
+		//隐藏监听
+		$('#addModal').on('hide.bs.modal', function() {
+			if (typeof (flag) != "undefined") {
+				flag = setInterval(showReturn, setTime);
+			}
+		})
+
+	});
+
+	clearInterval(flag);
+	var flag = setInterval(showReturn, setTime);
+</script>
