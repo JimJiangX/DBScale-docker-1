@@ -1,0 +1,16 @@
+[template]
+src = "start.sh.tmpl"
+dest = "start.sh"
+keys = [       
+         "/base/dir",
+         "/ip/addr",
+         "/horus/polymerizer/port",
+         "/consul/port",
+         "/consul/datacenter",
+         "/horus/server/port",
+         "/horus/polymerizer/db/user",
+         "/horus/polymerizer/db/name",
+         "/horus/polymerizer/db/port",
+         "/horus/polymerizer/db/pwd",
+         "/horus/polymerizer/db/host",
+]
