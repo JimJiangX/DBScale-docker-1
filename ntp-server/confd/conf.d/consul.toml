@@ -1,0 +1,9 @@
+[template]
+src = "consul.toml"
+dest = "/etc/ntp.conf"
+owner = "root"
+mode = "0644"
+keys = [
+   "/dbs/ip",   ##允许连接ntp的网段
+   "/up/ip",    ##上一级ntp服务器IP
+]
