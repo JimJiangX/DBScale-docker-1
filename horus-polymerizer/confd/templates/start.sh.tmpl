@@ -1,31 +1,16 @@
 #!/bin/bash
 set -o nounset
-#基础目录
 base_dir={{getv "/base/dir"}}
-#绑定IP地址
 ip={{getv "/ip/addr"}}
-# horus polymerizer port
 horus_polymerizer_port={{getv "/horus/polymerizer/port"}}
-#consul 端口号
 consul_port={{getv "/consul/port"}}
-#consul 数据中心名称
 consul_dc={{getv "/consul/datacenter"}}
-#horus server端口号
 horus_server_port={{getv "/horus/server/port"}}
-#couchbase 集群IP地址
-#日志文件
 log_file={{getv "/base/dir"}}/polymerizer.log
-
-#kafka_addr=<KAFKA_ADDR>
-
-#kafka_event_topic="dbass_event_topic"
-
-#kafka_metric_topic="dbass_metric_topic"
-
-#mysql连接串
+couchbase_list=$cb1,$cb2,$cb3
 mysql_connection="{{getv "/horus/polymerizer/db/user"}}:{{getv "/horus/polymerizer/db/pwd"}}@tcp({{getv "/horus/polymerizer/db/host"}}:{{getv "/horus/polymerizer/db/port"}})/{{getv "/horus/polymerizer/db/name"}}?charset=utf8"
 
-$base_dir/bin/horus-polymerizer -logfile ${log_file} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -cb ${couchbase_list} -mysql ${mysql_connection} &
+horus-polymerizer -logfile ${log_file} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -cb ${couchbase_list} -mysql ${mysql_connection} &
 #$base_dir/bin/horus-polymerizer -logfile ${log_file} -enable-kafka -kafka-addr ${kafka_addr} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -cb ${couchbase_list} -mysql ${mysql_connection} &
 #$base_dir/bin/horus-polymerizer -logfile ${log_file} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -mysql ${mysql_connection} &
 

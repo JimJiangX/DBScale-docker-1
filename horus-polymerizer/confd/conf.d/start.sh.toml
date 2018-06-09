@@ -1,6 +1,7 @@
 [template]
 src = "start.sh.tmpl"
 dest = "/usr/bin/start.sh"
+mode = "0755"
 keys = [       
          "/base/dir",
          "/ip/addr",
@@ -13,4 +14,7 @@ keys = [
          "/horus/polymerizer/db/port",
          "/horus/polymerizer/db/pwd",
          "/horus/polymerizer/db/host",
+         "/cb1",
+         "/cb2",
+         "/cb3",
 ]
