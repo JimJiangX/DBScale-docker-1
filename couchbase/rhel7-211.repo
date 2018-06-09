@@ -1,25 +1,5 @@
-[rhel-7-server-rpms]
-name = rhel-7-server-rpms
-baseurl = http://192.168.211.20:81/rhel-7-server-rpms
-enabled=1
-gpgcheck=0
-[rhel-7-fast-datapath-rpms]
-name = rhel-7-fast-datapath-rpms
-baseurl = http://192.168.211.20:81/rhel-7-fast-datapath-rpms
-enabled=1
-gpgcheck=0
-[rhel-7-server-extras-rpms]
-name = rhel-7-server-extras-rpms
-baseurl = http://192.168.211.20:81/rhel-7-server-extras-rpms
-enabled=1
-gpgcheck=0
-[rh-gluster-3-for-rhel-7-server-rpms]
-name = rh-gluster-3-for-rhel-7-server-rpms
-baseurl = http://192.168.211.20:81/rh-gluster-3-for-rhel-7-server-rpms
-enabled=1
-gpgcheck=0
-[rhel-7-server-ose-3.7-rpms]
-name = rhel-7-server-ose-3.7-rpms
-baseurl = http://192.168.211.20:81/rhel-7-server-ose-3.7-rpms
+[centos-7.4x64]
+name=centos 7.4 x64
+baseurl=http://10.0.11.80/dbscale
 enabled=1
 gpgcheck=0
