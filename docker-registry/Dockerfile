@@ -11,14 +11,12 @@ RUN     rm -rf /etc/yum.repos.d/*
 COPY    rhel7-211.repo /etc/yum.repos.d/
 RUN     yum clean all && yum repolist
 EXPOSE  20160
-ADD    confdx /
+ADD    bin/confd /usr/bin/confd
 ADD    confd /etc/confd
-ADD    registry /usr/bin/
-ADD    registry.sh /
+ADD    bin/registry /usr/bin/registry
+ADD    bin/start.sh /usr/bin/start.sh
 
-RUN     mv  confdx confd &&  \
-        chmod 777 confd &&   \
-        /confd -version && \
-        /confd -onetime -backend env
+RUN     confd -version && \
+        confd -onetime -backend env
          
-CMD    registry /etc/registry.conf  
+CMD    start.sh 
