@@ -18,16 +18,15 @@ ENV CB_USER=couchbase
 ENV CB_ADMIN_PASS=222222
  
 COPY rhel7-211.repo /etc/yum.repos.d/
-ADD  couchbase-server-enterprise-5.1.0-centos7.x86_64.rpm  /
-CMD  /usr/sbin/init
-RUN  yum clean all && yum repolist &&  \
-     yum -y install openssl hostname initscripts pkgconfig tar wget couchbase-server 
+ADD couchbase-server-enterprise-4.6.4-centos7.x86_64.rpm /
+RUN  yum clean all && yum repolist && yum -y install openssl && rpm -ivh couchbase-server-enterprise-4.6.4-centos7.x86_64.rpm
 WORKDIR /
 COPY confd-0.16.0-linux-amd64 /
 RUN mv confd-0.16.0-linux-amd64 confd && chmod +x confd && ./confd -version
+RUN yum -y install http://packages.couchbase.com/releases/${CB_VERSION}/couchbase-server-community_${CB_VERSION}_x86_64.rpm
 USER $CB_USER
 #COPY confd /etc/confd
 #RUN ./confd -onetime -backend env
 # Set default command
+CMD /run.sh
 EXPOSE 8091 8092 11209 11210 11211
-CMD /opt/couchbase/bin/couchbase-server start -- -noinput

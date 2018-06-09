@@ -1,0 +1,7 @@
+[template]
+src = "run.sh.tmpl"
+dest = "run.sh"
+keys = [
+       "/cb/user",
+       "/cb/admin/pass",
+]
