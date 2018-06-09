@@ -1,0 +1,47 @@
+#!/bin/bash
+set -o nounset
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -lt 1 ];then
+        echo "args must eqaul to 1"
+        exit 2
+fi
+
+CONTAINER=$1
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+        	echo "Container $CONTAINER not running."
+                exit 4
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+        exit 1
+fi
+
+
+#mysql.error_file_size
+data_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASDAT"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+errfile=${data_dir}/mysql.err
+errsize=$(du -b $errfile 2>/dev/null | awk '{print $1}')
+if [ "$errsize" = "" ];then
+	errsize=0
+fi
+
+
+#mysql.table_size
+tablestr=$(docker exec ${CONTAINER} /root/db_mgm.sh list_tab '' | tr -t '\n' '#')
+if [ "${tablestr}" = "" ];then
+	tablestr=0
+fi
+
+echo "$errsize:$tablestr"

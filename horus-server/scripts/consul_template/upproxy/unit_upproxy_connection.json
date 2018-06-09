@@ -1,0 +1,44 @@
+#!/bin/bash
+set -o nounset
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+        echo "must eqaul to 1"
+        exit 2
+fi
+
+CONTAINER=$1
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+        	echo "Container $CONTAINER not running."
+                exit 4
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+        exit 1
+fi
+
+data_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASDAT"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+link=$(awk -F= '/proxy-address=/{print $2}' ${data_dir}/upsql-proxy.conf)
+if [ "${link}" == "" ];then
+        echo "not find link"
+        exit 2
+fi 
+
+connection=$(docker exec ${CONTAINER} netstat -an | grep -i ESTABLISHED | grep $link | wc -l)
+if [ "${connection}" == "" ];then
+	echo "null"
+        exit 2
+fi 
+
+echo ${connection}

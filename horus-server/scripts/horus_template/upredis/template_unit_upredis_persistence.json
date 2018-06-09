@@ -1,0 +1,180 @@
+{
+  "metric_class": "unit_upredis_persistence",
+  "interval_time": 60,
+  "exec_file": "unit_upredis_persistence.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upredis",
+  "metrics": [
+    {
+      "metric": "unit_upredis.rdb_bgsave_in_progress",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "err",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "ok",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.rdb_changes_since_last_save",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "err",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "ok",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.rdb_last_bgsave_status",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "err",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "ok",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.rdb_last_bgsave_time_sec",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "0-0",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "0-0",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "0-0",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-0",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.rdb_last_save_time",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 1440
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+#!/bin/bash
+set -o nounset
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 3 ];then
+	echo "must eqaul to 3"
+  	exit 2
+fi
+
+CONTAINER=$1
+#USER=$2
+#PASSWD=$3
+
+STATUSFILE=`mktemp -u /tmp/mysql_connection_status-XXXXXX`
+VARFILE=`mktemp -u /tmp/mysql_connection_variables-XXXXX`
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+		rm -f $STATUSFILE $VARFILE
+                exit 3
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+	rm -f $STATUSFILE $VARFILE
+        exit 31
+fi
+
+docker exec ${CONTAINER} mysql -e"show status where Variable_name in ('threads_running','threads_cached','Threads_connected','Aborted_connects');" > $STATUSFILE  2>/dev/null
+if [ $? -ne 0 ];then
+	echo "get status err"
+	rm -f $STATUSFILE $VARFILE
+	exit 4
+fi
+
+docker exec ${CONTAINER} mysql -e"show variables where Variable_name in ('max_connections', 'thread_cache_size');" > $VARFILE  2>/dev/null
+if [ $? -ne 0 ];then
+	echo "get variabes err"
+	rm -f $STATUSFILE $VARFILE
+	exit 5
+fi
+
+while read LINE 
+do 
+	key=`echo $LINE| awk '{print $1}'`
+ 	value=`echo $LINE| awk '{print $2}'`
+ 	case $key in
+	Aborted_connects)
+	aborted=$value
+	;;
+	Threads_cached)
+	cached=$value
+	;;
+	Threads_connected)
+	#mysql.connection_attempts
+	attempts=$value
+	;;
+	Threads_running)
+	#unsql.exec_thread
+	exec_thread=$value
+	esac
+done <$STATUSFILE
+
+
+while read LINE 
+do 
+ 	key=`echo $LINE| awk '{print $1}'`
+ 	value=`echo $LINE| awk '{print $2}'`
+ 	case $key in
+	max_connections)
+	#mysql.connection_total
+	total=$value
+	;;
+	thread_cache_size)
+	size=$value
+	esac
+done <$VARFILE
+
+#mysql.connection_usage
+connection_usage=`echo "scale=2;$attempts/$total*100" |bc `
+
+#mysql.thread_cache_usage
+cache_usage=`echo "scale=3;$cached/$size*100" |bc `
+
+echo "$attempts:$total:$connection_usage:$exec_thread:$cache_usage"
+
+rm -f $STATUSFILE $VARFILE

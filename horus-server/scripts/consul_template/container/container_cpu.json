@@ -1,0 +1,46 @@
+#!/bin/bash
+set -o nounset
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER_NAME=$1
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if ! installed docker; then
+	echo "not find docker"
+	exit 3
+fi
+
+running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER_NAME} 2>/dev/null`
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER_NAME} is not runing !"
+	exit 4
+fi
+
+cpu_num=`docker inspect -f '{{.HostConfig.CpusetCpus}}' ${CONTAINER_NAME} | awk -F, '{print NF}' 2>/dev/null`
+if [ "${cpu_num}" == "" ]; then
+	echo "cpu_num not found"
+	exit 5
+elif [ "${cpu_num}" == "0" ]; then
+	cpu_num=1
+fi
+
+all_cpu_usage=`docker stats --no-stream ${CONTAINER_NAME} 2>/dev/null | tail -n 1| awk '{print $2}' | tr -d % 2>/dev/null`
+if [ "${all_cpu_usage}" == "" ]; then
+	echo "all_cpu_usage not found"
+	exit 6
+fi
+
+avg_cpu_usage=`awk 'BEGIN{printf "%.2f",'${all_cpu_usage}'/'${cpu_num}'}' 2>/dev/null`
+if [ "${avg_cpu_usage}" == "" ]; then
+	echo "avg_cpu_usage not found"
+	exit 7
+fi
+
+echo "${all_cpu_usage}:${avg_cpu_usage}"

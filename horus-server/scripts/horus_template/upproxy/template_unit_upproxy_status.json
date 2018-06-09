@@ -1,0 +1,44 @@
+{
+  "metric_class": "unit_upproxy_status",
+  "interval_time": 60,
+  "exec_file": "unit_upproxy_status.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upproxy",
+  "metrics": [
+    {
+      "metric": "unit_upproxy.status",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "critical",
+          "event_level_enable": true,
+          "alarm_enable": true
+        },
+        {
+          "level": "warning",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "passing",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 15
+    }
+  ]
+}

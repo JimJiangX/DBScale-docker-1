@@ -1,0 +1,78 @@
+{
+  "metric_class": "unit_upredis_client",
+  "interval_time": 60,
+  "exec_file": "unit_upredis_client.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upredis",
+  "metrics": [
+    {
+      "metric": "unit_upredis.connected_clients",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "1000-100000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "500-999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "100-499",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-99",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.blocked_clients",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "80-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "60-79",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    }
+  ]
+}

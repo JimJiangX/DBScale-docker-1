@@ -1,0 +1,44 @@
+#!/bin/bash
+set -o nounset
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER_ID=$1
+CONTAINER_NET_DEV=eth0
+INTERVAL=5
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+CONTAINER_NAME=$(docker inspect -f '{{.Name}}' ${CONTAINER_ID} | cut -c 2-)
+
+running_status=$(docker inspect -f "{{.State.Running}}" ${CONTAINER_NAME} 2>/dev/null)
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER_NAME} is not runing !"
+	exit 4
+fi
+
+out=$(docker exec ${CONTAINER_NAME} get_net_flow_rate ${CONTAINER_NET_DEV} ${INTERVAL} 2>/dev/null)
+
+input=$(echo $out | awk '{print $1}' | awk -F: '{print $2}' 2>/dev/null)
+if [ "${input}" == "" ]; then
+	echo "input not found"
+	exit 5
+fi
+
+output=$(echo $out | awk '{print $2}' | awk -F: '{print $2}' 2>/dev/null)
+if [ "${output}" == "" ]; then
+	echo "output not found"
+	exit 6
+fi
+
+echo "${input}:${output}"

@@ -1,0 +1,86 @@
+#!/bin/bash
+set -o nounset
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 3 ];then
+	echo "must eqaul to 3"
+  	exit 2
+fi
+
+CONTAINER=$1
+#USER=$2
+#PASSWD=$3
+TEMPFILE=`mktemp -u /tmp/mysql_buffer-XXXXXX`
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+		rm -f $TEMPFILE
+                exit 4
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+	rm -f $TEMPFILE
+        exit 1
+fi
+
+docker exec ${CONTAINER} mysql -e"show status where Variable_name in ('Innodb_buffer_pool_pages_free','Innodb_page_size','Innodb_buffer_pool_pages_total','innodb_buffer_pool_reads','innodb_buffer_pool_read_requests');" >$TEMPFILE  2>/dev/null
+if [ $? -ne 0 ];then
+	echo "get status err"
+	rm -f $TEMPFILE
+	exit 2
+fi
+
+while read LINE 
+do
+	key=`echo $LINE| awk '{print $1}'`
+	value=`echo $LINE| awk '{print $2}'`
+	case $key in
+	Innodb_buffer_pool_read_requests)
+	requests=$value
+	;;
+	Innodb_buffer_pool_reads)
+	reads=$value
+	;;
+	Innodb_buffer_pool_pages_total)
+	pool_pages_total=$value
+	;;
+	Innodb_buffer_pool_pages_free)
+	pool_pages_free=$value
+	;;
+	Innodb_page_size)
+	page_size=$value
+	esac
+done <$TEMPFILE
+
+#mysql.buffer_pool_hit
+#hit=`echo "scale=4;($requests - $reads)/$requests*100" |bc `
+hit=`docker exec ${CONTAINER} orzdba.pl -nocolor -C 1 -hit | tail -n 1 | awk '{print $2}' | sed 's/|//g'`
+
+#mysql.buffer_pool.size
+total=`echo "$pool_pages_total*$page_size" |bc `
+
+#mysql.buffer_pool.free_size
+free=`echo "$pool_pages_free*$page_size" |bc `
+
+#mysql.buffer_pool_dirty_page
+dirty_page=`docker exec  ${CONTAINER} mysql -e"show engine innodb status \G;" 2>/dev/null | grep '^Total large memory allocated' | awk '{print $5}' | tr -d ";"`
+if [ "$dirty_page" = "" ];then
+   dirty="err"
+else
+   dirty=`echo "${dirty_page}" |bc `
+fi
+
+#mysql.buffer_pool_usage
+usage=`awk 'BEGIN{printf "%.2f",('${pool_pages_total}'-'${pool_pages_free}')/'${pool_pages_total}'*100}'`
+
+echo "$dirty:$free:$hit:$total:$usage"
+rm -f $TEMPFILE

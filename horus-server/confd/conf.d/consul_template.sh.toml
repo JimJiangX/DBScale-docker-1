@@ -1,0 +1,11 @@
+[template]
+src = "consul_template.sh.tmpl"
+dest = "/scripts/consul_template/consul_template.sh"
+keys = [
+         "/ip/addr",
+         "/consul/port",
+         "/cb1",
+         "/cb2",
+         "/cb3",
+]
+

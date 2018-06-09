@@ -1,0 +1,180 @@
+{
+  "metric_class": "unit_upsql_connection",
+  "interval_time": 60,
+  "exec_file": "unit_upsql_connection.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upsql",
+  "metrics": [
+    {
+      "metric": "unit_upsql.connection_max",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "70-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upsql.connection_attempts",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "70-89",
+          "event_level_enable": false,
+          "alarm_enable": true
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upsql.connection_usage",
+      "event_levels":[
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "70-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upsql.exec_thread",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "70-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upsql.thread_cache_usage",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false 
+        },
+        {
+          "level": "warning",
+          "value": "70-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    }
+  ]
+}

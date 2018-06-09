@@ -1,0 +1,44 @@
+{
+  "metric_class": "unit_upproxy_connection",
+  "interval_time": 60,
+  "exec_file": "unit_upproxy_connection.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upproxy",
+  "metrics": [
+    {
+      "metric": "unit_upproxy.connection",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "501-9999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "101-500",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "51-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-50",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    }
+  ]
+}

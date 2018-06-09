@@ -1,0 +1,33 @@
+#!/bin/bash
+set -o nounset
+LANG=POSXIA
+
+if [ $# -lt 1 ];then
+	echo "must bigger than 1"
+  	exit 2
+fi
+
+TEMFILE=`mktemp -u /tmp/host_fs-XXXXX`
+
+function get_data()
+{
+	# unit K
+	local d=`df -k $1 2>/dev/null | tail -n 1 | awk '{print $2":"$5}' | sed 's/%//g'`
+	# $2:total  $5:Use%
+	if [ "$d" = "" ];then
+		d="err:err"
+	fi
+	echo $d
+}
+
+data=""
+for dev in $@
+do
+  dev_data=`get_data $dev`
+  data=$data:$dev_data
+done
+
+data=${data:1}
+echo $data
+
+rm -f $TEMFILE

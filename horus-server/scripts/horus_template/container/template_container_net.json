@@ -1,0 +1,78 @@
+{
+  "metric_class": "container_net",
+  "interval_time": 60,
+  "exec_file": "container_net.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "container",
+  "metrics": [
+    {
+      "metric": "container.net_input",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "104857601-1048576000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "10485761-104857600",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "1048577-10485760",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-1048576",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+   },
+   {
+      "metric": "container.net_output",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "104857601-1048576000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "10485761-104857600",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "1048577-10485760",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-1048576",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+   }
+  ]
+}

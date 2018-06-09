@@ -1,0 +1,9 @@
+[template]
+src = "HS-reg.sh.tmpl"
+dest = "/scripts/HS-reg.sh"
+keys = [
+         "/ip/addr",
+         "/horus/server/port",
+         "/consul/port",
+]
+

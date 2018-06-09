@@ -1,0 +1,95 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+outprint() {
+        # upredis.replication.status
+        if [ "${role}" != "master" ]; then
+                if [ "${master_link_status}" == "up" ]; then
+                        slaveRunning="YES"
+                else
+                        slaveRunning="NO"
+                fi
+        else
+                slaveRunning="YES"
+        fi
+
+	replication="${connected_slaves}#${master_host}#${master_last_io_seconds_ago}#${master_link_down_since_seconds}#${master_link_status}#${slaveRunning}#${master_port}#${master_repl_offset}#${role}"
+        echo "${replication}:${slaveRunning}"
+}
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER=$1
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+running_status=$(docker inspect -f "{{.State.Running}}" ${CONTAINER})
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER} is not runing !"
+	exit 4
+fi
+
+#
+TEMPFILE=$(mktemp -u /tmp/upredis_replaction-XXXXX)
+#
+docker exec ${CONTAINER} /root/get_info.sh > ${TEMPFILE}
+
+role=$(cat ${TEMPFILE} | awk -F: '/role:/{print $2}' | sed 's/\r//g')
+if [ "${role}" == "" ]; then
+	echo "role not found"
+	rm -rf ${TEMPFILE}
+	exit 7
+fi
+
+connected_slaves=$(cat ${TEMPFILE} | awk -F: '/connected_slaves:/{print $2}' | sed 's/\r//g')
+if [ "${connected_slaves}" == "" ]; then
+     	echo "connected_slaves not found"
+	rm -rf ${TEMPFILE}
+	exit 7
+fi
+
+master_repl_offset=$(cat ${TEMPFILE} | awk -F: '/master_repl_offset:/{print $2}' | sed 's/\r//g')
+if [ "${master_repl_offset}" == "" ]; then
+	echo "master_repl_offset not found"
+	rm -rf ${TEMPFILE}
+	exit 7
+fi
+
+master_host=$(cat ${TEMPFILE} | awk -F: '/master_host:/{print $2}' | sed 's/\r//g')
+if [ "${master_host}" == "" ]; then
+	master_host="null"
+fi
+
+master_port=$(cat ${TEMPFILE} | awk -F: '/master_port:/{print $2}' | sed 's/\r//g')
+if [ "${master_port}" == "" ]; then
+	master_port="null"
+fi
+
+master_link_status=$(cat ${TEMPFILE} | awk -F: '/master_link_status:/{print $2}' | sed 's/\r//g')
+if [ "${master_link_status}" == "" ]; then
+	master_link_status="null"
+fi
+
+master_last_io_seconds_ago=$(cat ${TEMPFILE} | awk -F: '/master_last_io_seconds_ago:/{print $2}' | sed 's/\r//g')
+if [ "${master_last_io_seconds_ago}" == "" ]; then
+	master_last_io_seconds_ago="null"
+fi
+
+master_link_down_since_seconds=$(cat ${TEMPFILE} | awk -F: '/master_link_down_since_seconds:/{print $2}' | sed 's/\r//g')
+if [ "${master_link_down_since_seconds}" == "" ]; then
+	master_link_down_since_seconds="null"
+fi
+
+outprint
+
+rm -rf ${TEMPFILE}

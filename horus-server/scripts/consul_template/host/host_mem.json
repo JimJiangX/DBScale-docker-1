@@ -1,0 +1,11 @@
+#!/bin/bash
+set -o nounset
+
+data=`free -m | grep '^Mem:' | awk '{print $3/$2*100}'`
+
+if [ "$data" = "" ];then
+	echo "get data fail"
+	exit 2
+fi
+
+echo "${data}"

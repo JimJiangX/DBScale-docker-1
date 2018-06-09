@@ -1,0 +1,316 @@
+{
+  "metric_class": "unit_upredis_stat",
+  "interval_time": 60,
+  "exec_file": "unit_upredis_stat.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upredis",
+  "metrics": [
+    {
+      "metric": "unit_upredis.evicted_keys",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "10001-50000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "5001-10000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "1001-5000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-1000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.expired_keys",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "100000-100000000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "10000-99999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "1000-9999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.instantaneous_input_kbps",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "4001-50000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "2001-4000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "1001-2000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-1000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.instantaneous_ops_per_sec",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "10000000-100000000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "1000000-9999999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "100000-999999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-99999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.instantaneous_output_kbps",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "10000000-100000000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "1000000-9999999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "100000-999999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-99999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.keyspace_hits",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "10000-100000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "1000-9999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "100-999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-99",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.keyspace_misses",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "10000-100000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "1000-9999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "100-999",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-99",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.latest_fork_usec",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "80-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "60-79",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.rejected_connections",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "80-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "60-79",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+#!/bin/bash
+set -o nounset
+
+now_time=$(date +"%Y-%m-%dT%H:%M:")
+b1_time=$(date -d -1min +"%Y-%m-%dT%H:%M:")
+b2_time=$(date -d -2min +"%Y-%m-%dT%H:%M:")
+b3_time=$(date -d -3min +"%Y-%m-%dT%H:%M:")
+log_file="sm.log"
+key_word="Starting isolate"
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+        echo "must eqaul to 1"
+        exit 2
+fi
+
+CONTAINER=$1
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+		echo "Container $CONTAINER not running"
+		exit 3
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+        exit 4
+fi
+
+logs_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASLOG"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+
+ret=$(grep -E "${now_time}|${b1_time}|${b2_time}|${b3_time}" ${logs_dir}/${log_file} | grep "${key_word}" |wc -l)
+if [  ${ret} -eq 0 ];then
+	output="normal"
+else
+	output="abnormal"
+fi 
+
+echo $output

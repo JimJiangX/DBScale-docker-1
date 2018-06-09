@@ -1,0 +1,41 @@
+# 程序名称
+appname = horus-server
+# 运行模式
+runmode = dev
+#
+httpip = {{getv "/ip/addr"}}
+# 端口号
+httpport = {{getv "/horus/server/port"}}
+# 日志文件
+logfile= {{getv "/base/dir"}}/logs/horus-server.log
+# horus agent 端口号
+agentport = {{getv "/horus/agent/port"}}
+
+[mysql]
+dbDriver = mysql
+dbName = {{getv "/horus/db/name"}}
+dbHost = {{getv "/horus/db/host"}}
+dbPort = {{getv "/horus/db/port"}}
+dbUser = {{getv "/horus/db/user"}}
+dbPassword = {{getv "/horus/db/pwd"}}
+dbMaxOpen=8
+
+[discovery]
+replication = true
+uri = consul://{{getv "/ip/addr"}}:{{getv "/consul/port"}}/Horus
+ttl = 20s
+heartbeat = 60s
+options =
+
+[cluster]
+# 本地consul agent 地址
+ip = {{getv "/ip/addr"}}
+# 本地consul agent 端口
+port = {{getv "/consul/port"}}
+# consul 数据中心名称
+datacenter = {{getv "/consul/datacenter"}}
+# consul 令牌 
+token =
+
+[horusagent]
+destination = /tmp

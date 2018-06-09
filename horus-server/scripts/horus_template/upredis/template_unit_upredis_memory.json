@@ -1,0 +1,113 @@
+{
+  "metric_class": "unit_upredis_memory",
+  "interval_time": 60,
+  "exec_file": "unit_upredis_mem.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upredis",
+  "metrics": [
+    {
+      "metric": "unit_upredis.used_memory",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "80-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "60-79",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.used_memory_pct",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "80-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "60-79",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upredis.mem_fragmentation_ratio",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "80-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "60-79",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    }
+  ]
+}
+

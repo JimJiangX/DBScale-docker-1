@@ -1,0 +1,110 @@
+#!/bin/bash
+
+set -e
+set -o nounset
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+	command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 3 ];then
+	echo "must eqaul to 3"
+  	exit 2
+fi
+
+CONTAINER=$1
+#USER=$2
+#PASSWD=$3
+interval=20
+STATSFILE=`mktemp -u /tmp/mysql_pressure-XXXXX`
+
+if installed docker
+then
+	running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+	if [ "${running_status}" != "true" ]; then
+		exit 4
+	fi
+else
+	echo "Container $CONTAINER not found, and Docker not installed."
+	exit 1
+fi
+
+get_mysql_stats1(){
+docker exec ${CONTAINER} mysql -e "show global status where Variable_name in ('Com_insert','Com_update','Com_delete','Com_select');" > $STATSFILE  2>/dev/null
+if [ $? -ne 0 ];then
+	echo "get data err"
+	exit 2
+fi
+while read LINE 
+do 
+ 	key=`echo $LINE| awk '{print $1}'`
+ 	value=`echo $LINE| awk '{print $2}'`
+ 	case $key in
+ 	Com_delete)
+	# mysql.com_delete
+	delete=$value
+	;;
+	Com_insert)
+	# mysql.com_insert
+	insert=$value
+	;;
+	Com_select)
+	# mysql.com_select
+	select=$value
+	;;
+	Com_update)
+	# mysql.com_update
+	update=$value
+	esac
+done <$STATSFILE
+}
+
+get_mysql_stats2(){
+docker exec ${CONTAINER} mysql -e "show global status where Variable_name in ('Com_insert','Com_update','Com_delete','Com_select','open_tables');" >$STATSFILE  2>/dev/null
+if [ $? -ne 0 ];then
+        echo "get data err"
+        exit 2
+fi
+while read LINE 
+do
+        key=`echo $LINE| awk '{print $1}'`
+        value=`echo $LINE| awk '{print $2}'`
+        case $key in
+        Com_delete)
+	# mysql.com_delete
+	delete2=$value
+	;;
+	Com_insert)
+	# mysql.com_insert
+	insert2=$value
+	;;
+	Com_select)
+	# mysql.com_select
+	select2=$value
+	;;
+	Com_update)
+	# mysql.com_update
+	update2=$value
+	;;
+	Open_tables)
+	# mysql.innodb_open_table
+	open_tables=$value
+	esac
+done <$STATSFILE
+}
+
+get_mysql_stats1
+sleep $interval
+get_mysql_stats2
+del_tps=$(awk 'BEGIN{printf "%.0f",('${delete2}'-'${delete}')/'${interval}'}')
+ins_tps=$(awk 'BEGIN{printf "%.0f",('${insert2}'-'${insert}')/'${interval}'}')
+sel_tps=$(awk 'BEGIN{printf "%.0f",('${select2}'-'${select}')/'${interval}'}')
+upd_tps=$(awk 'BEGIN{printf "%.0f",('${update2}'-'${update}')/'${interval}'}')
+sum_qps=$(awk 'BEGIN{printf "%.0f",('${del_tps}'+'${ins_tps}'+'${sel_tps}'+'${upd_tps}')}')
+echo $del_tps:$ins_tps:$sel_tps:$upd_tps:$open_tables:$sum_qps
+
+rm -f $STATSFILE

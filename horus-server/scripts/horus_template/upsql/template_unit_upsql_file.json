@@ -1,0 +1,78 @@
+{
+  "metric_class": "unit_upsql_file",
+  "interval_time": 60,
+  "exec_file": "unit_upsql_file.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_upsql",
+  "metrics": [
+    {
+      "metric": "unit_upsql.error_file_size",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "5368709120-53687091200",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "2684354560-5368709119",
+          "event_level_enable": false,
+          "alarm_enable": false 
+        },
+        {
+          "level": "normal",
+          "value": "1342177280-2684354559",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-1342177280",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_upsql.table_size",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "104857600001-10485760000000000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "1048576001-104857600000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "104857601-1048576000",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-104857600",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 1440
+    }
+  ]
+}

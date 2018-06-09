@@ -1,0 +1,11 @@
+#!/bin/bash
+set -o nounset
+
+LANG=POSXIA
+
+data=`mpstat 1 10 2>/dev/null | grep "Average" | awk '{print 100 -$NF}'`
+if [ "${data}" == "" ];then
+	echo "get data fail"
+	exit 2
+fi
+echo "${data}"

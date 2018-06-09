@@ -1,0 +1,146 @@
+{
+  "metric_class": "unit_mysql_fs",
+  "interval_time": 60,
+  "exec_file": "unit_mysql_fs.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_mysql",
+  "metrics": [
+    {
+      "metric": "unit_mysql.datadir_total",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "70-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_mysql.datadir_usage",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "80-100",
+          "event_level_enable": true,
+          "alarm_enable": true
+        },
+        {
+          "level": "warning",
+          "value": "60-79",
+          "event_level_enable": true,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_mysql.logdir_total",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "60-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "30-59",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-29",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": false,
+      "event": false,
+      "event_type": "data_type",
+      "value_type": "int64",
+      "counter": 1440
+    },
+    {
+      "metric": "unit_mysql.logdir_usage",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "80-100",
+          "event_level_enable": true,
+          "alarm_enable": true
+        },
+        {
+          "level": "warning",
+          "value": "60-79",
+          "event_level_enable": true,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-69",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    }
+  ]
+}

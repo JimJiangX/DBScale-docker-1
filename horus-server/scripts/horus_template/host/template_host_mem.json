@@ -1,0 +1,44 @@
+{
+  "metric_class": "host_mem",
+  "interval_time": 60,
+  "exec_file": "host_mem.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "host",
+  "metrics": [
+    {
+      "metric": "host.mem_usage",
+      "event_levels": [
+         {
+          "level": "critical",
+          "value": "90-100",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "warning",
+          "value": "50-89",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "40-49",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "0-39",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+        ],
+       "history": true,
+      "event": true,
+      "event_type": "data_type",
+      "value_type": "float64",
+      "counter": 1440
+    }
+  ]
+}

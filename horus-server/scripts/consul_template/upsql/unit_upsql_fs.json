@@ -1,0 +1,37 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+function getfsdata()
+{	
+	# unit K
+	subdata=`df -k $1 2>/dev/null | tail -n 1 | awk '{print $2":"$5}' | sed 's/%//g'`
+	if [ "$subdata" = "" ];then
+		subdata="err:err"
+	fi
+	# $2:total  $5:Use% 
+	echo $subdata
+}
+
+if [ $# -lt 1 ];then
+	echo "must bigger than 1"
+  	exit 2
+fi
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+CONTAINER=$1
+
+data_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASDAT"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+logs_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASLOG"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+
+data=$(getfsdata ${data_dir})
+log=$(getfsdata ${logs_dir})
+
+echo $data:$log

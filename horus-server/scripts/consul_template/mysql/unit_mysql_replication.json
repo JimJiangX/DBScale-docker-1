@@ -1,0 +1,126 @@
+#!/bin/bash
+set -o nounset
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -lt 1 ];then
+        echo "must eqaul to 1"
+        exit 2
+fi
+
+CONTAINER=$1
+#USER=$2
+#PASSWD=$3
+SLAVEFILE=$(mktemp -u /tmp/mysql_replaction-XXXXX)
+
+# init output args
+mhost=''
+mport=''
+mID=''
+slaveIO=''
+slaveSQL=''
+seconds_behind_master=''
+relay_Log_File=''
+relay_Log_Pos=''
+master_Log_File=''
+read_Master_Log_Pos=''
+data_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASDAT"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+host=$(awk -F= '/^bind_address=/{print $2}' ${data_dir}/my.cnf 2>/dev/null)
+port=$(awk -F= '/^port=/{print $2}' ${data_dir}/my.cnf 2>/dev/null)
+rwmode=$(docker exec ${CONTAINER} mysql  -e"show variables like 'read_only';" 2>/dev/null |tail -n 1 | awk '{print $2}')
+
+
+outprint() {
+	set +o nounset
+	# mysql.replication.status
+	if [ "${mhost}" != '' ]; then
+		if [ "${slaveIO}" == "YES" ] && [ "${slaveSQL}" == "YES" ]; then
+			slaveRunning="YES"
+		else
+			slaveRunning="NO"
+		fi
+	else
+		slaveRunning="YES"
+	fi
+
+	replication="${mhost}#${mport}#${rwmode}#${mID}#${slaveIO}#${slaveRunning}#${slaveSQL}#${seconds_behind_master}#${relay_Log_File}#${relay_Log_Pos}#${master_Log_File}#${read_Master_Log_Pos}#${host}#${port}"
+	echo "${replication}:${slaveIO}:${slaveRunning}:${slaveSQL}"
+	set -o nounset
+}
+
+rmtempfile() {
+	if [ -e ${SLAVEFILE} ]; then
+		rm -f ${SLAVEFILE}
+	fi
+
+}
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+		echo "container ${CONTAINER} is not running"
+		rmtempfile
+                exit 2
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+	rmtempfile
+        exit 1
+fi
+
+docker exec ${CONTAINER} mysql -e "show slave status \G;" >${SLAVEFILE}  2>/dev/null
+#${EXEC_BIN} -S /${CONTAINER}_DAT_LV/mysql.sock -u${USER} -p${PASSWD}  -e"show slave status \G;" >${SLAVEFILE}  2>/dev/null
+if [ $? -ne 0 ]; then
+	echo "get slave status failed"
+	rmtempfile
+	exit 3
+fi
+
+while read LINE 
+do  
+	#去掉开头空格 awk -F : {print $1}
+ 	key=`echo $LINE| awk '{print $1}'`
+ 	value=`echo $LINE| awk '{print $2}'`
+	case $key in
+	Master_Host:)
+		mhost=$value
+	;;
+	Master_Port:)
+		mport=$value
+	;;
+	Master_Server_Id:)
+		mID=$value
+	;;
+	Slave_IO_Running:)
+		slaveIO=$value
+	;;
+	Slave_SQL_Running:)
+		slaveSQL=$value
+	;;
+	Seconds_Behind_Master:)
+		seconds_behind_master=$value
+	;;
+	Relay_Log_File:)
+		relay_Log_File=$value
+	;;
+	Relay_Log_Pos:)
+		relay_Log_Pos=$value
+	;;
+	Master_Log_File:)
+		master_Log_File=$value
+	;;
+	Read_Master_Log_Pos:)
+		read_Master_Log_Pos=$value
+	esac
+done <${SLAVEFILE}
+
+outprint
+rmtempfile
+exit

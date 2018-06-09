@@ -1,0 +1,47 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER=$1
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+running_status=$(docker inspect -f "{{.State.Running}}" ${CONTAINER})
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER} is not runing !"
+	exit 4
+fi
+
+#
+TEMPFILE=$(mktemp -u /tmp/upredis_client-XXXXX)
+#
+docker exec ${CONTAINER} /root/get_info.sh > ${TEMPFILE}
+
+connected_clients=$(cat ${TEMPFILE} | awk -F: '/connected_clients:/{print $2}' | sed 's/\r//g')
+if [ "${connected_clients}" == "" ]; then
+	echo "connected_clients not found"
+	rm -rf ${TEMPFILE}
+	exit 8
+fi
+
+blocked_clients=$(cat ${TEMPFILE} | awk -F: '/blocked_clients:/{print $2}' | sed 's/\r//g')
+if [ "${blocked_clients}" == "" ]; then
+	echo "blocked_clients not found"
+	rm -rf ${TEMPFILE}
+	exit 9
+fi
+
+echo "${blocked_clients}:${connected_clients}"
+
+rm -rf ${TEMPFILE}

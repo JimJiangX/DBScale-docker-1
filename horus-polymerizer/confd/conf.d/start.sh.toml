@@ -1,6 +1,6 @@
 [template]
 src = "start.sh.tmpl"
-dest = "start.sh"
+dest = "/usr/bin/start.sh"
 keys = [       
          "/base/dir",
          "/ip/addr",

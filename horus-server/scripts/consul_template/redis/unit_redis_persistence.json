@@ -1,0 +1,68 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER=$1
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+running_status=$(docker inspect -f "{{.State.Running}}" ${CONTAINER})
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER} is not runing !"
+	exit 4
+fi
+
+#
+TEMPFILE=$(mktemp -u /tmp/redis_persistence-XXXXX)
+#
+docker exec ${CONTAINER} /root/get_info.sh > ${TEMPFILE}
+
+rdb_last_bgsave_status=$(cat ${TEMPFILE} | awk -F: '/rdb_last_bgsave_status:/{print $2}' | sed 's/\r//g')
+if [ "${rdb_last_bgsave_status}" == "" ]; then
+	echo "rdb_last_bgsave_status not found"
+	rm -rf ${TEMPFILE}
+	exit 8
+fi
+
+rdb_last_save_time=$(cat ${TEMPFILE} | awk -F: '/rdb_last_save_time:/{print $2}' | sed 's/\r//g')
+if [ "${rdb_last_save_time}" == "" ]; then
+	echo "rdb_last_save_time not found"
+	rm -rf ${TEMPFILE}
+	exit 9
+fi
+
+rdb_last_bgsave_time_sec=$(cat ${TEMPFILE} | awk -F: '/rdb_last_bgsave_time_sec:/{print $2}' | sed 's/\r//g')
+if [ "${rdb_last_bgsave_time_sec}" == "" ]; then
+	echo "rdb_last_bgsave_time_sec not found"
+	rm -rf ${TEMPFILE}
+	exit 10
+fi
+
+rdb_changes_since_last_save=$(cat ${TEMPFILE} | awk -F: '/rdb_changes_since_last_save:/{print $2}' | sed 's/\r//g')
+if [ "${rdb_changes_since_last_save}" == "" ]; then
+	echo "rdb_changes_since_last_save not found"
+	rm -rf ${TEMPFILE}
+	exit 11
+fi
+
+rdb_bgsave_in_progress=$(cat ${TEMPFILE} | awk -F: '/rdb_bgsave_in_progress:/{print $2}' | sed 's/\r//g')
+if [ "${rdb_bgsave_in_progress}" == "" ]; then
+	echo "rdb_bgsave_in_progress not found"
+	rm -rf ${TEMPFILE}
+	exit 12
+fi
+
+echo "${rdb_bgsave_in_progress}:${rdb_changes_since_last_save}:${rdb_last_bgsave_status}:${rdb_last_bgsave_time_sec}:${rdb_last_save_time}"
+
+rm -rf ${TEMPFILE}

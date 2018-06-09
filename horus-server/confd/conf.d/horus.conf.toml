@@ -1,0 +1,20 @@
+[template]
+src = "horus.conf.tmpl"
+dest = "horus.conf"
+keys = [       
+         "/ip/addr",
+         "/horus/server/port",
+         "/base/dir",
+         "/horus/agent/port",
+         "/horus/db/name",
+         "/horus/db/host",
+         "/horus/db/port",
+         "/horus/db/user",
+         "/horus/db/pwd",
+         "/consul/port",
+         "/consul/datacenter",
+         "/cb1",
+         "/cb2",
+         "/cb3",
+]
+

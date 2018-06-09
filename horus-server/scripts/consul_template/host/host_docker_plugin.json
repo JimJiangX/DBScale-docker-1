@@ -1,0 +1,11 @@
+#!/bin/bash
+set -o nounset
+
+systemctl status swarm-agent.service  >/dev/null 2>&1
+if [  $? -eq 0 ];then
+	status=passing
+else
+	status=critical
+fi 
+
+echo $status

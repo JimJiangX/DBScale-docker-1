@@ -1,0 +1,27 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER=$1
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+docker exec ${CONTAINER} /root/get_info.sh >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	service_status="critical"
+else
+	service_status="passing"
+fi
+
+echo "${service_status}"

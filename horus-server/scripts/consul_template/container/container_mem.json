@@ -1,0 +1,65 @@
+#!/bin/bash
+set -o nounset
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER_NAME=$1
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if ! installed docker; then
+	echo "not find docker"
+	exit 3
+fi
+
+if ! installed jq; then
+	echo "not find jq"
+	exit 3
+fi
+
+running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER_NAME} 2>/dev/null`
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER_NAME} is not runing !"
+	exit 4
+fi
+
+temp_file=$(mktemp -u /tmp/docker-stats-XXXXX)
+
+curl -sb -H "Accept: application/json" -X GET --url 'http://localhost:2375/containers/'${CONTAINER_NAME}'/stats?stream=false' > ${temp_file}
+if [ $? -ne 0 ]; then
+	rm -rf ${temp_file}
+	echo "get container stats api failed"
+	exit 5
+fi
+
+getValue() {
+	local key=$1
+	ret=$(jq ${key} < ${temp_file})
+	if [ "${ret}" == "" ]; then
+		rm -rf ${temp_file}
+		echo "${key} not found"
+		exit 6
+	fi
+	echo ${ret}
+}
+
+mem_usage=$(getValue .memory_stats.usage)
+mem_cache=$(getValue .memory_stats.stats.cache)
+mem_used_no_cache=$(awk 'BEGIN{printf '${mem_usage}'-'${mem_cache}'}' 2>/dev/null)
+if [ ${mem_used_no_cache} -lt 0 ]; then
+	rm -rf ${temp_file}
+	echo "get mem used no cache failed"
+	exit 7
+fi
+
+mem_limit=$(getValue .memory_stats.limit)
+mem_usage=$(awk 'BEGIN{printf "%.2f",'${mem_used_no_cache}'/'${mem_limit}'*100}' 2>/dev/null)
+
+#echo ${mem_used_no_cache}
+echo ${mem_usage}
+rm -rf ${temp_file}

@@ -1,0 +1,44 @@
+{
+  "metric_class": "unit_switch_manager_failover",
+  "interval_time": 60,
+  "exec_file": "unit_switch_manager_failover.sh",
+  "params": "",
+  "enable": true,
+  "metric_type": "unit_switch_manager",
+  "metrics": [
+    {
+      "metric": "unit_switch_manager.failover",
+      "event_levels": [
+        {
+          "level": "critical",
+          "value": "abnormal",
+          "event_level_enable": true,
+          "alarm_enable": true
+        },
+        {
+          "level": "warning",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "normal",
+          "value": "",
+          "event_level_enable": false,
+          "alarm_enable": false
+        },
+        {
+          "level": "info",
+          "value": "normal",
+          "event_level_enable": false,
+          "alarm_enable": false
+        }
+      ],
+      "history": true,
+      "event": true,
+      "event_type": "string_type",
+      "value_type": "string",
+      "counter": 1440
+    }
+  ]
+}

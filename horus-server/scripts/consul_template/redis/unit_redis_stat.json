@@ -1,0 +1,96 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER=$1
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+running_status=$(docker inspect -f "{{.State.Running}}" ${CONTAINER})
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER} is not runing !"
+	exit 4
+fi
+
+#
+TEMPFILE=$(mktemp -u /tmp/redis_stat-XXXXX)
+#
+docker exec ${CONTAINER} /root/get_info.sh > ${TEMPFILE}
+
+evicted_keys=$(cat ${TEMPFILE} | awk -F: '/evicted_keys:/{print $2}' | sed 's/\r//g')
+if [ "${evicted_keys}" == "" ]; then
+	echo "evicted_keys not found"
+	rm -rf ${TEMPFILE}
+	exit 8
+fi
+
+expired_keys=$(cat ${TEMPFILE} | awk -F: '/expired_keys:/{print $2}' | sed 's/\r//g')
+if [ "${expired_keys}" == "" ]; then
+	echo "expired_keys not found"
+	rm -rf ${TEMPFILE}
+	exit 9
+fi
+
+instantaneous_input_kbps=$(cat ${TEMPFILE} | awk -F: '/instantaneous_input_kbps:/{print $2}' | sed 's/\r//g')
+if [ "${instantaneous_input_kbps}" == "" ]; then
+	echo "instantaneous_input_kbps not found"
+	rm -rf ${TEMPFILE}
+	exit 10
+fi
+
+instantaneous_ops_per_sec=$(cat ${TEMPFILE} | awk -F: '/instantaneous_ops_per_sec:/{print $2}' | sed 's/\r//g')
+if [ "${instantaneous_ops_per_sec}" == "" ]; then
+	echo "instantaneous_ops_per_sec not found"
+	rm -rf ${TEMPFILE}
+	exit 11
+fi
+
+instantaneous_output_kbps=$(cat ${TEMPFILE} | awk -F: '/instantaneous_output_kbps:/{print $2}' | sed 's/\r//g')
+if [ "${instantaneous_output_kbps}" == "" ]; then
+	echo "instantaneous_output_kbps not found"
+	rm -rf ${TEMPFILE}
+	exit 12
+fi
+
+keyspace_hits=$(cat ${TEMPFILE} | awk -F: '/keyspace_hits:/{print $2}' | sed 's/\r//g')
+if [ "${keyspace_hits}" == "" ]; then
+	echo "keyspace_hits not found"
+	rm -rf ${TEMPFILE}
+	exit 13
+fi
+
+keyspace_misses=$(cat ${TEMPFILE} | awk -F: '/keyspace_misses:/{print $2}' | sed 's/\r//g')
+if [ "${keyspace_misses}" == "" ]; then
+	echo "keyspace_misses not found"
+	rm -rf ${TEMPFILE}
+	exit 14
+fi
+
+latest_fork_usec=$(cat ${TEMPFILE} | awk -F: '/latest_fork_usec:/{print $2}' | sed 's/\r//g')
+if [ "${latest_fork_usec}" == "" ]; then
+	echo "latest_fork_usec not found"
+	rm -rf ${TEMPFILE}
+	exit 15
+fi
+
+rejected_connections=$(cat ${TEMPFILE} | awk -F: '/rejected_connections:/{print $2}' | sed 's/\r//g')
+if [ "${rejected_connections}" == "" ]; then
+	echo "rejected_connections not found"
+	rm -rf ${TEMPFILE}
+	exit 16
+fi
+
+echo "${evicted_keys}:${expired_keys}:${instantaneous_input_kbps}:${instantaneous_ops_per_sec}:${instantaneous_output_kbps}:${keyspace_hits}:${keyspace_misses}:${latest_fork_usec}:${rejected_connections}"
+
+rm -rf ${TEMPFILE}

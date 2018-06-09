@@ -1,0 +1,45 @@
+#!/bin/bash
+set -o nounset
+
+now_time=$(date +"%d %b %H:%M:")
+log_file="sentinel.log"
+key_word="switch-master"
+
+# Succeed if the given utility is installed. Fail otherwise.
+# For explanations about `which` vs `type` vs `command`, see:
+# http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script/677212#677212
+# (Thanks to @chenhanxiao for pointing this out!)
+installed () {
+        command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+        echo "must eqaul to 1"
+        exit 2
+fi
+
+CONTAINER=$1
+
+if installed docker
+then
+        running_status=`docker inspect -f "{{.State.Running}}" ${CONTAINER}`
+        if [ "${running_status}" != "true" ]; then
+		status=critical
+		echo $status
+                exit 
+        fi
+else
+        echo "Container $CONTAINER not found, and Docker not installed."
+        exit 1
+fi
+
+logs_dir=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/DBAASLOG"}}{{.Source}}{{end}}{{end}}' ${CONTAINER})
+
+ret=$(grep "${now_time}" ${logs_dir}/${log_file} | grep "${key_word}" |wc -l)
+if [  ${ret} -eq 0 ];then
+	output="normal"
+else
+	output="abnormal"
+fi 
+
+echo $output

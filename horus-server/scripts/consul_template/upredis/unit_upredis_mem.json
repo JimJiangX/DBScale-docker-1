@@ -1,0 +1,64 @@
+#!/bin/bash
+set -o nounset
+
+installed () {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if [ $# -ne 1 ];then
+	echo "args must eqaul to 1"
+  	exit 2
+fi
+
+CONTAINER=$1
+
+if ! installed docker; then
+        echo "not find docker"
+        exit 3
+fi
+
+running_status=$(docker inspect -f "{{.State.Running}}" ${CONTAINER})
+if [ "${running_status}" != "true" ]; then
+	echo "container ${CONTAINER} is not runing !"
+	exit 4
+fi
+
+#
+TEMPFILE=$(mktemp -u /tmp/upredis_mem-XXXXX)
+#
+docker exec ${CONTAINER} /root/get_info.sh > ${TEMPFILE}
+
+used_memory=$(cat ${TEMPFILE} | awk -F: '/used_memory:/{print $2}' | sed 's/\r//g')
+if [ "${used_memory}" == "" ]; then
+	echo "used_memory not found"
+	rm -rf ${TEMPFILE}
+	exit 8
+fi
+
+maxmemory=$(docker inspect -f {{.HostConfig.Memory}} ${CONTAINER})
+if [ "${maxmemory}" == "" ]; then
+	echo "maxmemory not found"
+	rm -rf ${TEMPFILE}
+	exit 9
+fi
+
+used_memory_pct=$(awk 'BEGIN{printf "%.2f",'${used_memory}'/'${maxmemory}'}')
+
+#used_memory_rss=$(cat ${TEMPFILE} | awk -F: '/used_memory_rss:/{print $2}' | sed 's/\r//g')
+#if [ "${used_memory_rss}" == "" ]; then
+#	echo "used_memory_rss not found"
+#	rm -rf ${TEMPFILE}
+#	exit 10
+#fi
+
+mem_fragmentation_ratio=$(cat ${TEMPFILE} | awk -F: '/mem_fragmentation_ratio:/{print $2}' | sed 's/\r//g')
+if [ "${mem_fragmentation_ratio}" == "" ]; then
+	echo "mem_fragmentation_ratio not found"
+	rm -rf ${TEMPFILE}
+	exit 11
+fi
+
+#echo "${mem_fragmentation_ratio}:${used_memory}:${used_memory_pct}:${used_memory_rss}"
+echo "${mem_fragmentation_ratio}:${used_memory}:${used_memory_pct}"
+
+rm -rf ${TEMPFILE}
