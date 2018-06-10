@@ -1,6 +1,7 @@
 [template]
 src = "start.sh.tmpl"
-dest = "/usr/bin/start.sh"
+dest = "/horus-polymerizer/bin/start.sh"
+owner = "root"
 mode = "0755"
 keys = [       
          "/base/dir",

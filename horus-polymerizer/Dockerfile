@@ -20,13 +20,15 @@ ENV   HORUS_POLYMERIZER_DB_PORT=3306
 ENV   HORUS_POLYMERIZER_DB_NAME=hopas
 ENV   HORUS_POLYMERIZER_DB_USER=root
 
+WORKDIR /horus-polymerizer
 COPY    rhel7-211.repo /etc/yum.repos.d/
 RUN     yum clean all && yum repolist
 
-EXPOSE  20154 20155 8123  3306 8500 8300
+EXPOSE  20155
 
-ADD    confd-0.16.0-linux-amd64 /
+ADD    confd-0.16.0-linux-amd64 /horus-polymerizer
+RUN    mv confd-0.16.0-linux-amd64 /usr/bin/confd
 ADD    confd /etc/confd 
-ADD    horus-polymerizer  /usr/bin
-RUN    mv  confd-0.16.0-linux-amd64 confd && chmod +x confd && ./confd -version &&  ./confd -onetime -backend env   
-CMD    start.sh
+ADD    horus-polymerizer  /horus-polymerizer/bin/
+ADD    horus-poly-confd.sh /horus-polymerizer/bin/
+CMD    sh bin/horus-poly-confd.sh
