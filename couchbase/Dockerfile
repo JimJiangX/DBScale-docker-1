@@ -18,10 +18,8 @@ ENV CB_USER=couchbase
 ENV CB_ADMIN_PASS=222222
  
 COPY rhel7-211.repo /etc/yum.repos.d/
-ADD  couchbase-server-enterprise-5.1.0-centos7.x86_64.rpm  /
 CMD  /usr/sbin/init
-RUN  yum clean all && yum repolist &&  \
-     yum -y install openssl hostname initscripts pkgconfig tar wget couchbase-server 
+RUN  yum -y --skip-broken install openssl hostname initscripts pkgconfig tar wget couchbase-server
 WORKDIR /
 COPY confd-0.16.0-linux-amd64 /
 RUN mv confd-0.16.0-linux-amd64 confd && chmod +x confd && ./confd -version
