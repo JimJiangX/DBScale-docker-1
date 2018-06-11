@@ -1,5 +1,0 @@
-[centos-7.4x64]
-name=centos 7.4 x64
-baseurl=http://10.0.11.80/dbscale
-enabled=1
-gpgcheck=0

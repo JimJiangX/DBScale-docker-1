@@ -2,4 +2,4 @@
 
 confd -version 
 confd -onetime -backend env
-/bin/sh /horus-polymerizer/bin/start.sh
+/HORUS-POLYMERIZER/bin/start.sh

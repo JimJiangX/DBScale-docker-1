@@ -1,0 +1,7 @@
+#! /bin/bash
+/usr/bin/docker-entrypoint.sh
+
+/usr/bin/confd -onetime -backend env
+/MGM/bin/start.sh
+/MGM/script/MG-reg.sh
+ps  -ef | grep '$USER' |grep -i 'mgm' 

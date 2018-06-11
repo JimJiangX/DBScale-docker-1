@@ -5,6 +5,8 @@ HORUS_IP={{getv "/ip/addr"}}
 HORUS_PORT={{getv "/horus/server/port"}}
 
 add_template(){
+        local obj=$1
+	cd ${obj}
 	for file in `ls`
 	do
 		stat_code=`curl -o /dev/null -s -w %{http_code} -X POST -H "Content-Type: application/json" -d @${file} http://${HORUS_IP}:${HORUS_PORT}/v1/template/add`

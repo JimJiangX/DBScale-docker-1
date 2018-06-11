@@ -1,4 +1,0 @@
-#! /bin/bash
-/usr/bin/confd -onetime -backend env
-/bin/sh  /MGM/start.sh
-

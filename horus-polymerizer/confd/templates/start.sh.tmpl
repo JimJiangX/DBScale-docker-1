@@ -10,7 +10,7 @@ log_file={{getv "/base/dir"}}/polymerizer.log
 couchbase_list=$cb1,$cb2,$cb3
 mysql_connection="{{getv "/horus/polymerizer/db/user"}}:{{getv "/horus/polymerizer/db/pwd"}}@tcp({{getv "/horus/polymerizer/db/host"}}:{{getv "/horus/polymerizer/db/port"}})/{{getv "/horus/polymerizer/db/name"}}?charset=utf8"
 
-/horus-polymerizer/bin/horus-polymerizer  -logfile ${log_file} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -cb ${couchbase_list} -mysql ${mysql_connection} 
+/HORUS-POLYMERIZER/bin/horus-polymerizer  -logfile ${log_file} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -cb ${couchbase_list} -mysql ${mysql_connection} 
 #$base_dir/bin/horus-polymerizer -logfile ${log_file} -enable-kafka -kafka-addr ${kafka_addr} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -cb ${couchbase_list} -mysql ${mysql_connection} 
 #$base_dir/bin/horus-polymerizer -logfile ${log_file} -consulIP ${ip}:${consul_port} -datacenter ${consul_dc} -hsrv ${ip}:${horus_server_port} -ip ${ip} -port ${horus_polymerizer_port} -mysql ${mysql_connection} 
 

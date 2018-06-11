@@ -1,0 +1,11 @@
+[template]
+src = "MG-reg-to-hs.sh.tmpl"
+dest = "/MGM/script/MG-reg-to-hs.sh"
+owner = "root"
+mode = "0755"
+keys = [
+   "/horus/server/ip",
+   "/ip/addr",
+   "/horus/server/port",
+   "/mgm/port",
+]

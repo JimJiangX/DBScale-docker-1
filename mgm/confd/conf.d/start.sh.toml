@@ -1,0 +1,28 @@
+[template]
+src = "start.sh.tmpl"
+dest = "/MGM/bin/start.sh"
+owner = "root"
+mode = "0755"
+keys = [
+   "/base/dir",
+   "/ip/addr",
+   "/mgm/port",
+   "/consul/port",
+   "/mgm/db/host",
+   "/mgm/db/port",
+   "/mgm/db/user",
+   "/mgm/db/pwd",
+   "/mgm/db/name",
+   "/consul/key",
+   "/consul/server1",
+   "/consul/server2",
+   "/consul/server3",
+   "/consul/datacenter",
+   "/docker/reg/domain",
+   "/docker/reg/ip",
+   "/reg/port",
+   "/reg/ssh/port",
+   "/docker/reg/user",
+   "/docker/reg/password",
+   "/ca/crt",
+]

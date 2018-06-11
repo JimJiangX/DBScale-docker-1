@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 /opt/couchbase/bin/couchbase-server -- -noinput &
 CB_PID=$!
 sleep 10

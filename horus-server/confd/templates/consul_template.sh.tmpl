@@ -6,6 +6,8 @@ CONSUL_PORT={{getv "/consul/port"}}
 VERSION='1.0.1'
 
 add_scripts() {
+        local obj=$1
+	cd ${obj}
 	for file in `ls`
 	do
 		f=${file%%.*}.sh

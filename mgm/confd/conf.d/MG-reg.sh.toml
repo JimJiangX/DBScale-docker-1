@@ -1,0 +1,10 @@
+[template]
+src = "MG-reg.sh.tmpl"
+dest = "/MGM/script/MG-reg.sh"
+owner = "root"
+mode = "0755"
+keys = [
+   "/ip/addr",
+   "/mgm/port",
+   "/consul/port",
+]

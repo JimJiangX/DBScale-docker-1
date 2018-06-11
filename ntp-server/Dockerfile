@@ -3,6 +3,7 @@ LABEL maintainer="NTP-server Docker Maintainer "dongliheng@bsgchina.com"" \
       name="dbscale_NTP-server" \
       version="4.2.6" \
       summary="NTP-server:4.2.6 image in docker"
+
 ENV DBS_IP=0.0.0.0
 ENV UP_IP=127.0.0.1
 ADD local.repo  /etc/yum.repos.d/local.repo  

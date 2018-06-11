@@ -1,6 +1,8 @@
 [template]
 src = "run.sh.tmpl"
-dest = "run.sh"
+dest = "/COUCHBASE/bin/run.sh"
+owner = "root"
+mode = "0755"
 keys = [
        "/cb/user",
        "/cb/admin/pass",

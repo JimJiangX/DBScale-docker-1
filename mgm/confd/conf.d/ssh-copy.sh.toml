@@ -1,0 +1,8 @@
+[template]
+src = "ssh-copy.sh.tmpl"
+dest = "/MGM/script/ss-copy.sh"
+owner = "root"
+mode = "0755"
+keys = [
+      "/docker/reg/ip",
+]
