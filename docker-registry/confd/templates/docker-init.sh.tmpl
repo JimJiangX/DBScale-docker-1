@@ -1,0 +1,24 @@
+#!/bin/bash
+#set -o nounset
+
+# SET ENV
+. ../SetENV.sh
+
+domain={{getv "/docker/reg/domain"}}
+ip_addr={{getv "/docker/reg/ip"}}
+port={{getv "/reg/port"}}
+
+
+
+cert_file=/etc/pki/registry/${domain}.crt
+cert_dir="/etc/docker/certs.d/${domain}:${port}"
+
+# add DNS 
+echo "${ip_addr}    ${domain}" >> /etc/hosts
+
+# add cert file
+mkdir -p ${cert_dir}
+cp ${cert_file} ${cert_dir}/ca.crt
+
+
+

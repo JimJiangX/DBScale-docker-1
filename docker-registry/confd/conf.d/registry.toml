@@ -4,6 +4,6 @@ dest = "/etc/registry.conf"
 keys = [
     "/ip/addr",
     "/port",
-    "/data/dir"
+    "/data/dir",
 ]
 

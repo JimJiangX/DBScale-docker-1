@@ -1,0 +1,21 @@
+#!/bin/bash
+set -o nounset
+
+#horus_ip=$1
+horus_ip={{getv "/horus/server/ip"}}
+horus_port={{getv "/horus/server/port"}}
+component_ip={{getv "/ip/addr"}}
+component_port={{getv "/reg/port"}}
+
+component_type=registry
+name_prefix=registry
+
+reg_to_horus() {
+        stat_code=`curl -o /dev/null -s -w %{http_code} -X POST -H "Content-Type: application/json" -d '{"name": "'${name_prefix}'-'${component_ip}':'${component_port}'","host_name": "'${name_prefix}'-'${component_ip}':'${component_port}'", "tag": "'${name_prefix}'", "type": "platform", "check_type": "health"}' http://${horus_ip}:${horus_port}/v1/components`
+        if [ ${stat_code} != "201" ]; then
+                echo "${component_type} register to horus server failed"
+                exit 2
+        fi
+}
+
+reg_to_horus

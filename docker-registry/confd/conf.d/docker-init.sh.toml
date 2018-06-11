@@ -1,0 +1,11 @@
+[template]
+src = "docker-init.sh.tmpl"
+dest = "/DOCKER-REGISTRY/scripts/docker-init.sh"
+owner = "root"
+mode = "0755"
+keys = [
+    "/docker/reg/domain",
+    "/docker/reg/ip",
+    "/reg/port",
+]
+
