@@ -1,6 +1,6 @@
 [template]
 src = "consul_template.sh.tmpl"
-dest = "//HORUS-SERVER/scripts/consul_template/consul_template.sh"
+dest = "/HORUS-SERVER/ops/consul_template/consul_template.sh"
 owner = "root"
 mode = "0777"
 keys = [

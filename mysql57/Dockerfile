@@ -29,6 +29,9 @@ RUN groupadd -g ${MY_GID} -r ${MY_GROUP} && \
 	adduser ${MY_USER} -u ${MY_UID} -M -s /sbin/nologin -g ${MY_GROUP}
 
 
+WORKDIR /MYSQL
+EXPOSE 3306
+
 RUN     rm -rf /etc/yum.repos.d/*
 COPY    local.repo /etc/yum.repos.d/
 RUN \
@@ -109,15 +112,12 @@ RUN \
 	echo "!includedir ${MYSQL_CUST_INCL1}/"                >> /etc/my.cnf && \
 	echo "!includedir ${MYSQL_CUST_INCL2}/"                >> /etc/my.cnf && \
 	echo "character_set_server = utf8"                     >> /etc/my.cnf && \
+	echo "explicit_defaults_for_timestamp = true"          >> /etc/my.cnf && \
 	echo "innodb_buffer_pool_size = 1024M"                 >> /etc/my.cnf && \
 	echo "lower_case_table_names = 1"                      >> /etc/my.cnf && \
 	echo "sql_mode = 'ALLOW_INVALID_DATES,NO_AUTO_CREATE_USER'"  >> /etc/my.cnf 
 
-
-
-COPY ./scripts/docker-entrypoint.sh /
-
-EXPOSE 3306
+ADD ./ops/docker-entrypoint.sh /MYSQL/ops/
 
 VOLUME /var/lib/mysql
 VOLUME /var/log/mysql
@@ -125,4 +125,4 @@ VOLUME /var/sock/mysqld
 VOLUME /etc/mysql/conf.d
 VOLUME /etc/mysql/docker-default.d
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/MYSQL/ops/docker-entrypoint.sh"]

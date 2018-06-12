@@ -1,0 +1,14 @@
+[template]
+src = "init_CB.sh.tmpl"
+dest = "/HORUS-SERVER/ops/init_CB.sh"
+owner = "root"
+mode = "0777"
+keys = [
+         "/cb1",
+         "/cb2",
+         "/cb3",
+         "/cb/user",
+         "/cb/password",
+         "/cb/ram/per/node",  
+]
+

@@ -18,8 +18,8 @@ ENV    CONSUL_PORT=8500
 ENV    HORUS_SERVER_PORT=8500
 ENV    HORUS_SERVER_IP=10.0.11.101
 
-ENV    REGISTRY_HTTP_TLS_CERTIFICATE=/etc/pki/registry/<DOCKER_REG_DOMAIN>.crt
-ENV    REGISTRY_HTTP_TLS_KEY=/etc/pki/registry/<DOCKER_REG_DOMAIN>.key
+ENV    REGISTRY_HTTP_TLS_CERTIFICATE=/etc/pki/registry/registry.dbscale.me.crt
+ENV    REGISTRY_HTTP_TLS_KEY=/etc/pki/registry/registry.dbscale.me.key
 ENV    REGISTRY_AUTH=htpasswd
 ENV    REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" 
 ENV    REGISTRY_AUTH_HTPASSWD_PATH=/etc/pki/registry/htpasswd
@@ -31,5 +31,5 @@ RUN    yum clean all && yum repolist
 ADD    confd /etc/confd
 ADD    bin  /DOCKER-REGISTRY/bin      
 ADD    cert /etc/pki/registry
-ADD    scripts/start.sh /DOCKER-REGISTRY/scripts/start.sh
-CMD    /DOCKER-REGISTRY/scripts/start.sh 
+ADD    ops/start.sh /DOCKER-REGISTRY/ops/start.sh
+CMD    /DOCKER-REGISTRY/ops/start.sh 

@@ -1,9 +1,0 @@
-[template]
-src = "registry.tmpl"
-dest = "/etc/registry.conf"
-keys = [
-    "/ip/addr",
-    "/port",
-    "/data/dir",
-]
-

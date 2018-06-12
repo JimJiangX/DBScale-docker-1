@@ -1,6 +1,6 @@
 [template]
 src = "horus.conf.tmpl"
-dest = "/HORUS-SERVER/horus.conf"
+dest = "/HORUS-SERVER/conf/horus.conf"
 keys = [       
          "/ip/addr",
          "/horus/server/port",

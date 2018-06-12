@@ -1,6 +1,6 @@
 [template]
 src = "docker-init.sh.tmpl"
-dest = "/DOCKER-REGISTRY/scripts/docker-init.sh"
+dest = "/DOCKER-REGISTRY/ops/docker-init.sh"
 owner = "root"
 mode = "0755"
 keys = [

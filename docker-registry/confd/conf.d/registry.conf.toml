@@ -1,0 +1,9 @@
+[template]
+src = "registry.conf.tmpl"
+dest = "/DOCKER-REGISTRY/conf/registry.conf"
+keys = [
+    "/ip/addr",
+    "/port",
+    "/data/dir",
+]
+

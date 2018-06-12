@@ -1,6 +1,6 @@
 [template]
 src = "registry-reg.sh.tmpl"
-dest = "/DOCKER-REGISTRY/scripts/registry-reg.sh"
+dest = "/DOCKER-REGISTRY/ops/registry-reg.sh"
 keys = [
         "/ip/addr",
         "/reg/port",

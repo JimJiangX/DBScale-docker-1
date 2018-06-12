@@ -1,10 +1,11 @@
 [template]
-src = "HS-reg.sh.tmpl"
-dest = "/HORUS-SERVER/ops/HS-reg.sh"
+src = "HS-reg-to-hs.sh.tmpl"
+dest = "/HORUS-SERVER/ops/HS-reg-to-hs.sh"
 owner = "root"
 mode = "0777"
 keys = [
          "/ip/addr",
+         "/horus/server/ip",
          "/horus/server/port",
          "/consul/port",
 ]
